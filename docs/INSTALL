@@ -1,0 +1,20 @@
+Aspen's build process is relatively straight forward.
+
+Dependencies:
+All dependencies can be found in the dependencies directory. If you wish to use your own, comment out the relevant line in the makefile under SRC.
+Dependencies will be automatically built by running the makefile in the SRC directory.
+
+Required libs:
+Aspen requires zlib , openssl and liblua5.1 to build. both can be downloaded and compiled either through the web, or through your packaging system.
+lua5.1:
+http://lua.org
+zlib:
+http://zlib.net
+openssl:
+http://www.openssl.org
+
+In order to compile aspen, cd to the src directory and type 'make clean', then 'make'. You will see each file compile, and then you will see a message about linking at the end.
+
+To run, you have two options; you can run the startup script in the aspen root directory, (which cycles out your logs and then runs aspen), or you can run the aspen binary directly from the bin directory. Both the binary and the script take a port to start up on, but will use 6666 or the default port in conf.h, if none was specified.
+
+please e-mail all questions, comments and suggestions to Tyler Littlefield <tyler@tysdomain.com>.

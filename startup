@@ -1,0 +1,35 @@
+#!/bin/bash
+#configuration directives
+PORT=6666
+
+#set -e
+if [[ -e "noreboot" ]];then
+rm -f noreboot
+fi
+if [[ -e "logs/events.log.4" ]];then
+mv -f logs/events.log.4 logs/events.log.5
+fi
+if [[ -e  "logs/events.log.3" ]];then
+mv -f logs/events.log.3 logs/events.log.4
+fi
+if [[ -e  "logs/events.log.2" ]];then
+mv -f logs/events.log.2 logs/events.log.3
+fi
+if [[ -e  "logs/events.log.1" ]];then
+mv -f logs/events.log.1 logs/events.log.2
+fi
+if [[ -e  "logs/events.log" ]];then
+mv -f logs/events.log logs/events.log.1
+fi
+while true;do
+if [[ -e "noreboot" ]];then
+echo "noreboot file found, exiting."
+exit
+fi
+if (( $# == 1));then
+cd bin;./aspen ${1}
+else
+cd bin;./aspen ${PORT}
+fi
+sleep 5
+done 

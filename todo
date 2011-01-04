@@ -1,0 +1,5 @@
+[]MCCP
+[]Customizable colors (something similar to options, where  players can set colors for specific messages and those will be stored if they are not equal to the defaults.
+[] Rewrite of the help system or just cleanup, or... something.
+[] Convert everything to use tinyxml for it's serialization.
+[] Finish off exposing everything to scripting.
