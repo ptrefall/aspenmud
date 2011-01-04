@@ -40,7 +40,7 @@ protected:
     POSITION _position;
 public:
     Command();
-    ~Command();
+    virtual ~Command();
     void SetName(const std::string &name);
     std::string GetName() const;
     BOOL HasAlias(const std::string &name, BOOL partialMatch = false);
