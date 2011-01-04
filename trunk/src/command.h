@@ -68,7 +68,7 @@ protected:
     std::vector <Command*> *_commands;
 public:
     Commandable();
-    ~Commandable();
+    virtual ~Commandable();
     /*
     *Adds a command to the list of active commands:
     *Param: [in] A pointer to the command to add.

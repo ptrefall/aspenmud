@@ -34,7 +34,7 @@ class Component:public EventManager
 public:
     Component(const std::string &name);
     Component(void);
-    ~Component();
+    virtual ~Component();
     /*
     *Getters and setters
     *Getters:
