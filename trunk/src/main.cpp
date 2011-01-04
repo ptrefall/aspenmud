@@ -19,8 +19,10 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <sys/mman.h>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <ctime>
 #include <cstdio>
 #include "mud.h"
@@ -55,9 +57,14 @@ BOOL running;
 
 int main(int argc, char** argv)
 {
+std::cout << "server: " << sizeof(Server)/4 << std::endl;
+std::cout << "socket " << sizeof(Socket)/4 << std::endl;
+std::cout << "world: " << sizeof(World)/4 << std::endl;
+std::cout << "player: " << sizeof(Player)/4 << std::endl;
     BOOL copyover=false; //are we rebooting for copyover?
     int listener=0; //the socket to listen on when recovering from copyover
     world=new World();
+mlock(world, sizeof(world));
     world->WriteLog("Initializing "+MUD_NAME+".");
 //make sure the mud isn't ran as root:
 #ifdef ASPEN_UNIX
@@ -135,6 +142,7 @@ int main(int argc, char** argv)
     world->WriteLog("Entering game loop.");
     GameLoop();
     world->WriteLog("Game loop finished, exiting.");
+munlock(world, sizeof(world));
     delete world;
     return 0;
 }
