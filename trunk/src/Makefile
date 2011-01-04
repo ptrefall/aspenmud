@@ -10,7 +10,7 @@ ECHO = echo
 PROF =
 CC	= g++
 #debugging code (should always be used except for special cases).
-CFLAGS	= -O0 -g -ggdb -ansi -pedantic -Wall -Werror -fno-nonansi-builtins -fno-rtti
+CFLAGS	= -O1 -g -ggdb -ansi -pedantic -Wall -Werror -fno-nonansi-builtins -fno-rtti
 
 #makes the compile use our libraries.
 CFLAGS += -L../libs
