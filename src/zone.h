@@ -37,7 +37,7 @@ class Zone
     int _maxRooms;
 public:
     Zone();
-    ~Zone();
+    virtual ~Zone();
     /**
     *Retrieves the set name of the zone.
     *\return The name of the zone, or "" if a name hasn't been set.
