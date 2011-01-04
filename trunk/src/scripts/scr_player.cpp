@@ -1,0 +1,453 @@
+/*
+*scr_player.cpp
+*
+*   Copyright 2010 Tyler Littlefield.
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
+
+#include <string>
+#include <cstring>
+#include "scr_player.h"
+#include "scripts.h"
+#include "../player.h"
+#include "../world.h"
+
+#ifdef MODULE_SCRIPTING
+static const struct luaL_reg player_table [] = {
+//secure functions
+#ifndef SCRIPT_SECURE
+    {"SetPassword", SCR_SetPassword},
+    {"SetRank", SCR_SetRank},
+    {"SetOnlineTime", SCR_SetOnlineTime},
+    {"SetFirstLogin", SCR_SetFirstLogin},
+    {"SetLastLogin", SCR_SetLastLogin},
+    {"GetPassword", SCR_GetPassword},
+#endif
+//normal functions.
+    {"GetTitle", SCR_GetTitle},
+    {"SetTitle", SCR_SetTitle},
+    {"GetLevel", SCR_GetLevel},
+    {"SetLevel", SCR_SetLevel},
+    {"GetRank", SCR_GetRank},
+    {"GetFirstLogin", SCR_GetFirstLogin},
+    {"GetLastLogin", SCR_GetLastLogin},
+    {"GetPrompt", SCR_GetPrompt},
+    {"SetPrompt", SCR_SetPrompt},
+    {"Save", SCR_Save},
+    {"Write", SCR_Write},
+    {"Message", SCR_Message},
+//{"SetOption", SCR_SetOption},
+//{"GetOption", SCR_GetOption},
+//{"OptionExists", SCR_OptionExists},
+//{"ToggleOption", SCR_ToggleOption},
+//{"HasAccess", SCR_HasAccess}
+    {NULL, NULL}
+};
+
+EVENT(EVENT_INIT_PLAYER_SCRIPT)
+{
+    lua_State* lstate = (lua_State*)((OneArg*)args)->_arg;
+    luaL_newmetatable(lstate, "aspen.player");
+    lua_pushstring(lstate, "__index");
+    lua_pushvalue(lstate, -2);
+    lua_settable(lstate, -3);
+    luaL_openlib(lstate, "player", player_table, 0);
+    MessageType i;
+    i = MSG_ERROR;
+    lua_pushnumber(lstate, (int)i);
+    lua_setglobal(lstate, "MSG_ERROR");
+    i = MSG_INFO;
+    lua_pushnumber(lstate, (int)i);
+    lua_setglobal(lstate, "MSG_INFO");
+    i = MSG_CRITICAL;
+    lua_pushnumber(lstate, (int)i);
+    lua_setglobal(lstate, "MSG_CRITICAL");
+    i = MSG_CHANNEL;
+    lua_pushnumber(lstate, (int)i);
+    lua_setglobal(lstate, "MSG_CHANNEL");
+    i = MSG_LIST;
+    lua_pushnumber(lstate, (int)i);
+    lua_setglobal(lstate, "MSG_LIST");
+}
+
+BOOL InitPlayerScript(void)
+{
+    world->AddCallback("ScriptLoaded", EVENT_INIT_PLAYER_SCRIPT);
+    return true;
+}
+
+static bool IsPlayer(lua_State* l, UserData* udata)
+{
+    if ((udata->type != type_player) || (udata->ptr == NULL)) {
+        SCR_Error(l, "Invalid type.");
+        return false;
+    }
+
+    return true;
+}
+
+#ifndef SCRIPT_SECURE
+int SCR_GetPassword(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to GetPassword.");
+        return 0;
+    }
+
+    std::string password;
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+    password = ((Player*)udata->ptr)->GetPassword();
+
+    lua_pushlstring(l, password.c_str(), password.length());
+    return 1;
+}
+int SCR_SetPassword(lua_State *l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to SetPassword.");
+        return 0;
+    }
+
+    const char* password = lua_tostring(l, -1);
+    if (!password) {
+        SCR_Error(l, "Second argument to \'SetPassword\' should be a string.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -2);
+    if (!IsPlayer(l, udata)) {
+        return 0;
+    }
+
+    ((Player*)udata->ptr)->SetPassword(password);
+    return 0;
+}
+#endif
+
+int SCR_GetTitle(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to GetTitle.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return 0;
+    }
+
+    lua_pushlstring(l, ((Player*)udata->ptr)->GetTitle().c_str(), ((Player*)udata->ptr)->GetTitle().length());
+    return 1;
+}
+int SCR_SetTitle(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to SetTitle.");
+        return 0;
+    }
+
+    const char* title = lua_tostring(l, -1);
+    if (!title) {
+        SCR_Error(l, "Argument 2 to \'SetTitle\' must be a string.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return 0;
+    }
+
+    ((Player*)udata->ptr)->SetTitle(title);
+    return 0;
+}
+
+int SCR_GetLevel(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to GetLevel.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    lua_pushinteger(l, ((Player*)udata->ptr)->GetLevel());
+    return 1;
+}
+int SCR_SetLevel(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to SetLevel.");
+        return 0;
+    }
+
+    int level = lua_tointeger(l, -1);
+    UserData* udata = (UserData*)lua_touserdata(l, -2);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    ((Player*)udata->ptr)->SetLevel(level);
+    return 0;
+}
+
+int SCR_GetRank(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to GetRank.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    lua_pushinteger(l, ((Player*)udata->ptr)->GetRank());
+    return 0;
+}
+#ifndef SCRIPT_SECURE
+int SCR_SetRank(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to SetRank.");
+        return 0;
+    }
+
+    int rank = lua_tointeger(l, -1);
+    UserData* udata = (UserData*)lua_touserdata(l, -2);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    ((Player*)udata->ptr)->SetRank(rank);
+    return 0;
+}
+#endif
+
+int SCR_GetOnlineTime(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to GetOnlineTime.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    lua_pushinteger(l, ((Player*)udata->ptr)->GetOnlineTime());
+    return 1;
+}
+#ifndef SCRIPT_SECURE
+int SCR_SetOnlineTime(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to SetOnlineTime.");
+        return 0;
+    }
+
+    UINT tm = lua_tointeger(l, -1);
+    UserData* udata = (UserData*)lua_touserdata(l, -2);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    ((Player*)udata->ptr)->SetOnlineTime(tm);
+    return 0;
+}
+#endif
+
+int SCR_GetFirstLogin(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to GetFirstLogin.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    lua_pushinteger(l, ((Player*)udata->ptr)->GetFirstLogin());
+    return 1;
+}
+#ifndef SCRIPT_SECURE
+int SCR_SetFirstLogin(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to SetFirstLogin.");
+        return 0;
+    }
+
+    UINT tm = lua_tointeger(l, -1);
+    UserData* udata = (UserData*)lua_touserdata(l, -2);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    ((Player*)udata->ptr)->SetFirstLogin(tm);
+    return 0;
+}
+#endif
+
+int SCR_GetLastLogin(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to GetLastLogin.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    lua_pushinteger(l, ((Player*)udata->ptr)->GetLastLogin());
+    return 1;
+}
+#ifndef SCRIPT_SECURE
+int SCR_SetLastLogin(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to SetLastLogin.");
+        return 0;
+    }
+
+    UINT tm = lua_tointeger(l, -1);
+    UserData* udata = (UserData*)lua_touserdata(l, -2);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    ((Player*)udata->ptr)->SetLastLogin(tm);
+    return 0;
+}
+#endif
+
+int SCR_GetPrompt(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to GetPrompt.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    lua_pushlstring(l, ((Player*)udata->ptr)->GetPrompt().c_str(), ((Player*)udata->ptr)->GetPrompt().length());
+    return 1;
+}
+int SCR_SetPrompt(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to SetPrompt.");
+        return 0;
+    }
+
+    const char* prompt = lua_tostring(l, -1);
+    if (!prompt) {
+        SCR_Error(l, "Argument 2 to \'SetPrompt\' must be a string.");
+        return 0;
+    }
+    UserData* udata = (UserData*)lua_touserdata(l, -2);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    ((Player*)udata->ptr)->SetPrompt(prompt);
+    return 0;
+}
+
+int SCR_Save(lua_State* l)
+{
+    if (lua_gettop(l) != 1) {
+        SCR_Error(l, "Invalid number of arguments to Save.");
+        return 0;
+    }
+
+    UserData* udata = (UserData*)lua_touserdata(l, -1);
+    if (!IsPlayer(l, udata)) {
+        return false;
+    }
+
+    ((Player*)udata->ptr)->Save();
+    return 0;
+}
+
+int SCR_Write(lua_State* l)
+{
+    if (lua_gettop(l) != 2) {
+        SCR_Error(l, "Invalid number of arguments to Write.");
+        return 0;
+    }
+
+    const char* message = NULL;
+    UserData* udata = NULL;
+
+    message = lua_tostring(l, -1);
+    if (!message) {
+        SCR_Error(l, "Argument 2 to \'Write\' should be a string.");
+        return 0;
+    }
+
+    udata = (UserData*)lua_touserdata(l, -2);
+    if (!udata) {
+        SCR_Error(l, "Argument 1 to \'Write\' should be a player object.");
+        return 0;
+    }
+
+    if (!IsPlayer(l, udata)) {
+        return 0;
+    }
+
+    ((Player*)udata->ptr)->Write(message);
+    return 0;
+}
+
+int SCR_Message(lua_State* l)
+{
+    if (lua_gettop(l) != 3) {
+        SCR_Error(l, "Invalid number of arguments to Message.");
+        return 0;
+    }
+
+    const char* message = lua_tostring(l, -1);
+    if (!message) {
+        SCR_Error(l, "Argument 3 to \'Message\' should be a string.");
+        return 0;
+    }
+
+    MessageType type = (MessageType)lua_tointeger(l, -2);
+
+    UserData* udata = (UserData*)lua_touserdata(l, -3);
+    if (!udata) {
+        SCR_Error(l, "Argument 1 to \'Message\' should be a player object.");
+        return 0;
+    }
+
+    ((Player*)udata->ptr)->Message(type, message);
+    return 0;
+}
+#endif
