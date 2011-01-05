@@ -142,14 +142,14 @@ BOOL Server::PollSockets()
         sock = *iSocket;
 //see if the socket is set to be closed:
         if (sock->ShouldClose()) {
-            iSocket = CloseSocket(sock);
-continue;
+            iSocket = CloseSocket(iSocket);
+            continue;
         }
         // attempt to read from this socket if pending incoming data
         if (FD_ISSET(sock->GetControl(), &rSet)) {
             // if read fails, close the connection
             if (sock->Read() == false) {
-                iSocket = CloseSocket(sock);
+                iSocket = CloseSocket(iSocket);
                 continue;
             }
 //update their last input since we received data
@@ -223,7 +223,7 @@ continue;
             if (!mob->ComparePassword()) {
                 sock->Write("That password isn't valid!\n");
                 mob->IncInvalidPassword();
-                iSocket = CloseSocket(sock);
+                iSocket = CloseSocket(iSocket);
                 break;
             }
 //the player successfully logged in, set them to the game connection and run the player's EnterGame function to handle game entrance.
@@ -304,14 +304,15 @@ continue;
 void Server::FlushSockets()
 {
     std::list<Socket*>::iterator iSocket;
-std::list<Socket*>::iterator iSocketEnd = socketList.end();
+    std::list<Socket*>::iterator iSocketEnd = socketList.end();
     Socket *pSocket;
 
     // iterate through all sockets and flush outgoing data
     for (iSocket = socketList.begin(); iSocket != iSocketEnd; ++iSocket) {
+        pSocket = (*iSocket);
         // Attempt to flush this socket, close socket if failure
         if (pSocket->Flush() == false) {
-            iSocket = CloseSocket(pSocket);
+            iSocket = CloseSocket(iSocket);
         }
     }
 }
@@ -363,27 +364,17 @@ void Server::Sleep(DWORD pps)
     select(0, NULL, NULL, NULL, &sleepTime);
 }
 
-void Server::CloseSocket(Socket *pSocket)
-{
-    pSocket->Flush();
-    pSocket->Kill();
-    // remove the socket from the socket list
-    socketList.remove(pSocket);
-    // clear the sockets descriptor from the listening set
-    FD_CLR(pSocket->GetControl(), &fSet);
-    // and finally delete the socket
-    delete pSocket;
-}
 std::list<Socket*>::iterator Server::CloseSocket(std::list<Socket*>::iterator &it)
 {
-Socket* tmp = (*it);
+    Socket* tmp = (*it);
     tmp->Flush();
     tmp->Kill();
     // clear the sockets descriptor from the listening set
     FD_CLR(tmp->GetControl(), &fSet);
     // and finally delete the socket
     delete tmp;
-    return socketList.remove(it);
+//remove the socket.
+    return socketList.erase(it);
 }
 
 void Server::Accept()
