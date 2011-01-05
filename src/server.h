@@ -28,14 +28,23 @@
 #include "conf.h"
 #include "socket.h"
 
-/**
-*The server class will handle all low-level connection info,
-*As well as send incoming data from a connected socket to the parser after the player has been loaded or created.
-*This class also handles the login phase and passes control out to the player and parser while handling all data received.
-*/
-
 class Server
 {
+    /*
+    *Accepts all incoming connections
+    */
+    void                 Accept           ( void );
+    /*
+    *Closes a specified socket and remove it from the list
+    */
+    std::list<Socket*>::iterator CloseSocket      ( Socket *pSocket );
+
+    std::list<Socket*>   socketList;
+    int control;
+    fd_set               fSet;
+    fd_set               rSet;
+    sockaddr_in          my_addr;
+    struct timeval       lastSleep;
 public:
     Server  (void);
     ~Server ( void );
@@ -71,21 +80,6 @@ public:
     void Recover(int listener);
 //Adds the specified socket to the socket list and adds it to the descriptor set:
     void AddSock(Socket* sock);
-private:
-    /*
-    *Accepts all incoming connections
-    */
-    void                 Accept           ( void );
-    /*
-    *Closes a specified socket and remove it from the list
-    */
-    void                 CloseSocket      ( Socket *pSocket );
-    std::list<Socket*>   socketList;
-    int control;
-    fd_set               fSet;
-    fd_set               rSet;
-    sockaddr_in          my_addr;
-    struct timeval       lastSleep;
 };
 #endif
 
