@@ -27,7 +27,7 @@
 class ISerializable
 {
 public:
-virtual ~ISerializable() { }
+    virtual ~ISerializable() { }
     virtual void Serialize(Serializer& ar)=0;
     virtual void Deserialize(Serializer& ar)=0;
 };

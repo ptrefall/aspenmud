@@ -37,7 +37,7 @@ class Server
     /*
     *Closes a specified socket and remove it from the list
     */
-    std::list<Socket*>::iterator CloseSocket      ( Socket *pSocket );
+    std::list<Socket*>::iterator CloseSocket      (std::list<Socket*>::iterator &it);
 
     std::list<Socket*>   socketList;
     int control;
