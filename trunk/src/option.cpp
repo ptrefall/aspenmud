@@ -93,7 +93,7 @@ BOOL OptionExists(const std::string &name)
 {
     return (options.count(name)==0?false:true);
 }
-Option* GetGlobalOption(const std::string name)
+Option* GetGlobalOption(const std::string &name)
 {
     if (options.count(name) == 0) {
         return NULL;

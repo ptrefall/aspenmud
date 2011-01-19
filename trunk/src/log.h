@@ -30,7 +30,9 @@
 */
 class Log
 {
+FILE* out;
 public:
+Log();
     ~Log();
     /*
     *Opens a log file.
@@ -42,7 +44,5 @@ public:
     *Param: [in] The message to write.
     */
     void Write(const std::string &data,LOG_LEVEL l=INFORM);
-private:
-    FILE* out;
 };
 #endif

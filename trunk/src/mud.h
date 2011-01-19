@@ -28,13 +28,10 @@ enum LOG_LEVEL {INFORM,WARN,ERR,CRIT,SCRIPT, PLAYER, CONNECTION};
 
 //typedefs:
 typedef int FLAG; //bitfield flags
-#ifndef ASPEN_WIN
-typedef unsigned int DWORD;
-typedef long int WORD;
+typedef int VNUM;
 typedef int BOOL;
 typedef unsigned int UINT;
-#endif
-typedef int VNUM;
+typedef unsigned int DWORD;
 
 //forward declarations
 //I wanted to avoid these, but it seems I have no choice
