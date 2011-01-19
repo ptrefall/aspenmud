@@ -16,13 +16,14 @@
 *   limitations under the License.
 */
 
-
+unsigned int lcount, tcount;
 #include <unistd.h>
 #include <signal.h>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <cstdio>
+#include <iostream>
 #include "mud.h"
 #include "conf.h"
 #include "socket.h"
@@ -55,6 +56,7 @@ BOOL running;
 
 int main(int argc, char** argv)
 {
+    tcount = lcount = 0;
     BOOL copyover=false; //are we rebooting for copyover?
     int listener=0; //the socket to listen on when recovering from copyover
     world=new World();
@@ -136,6 +138,7 @@ int main(int argc, char** argv)
     GameLoop();
     world->WriteLog("Game loop finished, exiting.");
     delete world;
+    std::cout << "slept for a total of " << (float)tcount/1000.0 << "ms, with a total of " << lcount << " iterations, with an average sleep time of " << (float)tcount/(float)lcount << "." << std::endl;
     return 0;
 }
 
