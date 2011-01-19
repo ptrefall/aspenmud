@@ -39,7 +39,7 @@
 *Comment this out if you want all scripting functions enabled by default.
 *Leaving it commented will remove functions like SetPassword on player from being exposed to scripting.
 */
-//#define SCRIPT_SECURE
+#define SCRIPT_SECURE
 //delayed defines
 #define LIVING_PULSE 2 //seconds for each living heartbeat to take place.
 #define WORLD_PULSE 10 //the world pulse, used for room resets, etc.
@@ -108,20 +108,7 @@ enum POSITION {any, unconcious, sleeping, laying, resting, sitting, standing, fl
 //starting up. Leaving it defined can't hurt, but comment it out if this is giving you some sort of problem.
 #define SECURE_INITIALIZATION
 // conditional whether we are compiling for Windows or Unix
-#if defined(_WIN32)
-#define ASPEN_WIN32
-#define ASPEN_WIN
-#elif defined(_WIN64)
-#define ASPEN_WIN64
-#define ASPEN_WIN
-#else
-#define ASPEN_UNIX
-#endif
-#ifdef ASPEN_UNIX
 #ifndef OPEN_MAX
 #define OPEN_MAX 256
 #endif
 #endif
-
-#endif
-

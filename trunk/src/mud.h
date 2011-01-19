@@ -50,18 +50,4 @@ extern World* world;
 struct OLC_DATA;
 enum OLC_INPUT_TYPE {NUM, STRING};
 typedef void (*FP_INPUT)(Entity*, Player*, const Variant*);
-
-
-#ifdef ASPEN_WIN
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-
-struct timezone {
-    int tz_minuteswest; /* minutes W of Greenwich */
-    int tz_dsttime;     /* type of dst correction */
-};
-
-// equivalent function of gettimeofday for Windows.
-int gettimeofday(struct timeval *tv, struct timezone *tz);
-#endif /* ASPEN_WIN */
-
-#endif /*MUD_H*/
+#endif

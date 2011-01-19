@@ -16,11 +16,12 @@
 *   limitations under the License.
 */
 
-
 /*
 *A basic server class.
 *Manages all game connections and socket operations for the game.
 */
+extern unsigned int tcount;
+extern unsigned int lcount;
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -323,45 +324,39 @@ void Server::FlushSockets()
 // constant defined for this purpose.
 void Server::Sleep(DWORD pps)
 {
-    /*
-        struct timeval newTime;
-        int secs, usecs;
+    struct timeval newTime;
+    int secs, usecs;
 
-        if (pps <= 0) {
-            return;
-        }
-        gettimeofday(&newTime, NULL);
+    if (pps <= 0) {
+        return;
+    }
+    gettimeofday(&newTime, NULL);
 
-        // calculate exact amount of time we need to sleep
-        usecs = (lastSleep.tv_usec -  newTime.tv_usec) + 1000000 / pps;
-        secs  =  (lastSleep.tv_sec  -  newTime.tv_sec);
+    // calculate exact amount of time we need to sleep
+    usecs = (lastSleep.tv_usec -  newTime.tv_usec) + 1000000 / pps;
+    secs  =  (lastSleep.tv_sec  -  newTime.tv_sec);
 
-        while (usecs < 0) {
-            usecs += 1000000;
-            secs  -= 1;
-        }
-        while (usecs >= 1000000) {
-            usecs -= 1000000;
-            secs  += 1;
-        }
+    while (usecs < 0) {
+        usecs += 1000000;
+        secs  -= 1;
+    }
+    lcount += 1;
+    while (usecs >= 1000000) {
+        usecs -= 1000000;
+        secs  += 1;
+    }
+    tcount = (secs*1000000)+usecs;
+    // sleep if needed
+    if (secs > 0 || (secs == 0 && usecs > 0)) {
+        struct timeval sleepTime;
 
-        // sleep if needed
-        if (secs > 0 || (secs == 0 && usecs > 0)) {
-            struct timeval sleepTime;
+        sleepTime.tv_usec = usecs;
+        sleepTime.tv_sec  = secs;
+        select(0, NULL, NULL, NULL, &sleepTime);
+    }
 
-            sleepTime.tv_usec = usecs;
-            sleepTime.tv_sec  = secs;
-            select(0, NULL, NULL, NULL, &sleepTime);
-        }
-
-        // remember when we last slept
-        gettimeofday(&lastSleep, NULL);
-    */
-    struct timeval sleepTime;
-
-    sleepTime.tv_usec = 1000;
-    sleepTime.tv_sec = 0;
-    select(0, NULL, NULL, NULL, &sleepTime);
+    // remember when we last slept
+    gettimeofday(&lastSleep, NULL);
 }
 
 std::list<Socket*>::iterator Server::CloseSocket(std::list<Socket*>::iterator &it)
