@@ -58,6 +58,6 @@ public:
 
 BOOL RegisterOption(const std::string &name, const std::string & help, int rank, Variant value, VARIABLE_TYPE type, BOOL toggle = false);
 BOOL OptionExists(const std::string &name);
-Option* GetGlobalOption(const std::string name);
+Option* GetGlobalOption(const std::string &name);
 std::map<std::string, Option>* GetGlobalOptions();
 #endif

@@ -62,12 +62,10 @@ int main(int argc, char** argv)
     world=new World();
     world->WriteLog("Initializing "+MUD_NAME+".");
 //make sure the mud isn't ran as root:
-#ifdef ASPEN_UNIX
     if (getuid()==0) {
         world->WriteLog("This program may not be ran as root, now exiting.");
         return 1;
     }
-#endif
 //initialize the server class:
     int port;
 //determine if a port was specified. If not, use default.

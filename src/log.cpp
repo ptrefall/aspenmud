@@ -22,7 +22,10 @@
 #include <ctime>
 #include <cstring>
 #include "log.h"
-
+Log::Log()
+{
+out = NULL;
+}
 Log::~Log()
 {
     if (out) {
