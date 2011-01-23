@@ -72,6 +72,8 @@ World::~World()
 {
     std::map<int,Channel*>::iterator cit;
     std::map<int,Channel*>::iterator citEnd;
+    std::list<Zone*>::iterator zit;
+    std::list<Zone*>::iterator zitEnd;
 
     delete [] _motd;
     delete [] _banner;
@@ -86,6 +88,11 @@ World::~World()
     delete _channels;
     delete _cfactory;
     delete _properties;
+
+    zitEnd = _zones->end();
+    for (zit = _zones->begin(); zit != zitEnd; ++zit) {
+        delete (*zit);
+    }
     delete _zones;
     delete _rooms;
     delete _objects;

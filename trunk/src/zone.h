@@ -25,7 +25,6 @@
 #include "room.h"
 #include "serializer.hpp"
 
-///Zones are used to separate areas.
 /**
 *Zones are used to allow a builder to define an area, which will contain rooms, (a list of Room objects).
 *This is useful for determining where a mob can wander (not allowing it outside it's zone), etc.
