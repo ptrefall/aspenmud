@@ -7,11 +7,11 @@ MAKE=make -s
 RM = rm -f
 ECHO = echo
 #compiler flags:
-PROF =
+#enable if you want to profile.
+#PROF = -pg
 CC	= g++
 #debugging code (should always be used except for special cases).
 CFLAGS	= -O0 -g -ggdb -ansi -pedantic -Wall -Werror -fno-nonansi-builtins -fno-rtti
-
 #makes the compile use our libraries.
 CFLAGS += -L../libs
 #makes the compiler use our includes.
@@ -37,7 +37,7 @@ command.cpp com_gen.cpp com_wiz.cpp event.cpp menu.cpp\
 living.cpp channel.cpp modules.cpp component.cpp npc.cpp\
 editor.cpp exit.cpp room.cpp zone.cpp com_builder.cpp\
 com_movement.cpp ComponentFactory.cpp components.cpp olc.cpp socials.cpp\
-option.cpp
+option.cpp properties.cpp
 
 ###
 ###YOU SHOULD NOT MODIFY ANYTHING PAST THIS POINT.

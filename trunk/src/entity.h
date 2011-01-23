@@ -1,23 +1,4 @@
 /*
-*entity.h
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
-/*
 *This comprises our game objects.
 */
 
@@ -34,12 +15,12 @@
 #include "command.h"
 #include "serialize.h"
 #include "serializer.hpp"
+#include "properties.h"
 
-class Entity:public ISerializable, public EventManager, public Commandable
+class Entity:public ISerializable, public EventManager, public Commandable, public PropertyMap
 {
     std::list <Entity*> _contents;
     std::list <Component*> *_components;
-    std::map <std::string,Variant> *_vars;
 #ifdef OLC
     std::vector <struct OLC_DATA*> *_olcs;
 #endif
@@ -131,84 +112,6 @@ public:
     *Param: [in] the object to attach the components to.
     */
     void Attach(Entity * obj);
-    /*
-    *Adds a variable to the container
-    *Param: [in] the name of the variable.
-    *[in] The value of the variable.
-    *Return: True if the variable was added, false otherwise.
-    */
-    template <class T>
-    BOOL AddVar(const std::string name, T val) {
-        if (VarExists(name)) {
-            return false;
-        }
-        (*_vars)[name]=val;
-        return true;
-    }
-    /*
-    *Removes a variable from the container.
-    *Param: [in] The name of the variable.
-    *Return: True if the variable was removed, false otherwise.
-    */
-    BOOL RemoveVar(const std::string &name);
-    /*
-    *Checks to see if the specified variable exists
-    *Param: [in] the name of the variable.
-    *Return: true if the variable exists, false otherwise.
-    */
-    BOOL VarExists(const std::string &name) const;
-    /*
-    *Sets the persistents of a variable.
-    *Param: [in] the name of the variable.
-    *[in] True if the variable should be persistent (default), false otherwise.
-    */
-    void SetPersistents(const std::string &name, BOOL s);
-    /*
-    *Returns the persistents state for a variable.
-    *Return: True if the variable is persistent, false otherwise.
-    */
-    BOOL GetPersistents(const std::string &name) const;
-    /*
-    *Getters
-    *Param: [in] the name of the variable to get
-    *Return: The value of the variable.
-    *Throws: VarNotFoundException if the requested variable doesn't exist.
-    */
-    int GetInt(const std::string &name) const;
-    UINT GetUint(const std::string &name) const;
-    unsigned short GetUshort(const std::string &name) const;
-    short GetShort(const std::string &name) const;
-    char GetByte(const std::string &name) const;
-    unsigned char GetUbyte(const std::string &name) const;
-    float GetFloat(const std::string &name) const;
-    double GetDouble(const std::string &name) const;
-    std::string GetString(const std::string &name) const;
-    /*
-    *Setters
-    *Sets the value at the specified variable.
-    *Param: [in] the name of the variable.
-    *[in] the value of the variable.
-    *Throws: VarNotFound exception, if the variable specified doesn't exist.
-    */
-    void SetInt(const std::string &name, int s);
-    void SetUint(const std::string &name, unsigned int s);
-    void SetUshort(const std::string &name, unsigned short s);
-    void SetShort(const std::string &name, short s);
-    void SetByte(const std::string &name, char s);
-    void SetUbyte(const std::string &name, unsigned char s);
-    void SetFloat(const std::string &name, float s);
-    void SetDouble(const std::string &name, double s);
-    void SetStr(const std::string &name, const std::string &s);
-    void SetStr(const std::string &name, const char* s);
-//Operators to retrieve variants.
-    /*
-    *[]
-    *returns: a reference to the variant.
-    *Param: [in] the name of the variant to retrieve.
-    */
-    Variant& operator [](const std::string & name) const;
-    Variant& operator [](const char* name) const;
-
 #ifdef OLC
 //olc-based functions.
     /*

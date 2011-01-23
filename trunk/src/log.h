@@ -30,9 +30,9 @@
 */
 class Log
 {
-FILE* out;
+    FILE* out;
 public:
-Log();
+    Log();
     ~Log();
     /*
     *Opens a log file.

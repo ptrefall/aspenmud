@@ -1,22 +1,3 @@
-/*
-*entity.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include <string>
 #include <list>
 #include <map>
@@ -28,6 +9,7 @@
 #include "command.h"
 #include "olc.h"
 #include "serializer.hpp"
+
 #ifdef OLC
 OLC_INPUT(olc_entity_name);
 #endif
@@ -41,7 +23,6 @@ Entity::Entity(void)
     _type=1;
     _onum=0;
     _components=new std::list <Component*>();
-    _vars=new std::map <std::string,Variant>();
 #ifdef OLC
     _olcs = new std::vector<struct OLC_DATA*>();
     AddOlc("name", "Please enter the name of the object", STRING, olc_entity_name);
@@ -60,7 +41,6 @@ Entity::~Entity(void)
         delete (*it);
     }
     delete _components;
-    delete _vars;
 #ifdef OLC
     for (oit=_olcs->begin(); oit!=_olcs->end(); oit++) {
         delete (*oit);
@@ -143,11 +123,11 @@ void Entity::Serialize(Serializer& ar)
         }
     }
 
-    size=_vars->size();
+    size=_properties.size();
 //go through and make sure we're not serializing persistent vars.
     /*
         if (size) {
-            for (it2=_vars->begin(); it2!=_vars->end(); it2++) {
+            for (it2=_properties.begin(); it2!=_properties.end(); it2++) {
                 if (((*it2).second.Typeof()==VAR_EMPTY)||(!(*it2).second.GetPersistents())) {
                     size--;
                 }
@@ -157,7 +137,7 @@ void Entity::Serialize(Serializer& ar)
 
     ar << size;
     if (size) {
-        for (it2=_vars->begin(); it2!=_vars->end(); it2++) {
+        for (it2=_properties.begin(); it2!=_properties.end(); it2++) {
             ar << (*it2).first;
             (*it2).second.Serialize(ar);
         }
@@ -200,7 +180,7 @@ void Entity::Deserialize(Serializer& ar)
         for (i=0; i<size; i++) {
             ar >> name;
             var.Deserialize(ar);
-            (*_vars)[name]=var;
+            _properties[name]=var;
         }
     }
 
@@ -249,7 +229,6 @@ BOOL Entity::MoveTo(Entity* targ)
     return false;
 }
 
-
 BOOL Entity::AddComponent(Component* component)
 {
     if (component==NULL) {
@@ -272,7 +251,6 @@ BOOL Entity::RemoveComponent(Component* component)
     component->Detach();
     return true;
 }
-
 bool Entity::HasComponent(const std::string &name)
 {
     std::list <Component*>::iterator it;
@@ -291,204 +269,6 @@ void Entity::Attach(Entity* obj)
     for (it=_components->begin(); it!=_components->end(); it++) {
         (*it)->Attach(obj);
     }
-}
-
-BOOL Entity::RemoveVar(const std::string &name)
-{
-    if (VarExists(name)) {
-        _vars->erase(name);
-        return true;
-    }
-    return false;
-}
-/*
-*Checks to see if the specified variable exists
-*Param: [in] the name of the variable.
-*Return: true if the variable exists, false otherwise.
-*/
-BOOL Entity::VarExists(const std::string &name) const
-{
-    return (_vars->count(name));
-}
-
-void Entity::SetPersistents(const std::string &name, BOOL s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetPersistents(s);
-}
-BOOL Entity::GetPersistents(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetPersistents();
-}
-
-int Entity::GetInt(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetInt();
-}
-UINT Entity::GetUint(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetUint();
-}
-unsigned short Entity::GetUshort(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetUshort();
-}
-short Entity::GetShort(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetShort();
-}
-char Entity::GetByte(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetByte();
-}
-unsigned char Entity::GetUbyte(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetUbyte();
-}
-float Entity::GetFloat(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetFloat();
-}
-std::string Entity::GetString(const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name].GetStr();
-}
-
-void Entity::SetInt(const std::string &name, int s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetInt(s);
-}
-void Entity::SetUint(const std::string &name, unsigned int s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetUint(s);
-}
-void Entity::SetUshort(const std::string &name, unsigned short s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetUshort(s);
-}
-void Entity::SetShort(const std::string &name, short s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetShort(s);
-}
-void Entity::SetUbyte(const std::string &name, unsigned char s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetUbyte(s);
-}
-void Entity::SetByte(const std::string &name, char s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetByte(s);
-}
-void Entity::SetFloat(const std::string &name, float s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetFloat(s);
-}
-void Entity::SetDouble(const std::string &name, double s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetDouble(s);
-}
-void Entity::SetStr(const std::string &name, const std::string &s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetStr(s);
-}
-void Entity::SetStr(const std::string &name, const char* s)
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    (*_vars)[name].SetStr(s);
-}
-
-Variant& Entity::operator [](const std::string &name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name];
-}
-Variant& Entity::operator [](const char* name) const
-{
-    if (!VarExists(name)) {
-        throw(VarNotFoundException(std::string("Variable ")+name+std::string(" doesn't exist. ")+WHERE()));
-    }
-
-    return (*_vars)[name];
 }
 
 #ifdef OLC
