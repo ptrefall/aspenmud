@@ -27,7 +27,7 @@
 #include "serializer.hpp"
 #include "event.h"
 
-int zone_saves;
+static int zone_saves;
 
 Zone::Zone()
 {
@@ -35,6 +35,17 @@ Zone::Zone()
 }
 Zone::~Zone()
 {
+//we need to clean up our rooms.
+    std::list<VNUM>::iterator it;
+    std::list<VNUM>::iterator itEnd;
+    Room* room = NULL;
+
+    itEnd = _rnums.end();
+    for (it = _rnums.begin(); it != itEnd; ++it) {
+        room = world->GetRoom((*it));
+        world->RemoveRoom((*it));
+        delete room;
+    }
 }
 
 std::string Zone::GetName(void) const
@@ -177,14 +188,18 @@ BOOL SaveZones(void)
     std::list<Zone*> *zones=new std::list <Zone*>();
     world->GetZones(zones);
     std::list<Zone*>::iterator it;
+    std::list<Zone*>::iterator itEnd;
+
     FILE* output=fopen(AREA_FILE, "wb");
+
     Serializer* s=new Serializer(output, WRITE);
     int size=zones->size();
 
     (*s) << size;
 
     if (size) {
-        for (it=zones->begin(); it!=zones->end(); it++) {
+        itEnd = zones->end();
+        for (it = zones->begin(); it != itEnd; ++it) {
             (*it)->Serialize(*s);
         }
     }
