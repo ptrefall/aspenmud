@@ -24,7 +24,7 @@
 #include "log.h"
 Log::Log()
 {
-out = NULL;
+    out = NULL;
 }
 Log::~Log()
 {
