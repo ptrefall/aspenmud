@@ -26,16 +26,16 @@
 void InitializeMovementCommands(void)
 {
     world->WriteLog("Initializing movement commands.");
-    world->AddCommand(new CMDNorth());
-    world->AddCommand(new CMDSouth());
-    world->AddCommand(new CMDEast());
-    world->AddCommand(new CMDWest());
-    world->AddCommand(new CMDNortheast());
-    world->AddCommand(new CMDNorthwest());
-    world->AddCommand(new CMDSoutheast());
-    world->AddCommand(new CMDSouthwest());
-    world->AddCommand(new CMDUp());
-    world->AddCommand(new CMDDown());
+    world->commands.AddCommand(new CMDNorth());
+    world->commands.AddCommand(new CMDSouth());
+    world->commands.AddCommand(new CMDEast());
+    world->commands.AddCommand(new CMDWest());
+    world->commands.AddCommand(new CMDNortheast());
+    world->commands.AddCommand(new CMDNorthwest());
+    world->commands.AddCommand(new CMDSoutheast());
+    world->commands.AddCommand(new CMDSouthwest());
+    world->commands.AddCommand(new CMDUp());
+    world->commands.AddCommand(new CMDDown());
 }
 
 BOOL DoMove(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
@@ -100,10 +100,10 @@ BOOL DoMove(const std::string &verb, Player* mobile,std::vector<std::string> &ar
     }
 
 //call the event to signal that the player is moving
-    room->CallEvent("OnExit", NULL, (void*)mobile);
+    room->events.CallEvent("OnExit", NULL, (void*)mobile);
     dest = world->GetRoom(exit->GetTo());
     mobile->MoveTo(dest);
-    dest->CallEvent("OnEnter", NULL, (void*)mobile);
+    dest->events.CallEvent("OnEnter", NULL, (void*)mobile);
 
     mobile->Message(MSG_INFO, world->GetRoom(exit->GetTo())->DoLook(mobile));
     return true;

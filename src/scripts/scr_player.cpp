@@ -84,7 +84,7 @@ EVENT(EVENT_INIT_PLAYER_SCRIPT)
 
 BOOL InitPlayerScript(void)
 {
-    world->AddCallback("ScriptLoaded", EVENT_INIT_PLAYER_SCRIPT);
+    world->events.AddCallback("ScriptLoaded", EVENT_INIT_PLAYER_SCRIPT);
     return true;
 }
 

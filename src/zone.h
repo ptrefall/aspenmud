@@ -1,29 +1,10 @@
-/*
-*zone.h
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #ifndef ZONE_H
 #define ZONE_H
+#include <tinyxml.h>
 #include "mud.h"
 #include "conf.h"
 #include "event.h"
 #include "room.h"
-#include "serializer.hpp"
 
 /**
 *Zones are used to allow a builder to define an area, which will contain rooms, (a list of Room objects).
@@ -72,8 +53,8 @@ public:
     BOOL RemoveRoom(VNUM num);
     void GetRooms(std::list<VNUM>* rooms);
 
-    virtual void Serialize(Serializer& ar);
-    virtual void Deserialize(Serializer& ar);
+    virtual void Serialize(TiXmlElement* root);
+    virtual void Deserialize(TiXmlElement* zone);
 };
 
 BOOL InitializeZones(void);

@@ -29,9 +29,9 @@
 void InitializeBuilderCommands()
 {
     world->WriteLog("Initializing builder commands.");
-    world->AddCommand(new CMDZlist());
-    world->AddCommand(new CMDRlist());
-    world->AddCommand(new CMDDig());
+    world->commands.AddCommand(new CMDZlist());
+    world->commands.AddCommand(new CMDRlist());
+    world->commands.AddCommand(new CMDDig());
 }
 
 //zlist

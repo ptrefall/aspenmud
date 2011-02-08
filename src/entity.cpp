@@ -1,6 +1,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <tinyxml.h>
 #include "entity.h"
 #include "world.h"
 #include "room.h"
@@ -8,7 +9,6 @@
 #include "utils.h"
 #include "command.h"
 #include "olc.h"
-#include "serializer.hpp"
 
 #ifdef OLC
 OLC_INPUT(olc_entity_name);
@@ -28,8 +28,8 @@ Entity::Entity(void)
     AddOlc("name", "Please enter the name of the object", STRING, olc_entity_name);
 #endif
 
-    RegisterEvent("PostLook", new Event());
-    RegisterEvent("PreLook",new Event());
+    events.RegisterEvent("PostLook", new Event());
+    events.RegisterEvent("PreLook",new Event());
 }
 Entity::~Entity(void)
 {
@@ -103,90 +103,74 @@ void Entity::SetOnum(VNUM num)
     _onum=num;
 }
 
-void Entity::Serialize(Serializer& ar)
+void Entity::Serialize(TiXmlElement* root)
 {
-    int i=0;
-    int size=_components->size();
-    std::string key;
+    TiXmlElement* ent = new TiXmlElement("entity");
+    TiXmlElement *components = new TiXmlElement("components");
+    TiXmlElement* component = NULL;
+    TiXmlElement* contents = new TiXmlElement("contents");
+    TiXmlElement* properties = new TiXmlElement("properties");
     std::list <Component*>::iterator it;
-    std::map<std::string, Variant>::iterator it2;
+    std::list<Component*>::iterator itEnd = _components->end();
+    std::list<Entity*>::iterator cit;
+    std::list<Entity*>::iterator citEnd=_contents.end();
 
-    ar << _name;
-    ar << _desc;
-    ar << _script;
-
-    ar << size;
-    if (size) {
-        for (it=_components->begin(); it!=_components->end(); it++) {
-            key=(*it)->GetName();
-            ar << key;
+    if (_contents.size()) {
+        for (cit = _contents.begin(); cit != citEnd; ++cit) {
+            (*cit)->Serialize(ent);
         }
     }
+    ent->LinkEndChild(contents);
 
-    size=_properties.size();
-//go through and make sure we're not serializing persistent vars.
-    /*
-        if (size) {
-            for (it2=_properties.begin(); it2!=_properties.end(); it2++) {
-                if (((*it2).second.Typeof()==VAR_EMPTY)||(!(*it2).second.GetPersistents())) {
-                    size--;
-                }
-            }
-        }
-    */
-
-    ar << size;
-    if (size) {
-        for (it2=_properties.begin(); it2!=_properties.end(); it2++) {
-            ar << (*it2).first;
-            (*it2).second.Serialize(ar);
+    if (_components->size()) {
+        for (it=_components->begin(); it != itEnd; ++it) {
+            component = new TiXmlElement("component");
+            component->SetAttribute("name", (*it)->GetName().c_str());
+            components->LinkEndChild(component);
         }
     }
+    ent->LinkEndChild(components);
 
-    ar << _onum;
-    ar << _type;
+    variables.Serialize(properties);
+    ent->LinkEndChild(properties);
 
-    if (_location) {
-        i=_location->GetOnum();
-        ar << i;
-        i=0;
-    } else {
-        ar << i;
-    }
+    ent->SetAttribute("name", _name.c_str());
+    ent->SetAttribute("desc", _desc.c_str());
+    ent->SetAttribute("script", _script.c_str());
+    ent->SetAttribute("onum", _onum);
+    ent->SetAttribute("type", _type);
+    ent->SetAttribute("location", (_location?_location->GetOnum():0));
 
-    SerializeObjectList<Entity>(ar, _contents);
+    root->LinkEndChild(ent);
 }
-void Entity::Deserialize(Serializer& ar)
+void Entity::Deserialize(TiXmlElement* root)
 {
+    TiXmlElement* components = NULL;
+    TiXmlElement* component = NULL;
+    TiXmlElement* obj = NULL;
+    TiXmlElement* contents = NULL;
     int loc;
-    int size,i;
-    std::string name;
-    Variant var;
 
-    ar >> _name;
-    ar >> _desc;
-    ar >> _script;
-
-    ar >> size;
-    if (size) {
-        for (i=0; i<size; i++) {
-            ar >> name;
-            AddComponent(world->CreateComponent(name));
-        }
+    contents = root->FirstChild("contents")->ToElement();
+    for (obj = contents->FirstChild()->ToElement(); obj; obj = obj->NextSibling()->ToElement()) {
+        Entity* object = new Entity();
+        object->Deserialize(obj);
+        object->SetLocation(this);
+        _contents.push_back(object);
     }
 
-    ar >> size;
-    if (size) {
-        for (i=0; i<size; i++) {
-            ar >> name;
-            var.Deserialize(ar);
-            _properties[name]=var;
-        }
+    components = root->FirstChild("components")->ToElement();
+    for (component = components->FirstChild()->ToElement(); component; component = component->NextSibling()->ToElement()) {
+        AddComponent(world->CreateComponent(component->Attribute("name")));
     }
 
-    ar >> _onum;
-    ar >> _type;
-    ar >> loc;
+    variables.Deserialize(root->FirstChild("properties")->ToElement());
+    _name = root->Attribute("name");
+    _desc = root->Attribute("desc");
+    _script = root->Attribute("script");
+    root->Attribute("onum", &_onum);
+    root->Attribute("type", &_type);
+    root->Attribute("location", &loc);
     if (!loc) {
         _location=NULL;
     } else {
@@ -198,8 +182,6 @@ void Entity::Deserialize(Serializer& ar)
             _location=world->GetRoom(loc);
         }
     }
-
-    DeserializeObjectList<Entity>(ar, _contents);
 }
 
 std::string Entity::DoLook(Player* mobile)
@@ -207,10 +189,10 @@ std::string Entity::DoLook(Player* mobile)
     std::string str;
 
     LookArgs* args=new LookArgs(mobile,this,str);
-    CallEvent("PreLook", args, (void*)mobile);
+    events.CallEvent("PreLook", args, (void*)mobile);
     str+=Capitalize(this->GetName())+"\n";
     str+=this->GetDescription()+"\n";
-    CallEvent("PostLook", args, (void*)mobile);
+    events.CallEvent("PostLook", args, (void*)mobile);
     delete args;
     return str;
 }

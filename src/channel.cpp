@@ -29,8 +29,8 @@
 void InitializeChannels()
 {
     world->WriteLog("Initializing channels");
-    world->GetEvent("PlayerConnect")->Add(SubscribeChannels);
-    world->GetEvent("PlayerDisconnect")->Add(UnsubscribeChannels);
+    world->events.GetEvent("PlayerConnect")->Add(SubscribeChannels);
+    world->events.GetEvent("PlayerDisconnect")->Add(UnsubscribeChannels);
 //Register channels here.
     world->AddChannel(new Channel("chat","ch",RANK_PLAYER));
 }

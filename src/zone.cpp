@@ -1,30 +1,11 @@
-/*
-*zone.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include <string>
 #include <list>
+#include <tinyxml.h>
 #include <cstdio>
 #include <sys/stat.h>
 #include "zone.h"
 #include "world.h"
 #include "room.h"
-#include "serializer.hpp"
 #include "event.h"
 
 static int zone_saves;
@@ -100,45 +81,41 @@ void Zone::GetRooms(std::list<VNUM>* rooms)
     }
 }
 
-void Zone::Serialize(Serializer& ar)
+void Zone::Serialize(TiXmlElement* root)
 {
     std::list<VNUM>::iterator it;
-    Room* room;
-    int size=_rnums.size();
+    std::list<VNUM>::iterator itEnd = _rnums.end();
+    Room* room = NULL;
+    TiXmlElement* rooms = new TiXmlElement("rooms");
+    TiXmlElement* zone = new TiXmlElement("zone");
 
-    ar << _name;
-    ar << _maxRooms;
-    ar << size;
-
-//now we serialize all the rooms belonging to the zone
-//We will use the vnums stored, in order to retrieve a pointer from the global room-object table.
-
-    if (size) {
-        for (it=_rnums.begin(); it!=_rnums.end(); it++) {
+    if (_rnums.size()) {
+        for (it = _rnums.begin(); it != itEnd; ++it) {
             room=world->GetRoom((*it));
             if (room) {
-                room->Serialize(ar);
+                room->Serialize(rooms);
                 room=NULL;
             }
         }
     }
-}
-void Zone::Deserialize(Serializer& ar)
-{
-    int size,i;
-    Room* room=NULL;
+    zone->LinkEndChild(rooms);
 
-    ar >> _name;
-    ar >> _maxRooms;
-    ar >> size;
-    if (size) {
-        for (i=0; i<size; i++) {
-            room=new Room();
-            room->Deserialize(ar);
-            world->AddRoom(room->GetOnum(),room);
-            AddRoom(room->GetOnum());
-            room=NULL;
-        }
+    zone->SetAttribute("name", _name.c_str());
+    zone->SetAttribute("maxRooms", _maxRooms);
+    root->LinkEndChild(zone);
+}
+void Zone::Deserialize(TiXmlElement* zone)
+{
+    Room* room=NULL;
+    TiXmlElement* rooms = zone->FirstChild("rooms")->ToElement();
+    TiXmlElement* node = NULL;
+
+    for (node = rooms->FirstChild()->ToElement(); node; node = node->NextSibling()->ToElement()) {
+        room=new Room();
+        room->Deserialize(node);
+        world->AddRoom(room->GetOnum(),room);
+        AddRoom(room->GetOnum());
+        room=NULL;
     }
 }
 
@@ -176,8 +153,8 @@ BOOL InitializeZones(void)
             return false;
         }
         zone_saves = 0;
-        world->AddCallback("WorldPulse", AUTOSAVE_ZONES);
-        world->AddCallback("Shutdown", SHUTDOWN_ZONES);
+        world->events.AddCallback("WorldPulse", AUTOSAVE_ZONES);
+        world->events.AddCallback("Shutdown", SHUTDOWN_ZONES);
         return true;
     }
     return true;
@@ -189,40 +166,35 @@ BOOL SaveZones(void)
     world->GetZones(zones);
     std::list<Zone*>::iterator it;
     std::list<Zone*>::iterator itEnd;
+    TiXmlDocument doc;
+    TiXmlElement* zlist = new TiXmlElement("zones");
 
-    FILE* output=fopen(AREA_FILE, "wb");
+    TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
+    doc.LinkEndChild(decl);
 
-    Serializer* s=new Serializer(output, WRITE);
-    int size=zones->size();
-
-    (*s) << size;
-
-    if (size) {
+    if (zones->size()) {
         itEnd = zones->end();
         for (it = zones->begin(); it != itEnd; ++it) {
-            (*it)->Serialize(*s);
+            (*it)->Serialize(zlist);
         }
     }
     delete zones;
-    delete s;
+    doc.LinkEndChild(zlist);
+    doc.SaveFile(AREA_FILE);
     return true;
 }
 BOOL LoadZones(void)
 {
-    int size,i;
+    TiXmlDocument doc(AREA_FILE);
     Zone* zone=NULL;
-    FILE* input=fopen(AREA_FILE, "rb");
-    Serializer*s =new Serializer(input, READ);
-    (*s) >> size;
+    TiXmlElement* zones = doc.FirstChild("zones");
+    TiXmlElement* node = NULL;
 
-    if (size) {
-        for (i=0; i<size; i++) {
-            zone=new Zone();
-            zone->Deserialize(*s);
-            world->AddZone(zone);
-        }
+    for (node = zones->FirstChild()->ToElement(); node; node = node->NextSibling()->ToElement()) {
+        zone=new Zone();
+        zone->Deserialize(node);
+        world->AddZone(zone);
     }
-    delete s;
     return true;
 }
 

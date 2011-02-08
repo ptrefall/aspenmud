@@ -192,6 +192,11 @@ void Commandable::ListCommands(std::vector <std::string>* list, Player* mobile, 
     }
 }
 
+std::vector <Command*> *Commandable::GetPtr()
+{
+    return _commands;
+}
+
 
 void InitializeCommands()
 {

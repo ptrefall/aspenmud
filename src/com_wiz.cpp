@@ -27,10 +27,10 @@
 void InitializeWizCommands()
 {
     world->WriteLog("Initializing wizard commands.");
-    world->AddCommand(new CMDCopyover());
-    world->AddCommand(new CMDMkgod());
-    world->AddCommand(new CMDShutdown());
-    world->AddCommand(new CMDMkbuilder());
+    world->commands.AddCommand(new CMDCopyover());
+    world->commands.AddCommand(new CMDMkgod());
+    world->commands.AddCommand(new CMDShutdown());
+    world->commands.AddCommand(new CMDMkbuilder());
 }
 
 CMDCopyover::CMDCopyover()

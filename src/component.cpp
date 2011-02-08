@@ -27,11 +27,11 @@ void Component::_Init(void)
     _attached = false;
     _dependencies=new std::vector<std::string>();
 
-    RegisterEvent("OnCreate", new Event());
-    RegisterEvent("OnDestroy", new Event());
-    RegisterEvent("OnAttach", new Event());
-    RegisterEvent("OnDetach", new Event());
-    CallEvent("OnCreate", NULL, (void*)this);
+    events.RegisterEvent("OnCreate", new Event());
+    events.RegisterEvent("OnDestroy", new Event());
+    events.RegisterEvent("OnAttach", new Event());
+    events.RegisterEvent("OnDetach", new Event());
+    events.CallEvent("OnCreate", NULL, (void*)this);
 }
 
 Component::Component(const std::string &name)
@@ -50,7 +50,7 @@ Component::~Component(void)
         delete _dependencies;
         _dependencies=NULL;
     }
-    CallEvent("OnDestroy", NULL, (void*)this);
+    events.CallEvent("OnDestroy", NULL, (void*)this);
 }
 
 std::string Component::GetName(void) const
@@ -88,7 +88,7 @@ void Component::Attach(Entity* obj)
     }
 
     OneArg arg(obj);
-    CallEvent("OnAttach", &arg, (void*)this);
+    events.CallEvent("OnAttach", &arg, (void*)this);
     _attached = true;
 }
 void Component::Detach()
@@ -99,7 +99,7 @@ void Component::Detach()
 
     SetObject(NULL);
     _attached = false;
-    CallEvent("OnDetach", NULL, (void*) this);
+    events.CallEvent("OnDetach", NULL, (void*) this);
 }
 
 BOOL Component::DependencyExists(const std::string &name) const

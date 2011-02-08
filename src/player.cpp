@@ -1,23 +1,5 @@
-/*
-*player.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include <openssl/sha.h>
+#include <tinyxml.h>
 #include <map>
 #include <string>
 #include <sstream>
@@ -27,9 +9,7 @@
 #include "event.h"
 #include "utils.h"
 #include "world.h"
-#include "serializer.hpp"
 #include "exception.h"
-#include <openssl/sha.h>
 
 Player::Player()
 {
@@ -41,7 +21,6 @@ Player::Player()
     _prompt=">";
     _title="the brave";
     _level=1;
-    _exp=0;
     _rank=RANK_PLAYER;
     _firstLogin=0;
     _onlineTime=0;
@@ -61,11 +40,11 @@ Player::Player()
 #endif
 
 //events
-    RegisterEvent("EnterGame", new Event());
-    RegisterEvent("LeaveGame", new Event());
+    events.RegisterEvent("EnterGame", new Event());
+    events.RegisterEvent("LeaveGame", new Event());
 
-    AddCallback("HeartBeat", HB_OnlineTime);
-    AddCallback("HeartBeat", HB_AUTOSAVE);
+    events.AddCallback("HeartBeat", HB_OnlineTime);
+    events.AddCallback("HeartBeat", HB_AUTOSAVE);
 }
 Player::~Player()
 {
@@ -92,76 +71,101 @@ BOOL Player::IsPlayer(void)
     return true;
 }
 
-void Player::Serialize(Serializer& ar)
+void Player::Serialize(TiXmlDocument* doc)
 {
-    Living::Serialize(ar);
+    TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
+    doc->LinkEndChild(decl);
+    TiXmlElement* root = new TiXmlElement("player");
 
-    ar.WriteBytes((char*)_password, SHA256_DIGEST_LENGTH+1);
-    ar << _invalidPassword;
-    ar << _title;
-    ar << _prompt;
-    ar << _level;
-    ar << _exp;
-    ar << _rank;
-    ar << _firstLogin;
-    ar << _onlineTime;
-    ar << _lastLogin;
+//password info
+    TiXmlElement* password = new TiXmlElement("password");
+    password->SetAttribute("value", (char*)_password);
+    password->SetAttribute("invalid", _invalidPassword);
+    root->LinkEndChild(password);
 
-//serialize their options:
-    int count = 0;
+//time info
+    TiXmlElement* timeinfo = new TiXmlElement("timeinfo");
+    timeinfo->SetAttribute("firstLogin", _firstLogin);
+    timeinfo->SetAttribute("onlineTime", _onlineTime);
+    timeinfo->SetAttribute("lastLogin", _lastLogin);
+    root->LinkEndChild(timeinfo);
+
+//options
+    TiXmlElement* options = new TiXmlElement("options");
     std::map<std::string, Option>::iterator it;
-    std::map<std::string, Option>::iterator itEnd;
-    itEnd = _config->end();
-    for (it = _config->begin(); it != itEnd; ++it) {
-//we only serialize if:
-//1) the option exists. (This keeps us from having to clean out files if we remove a channel, etc).
-//2) The options value is not equal to the default value of the registered option (keeps overhead minimal).
-        if ((!OptionExists((*it).first)) || (GetGlobalOption((*it).first)->GetData() == (*it).second.GetData())) {
-            continue;
-        }
-        count++;
-    }
-    ar << count;
-    if (count) {
+    std::map<std::string, Option>::iterator itEnd = _config->end();
+    if (_config->size()) {
 //we serialize if there is actually something to serialize.
         for (it = _config->begin(); it != itEnd; ++it) {
             if ((!OptionExists((*it).first)) || (GetGlobalOption((*it).first)->GetData() == (*it).second.GetData())) {
                 continue;
             }
-            ar << (*it).first;
-            (*it).second.GetData().Serialize(ar);
+            TiXmlElement* option = new TiXmlElement("option");
+            option->SetAttribute("name", (*it).first.c_str());
+            (*it).second.GetData().Serialize(option);
+            options->LinkEndChild(option);
         }
     }
+    root->LinkEndChild(options);
+
+    root->SetAttribute("title", _title.c_str());
+    root->SetAttribute("prompt", _prompt.c_str());
+    root->SetAttribute("level", _level);
+    root->SetAttribute("rank", _rank);
+
+    Living::Serialize(root);
+    doc->LinkEndChild(root);
 }
-void Player::Deserialize(Serializer& ar)
+void Player::Deserialize(TiXmlElement* root)
 {
-    Living::Deserialize(ar);
+    int tmp = 0;
+    TiXmlElement* password = NULL;
+    TiXmlElement* tinfo = NULL;
+    TiXmlElement* option = NULL;
+    TiXmlElement* options = NULL;
+    Variant* var = NULL;
+    std::string name;
 
-    ar.ReadBytes((char*)_password, SHA256_DIGEST_LENGTH+1);
-    ar >> _invalidPassword;
-    ar >> _title;
-    ar >> _prompt;
-    ar >> _level;
-    ar >> _exp;
-    ar >> _rank;
-    ar >> _firstLogin;
-    ar >> _onlineTime;
-    ar >> _lastLogin;
-
-//deserialize options.
-    int count = 0;
-    ar >> count;
-    if (count) {
-//we only do this if there's something to deserialize.
-        Variant var;
-        std::string name;
-        int i=0;
-        for (; i < count; ++i) {
-            ar >> name;
-            var.Deserialize(ar);
-            SetOption(name, var);
-        }
+    if (!root) {
+        throw(FileLoadException("Error loading file: player element was not found."));
     }
+
+    password = root->FirstChild("password")->ToElement();
+    if (!password) {
+        throw(FileLoadException("Error loading file: password element was not found."));
+    }
+    memcpy(_password, password->Attribute("value"), SHA256_DIGEST_LENGTH);
+    password->Attribute("invalid", &_invalidPassword);
+
+    tinfo = root->FirstChild("timeinfo")->ToElement();
+    if (!tinfo) {
+        throw(FileLoadException("Could not find timeinfo element."));
+    }
+    tinfo->Attribute("firstLogin", &tmp);
+    _firstLogin = tmp;
+    tinfo->Attribute("onlineTime", &tmp);
+    _onlineTime = tmp;
+    tinfo->Attribute("lastLogin", &tmp);
+    _lastLogin = tmp;
+
+    options=root->FirstChild("options")->ToElement();
+    if (!options) {
+        throw(FileLoadException("Error: options node was not found."));
+    }
+//now we iterate through the options list, and pull in the options to deserialize.
+    for (option = options->FirstChild()->ToElement(); option; option = option->NextSibling()->ToElement()) {
+        name = option->Attribute("name");
+        var = new Variant();
+        var->Deserialize(option->FirstChild("variable")->ToElement());
+        SetOption(name, *var);
+    }
+
+    _title = root->Attribute("title");
+    _prompt = root->Attribute("prompt");
+    root->Attribute("level", &_level);
+    root->Attribute("rank", &_rank);
+
+    Living::Deserialize(root->FirstChild("living")->ToElement());
 }
 
 void Player::SetSocket(Socket* sock)
@@ -214,21 +218,19 @@ void Player::IncInvalidPassword(void)
 
 void Player::Save(void)
 {
-    FILE* output=fopen((std::string(PLAYER_DIR)+GetName()).c_str(), "wb");
-    Serializer* s=new Serializer(output, WRITE);
-    Serialize(*s);
-    delete s;
+    TiXmlDocument doc;
+    Serialize(&doc);
+    doc.SaveFile((std::string(PLAYER_DIR)+GetName()).c_str());
 }
+
 void Player::Load(void)
 {
-    FILE* in=fopen((std::string(PLAYER_DIR)+GetName()).c_str(), "rb");
-    try {
-        Serializer* ar=new Serializer(in,READ);
-        Deserialize(*ar);
-        delete ar;
-    } catch (Exception x) {
-        printf("%s\n", x.GetMessage().c_str());
+    TiXmlDocument doc((std::string(PLAYER_DIR)+GetName()).c_str());
+    if (!doc.LoadFile()) {
+        throw(FileLoadException("Error loading "+(std::string(PLAYER_DIR)+GetName())+"."));
     }
+    TiXmlElement* root = doc.FirstChild("player")->ToElement();
+    Deserialize(root);
 }
 
 void Player::EnterGame(BOOL quiet)
@@ -251,8 +253,8 @@ void Player::EnterGame(BOOL quiet)
 //show the login banner:
         Write("\n"+std::string(world->GetMotd())+"\n");
     }
-    world->CallEvent("PlayerConnect", NULL,this);
-    CallEvent("EnterGame", NULL, this);
+    world->events.CallEvent("PlayerConnect", NULL,this);
+    events.CallEvent("EnterGame", NULL, this);
     Save();
 }
 void Player::LeaveGame()
@@ -261,8 +263,8 @@ void Player::LeaveGame()
     Living::LeaveGame();
 //take the player from the users list:
     world->RemovePlayer(this);
-    world->CallEvent("PlayerDisconnect", NULL, this);
-    CallEvent("LeaveGame", NULL,this);
+    world->events.CallEvent("PlayerDisconnect", NULL, this);
+    events.CallEvent("LeaveGame", NULL,this);
 }
 
 void Player::Write(const std::string &text) const
@@ -401,19 +403,17 @@ EVENT(HB_AUTOSAVE)
     Player* person = (Player*)caller;
     int saves=0;
 
-    if (!person->VarExists("autosaves")) {
-        person->AddVar("autosaves", saves);
-        person->SetPersistents("autosaves", false);
+    if (!person->variables.FindProperty("autosaves")) {
+        person->variables.AddProperty("autosaves", Variant(saves));
         return;
     }
 
-    saves = person->GetInt("autosaves");
+    saves = person->variables.GetPropertyRef("autosaves").GetInt();
     saves++;
     if (saves >= 150) {
         saves = 0;
         person->Save();
         person->Message(MSG_INFO, "Autosaving.");
     }
-
-    person->SetInt("autosaves", saves);
+    person->variables.GetPropertyRef("autosaves").SetInt(saves);
 }

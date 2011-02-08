@@ -33,7 +33,7 @@
 BOOL InitializeOlc(void)
 {
     world->WriteLog("Initializing OLC.");
-    world->AddCommand(new CMDOedit());
+    world->commands.AddCommand(new CMDOedit());
     return true;
 }
 

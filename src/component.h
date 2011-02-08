@@ -25,13 +25,14 @@
 #include "entity.h"
 #include "event.h"
 
-class Component:public EventManager
+class Component
 {
     Entity* _object; //The object associated with the component (it's parent).
     BOOL _attached; //set if the component is attached to an object.
     std::string _name;
     std::vector <std::string> *_dependencies; //component dependencies.
 public:
+    EventManager events;
     Component(const std::string &name);
     Component(void);
     virtual ~Component();

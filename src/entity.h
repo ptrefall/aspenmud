@@ -4,6 +4,7 @@
 
 #ifndef ENTITY_H
 #define ENTITY_H
+#include <tinyxml.h>
 #include <list>
 #include <map>
 #include <string>
@@ -13,11 +14,9 @@
 #include "eventargs.h"
 #include "variant.h"
 #include "command.h"
-#include "serialize.h"
-#include "serializer.hpp"
-#include "properties.h"
+#include "property.hpp"
 
-class Entity:public ISerializable, public EventManager, public Commandable, public PropertyMap
+class Entity
 {
     std::list <Entity*> _contents;
     std::list <Component*> *_components;
@@ -31,6 +30,11 @@ class Entity:public ISerializable, public EventManager, public Commandable, publ
     std::string _desc;
     std::string _script; //the scripting associated with this object.
 public:
+//these are objects we need to store on each entity.
+    EventManager events;
+    Property variables;
+    Commandable commands;
+
     Entity(void);
     virtual ~Entity(void);
     virtual std::string GetName(void) const;
@@ -69,8 +73,8 @@ public:
     *Param: [in] the vnum for the object.
     */
     void SetOnum(VNUM num);
-    virtual void Serialize(Serializer& ar);
-    virtual void Deserialize(Serializer& ar);
+    virtual void Serialize(TiXmlElement* root);
+    virtual void Deserialize(TiXmlElement* root);
     /*
     *Called when the player looks at the object.
     *Param: [in] a pointer to the player who looked at the object.
