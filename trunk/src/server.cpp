@@ -293,7 +293,7 @@ BOOL Server::PollSockets()
             sock->SetConnectionType(con_game);
             mob->SetSocket(sock);
 //call the Create event:
-            world->CallEvent("PlayerCreated", NULL, (void*)mob);
+            world->events.CallEvent("PlayerCreated", NULL, (void*)mob);
             mob->EnterGame();
             break;
         }

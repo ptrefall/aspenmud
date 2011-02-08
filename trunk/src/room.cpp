@@ -1,25 +1,7 @@
-/*
-*room.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include <sstream>
 #include <string>
 #include <list>
+#include <tinyxml.h>
 #include "room.h"
 #include "living.h"
 #include "exit.h"
@@ -27,19 +9,18 @@
 #include "event.h"
 #include "eventargs.h"
 #include "zone.h"
-#include "serializer.hpp"
 
 Room::Room(void)
 {
-    RegisterEvent("PostLook", new Event());
-    RegisterEvent("OnEnter", new Event());
-    RegisterEvent("OnExit", new Event());
-    RegisterEvent("OnLook", new Event());
+    events.RegisterEvent("PostLook", new Event());
+    events.RegisterEvent("OnEnter", new Event());
+    events.RegisterEvent("OnExit", new Event());
+    events.RegisterEvent("OnLook", new Event());
 
     _zone=NULL;
     SetOnum(ROOM_NOWHERE);
     SetType(2);
-    GetEvent("PostLook")->Add(ROOM_POST_LOOK);
+    events.GetEvent("PostLook")->Add(ROOM_POST_LOOK);
 }
 Room::~Room(void)
 {
@@ -153,37 +134,37 @@ void Room::TellAllBut(const std::string &message, std::list <Player*>* players)
     }
 }
 
-void Room::Serialize(Serializer& ar)
+void Room::Serialize(TiXmlElement* root)
 {
+    TiXmlElement* room = new TiXmlElement("room");
+    TiXmlElement* exits = new TiXmlElement("exits");
     std::list <Exit*>::iterator it;
-    int size=_exits.size();
+    std::list<Exit*>::iterator itEnd = _exits.end();
 
-    Entity::Serialize(ar);
-
-    ar << size;
-    if (size) {
-        for (it=_exits.begin(); it!=_exits.end(); it++) {
-            (*it)->Serialize(ar);
+    if (_exits.size()) {
+        for (it=_exits.begin(); it != itEnd; ++it) {
+            (*it)->Serialize(exits);
         }
     }
+    room->LinkEndChild(exits);
+    Entity::Serialize(room);
+    root->LinkEndChild(room);
 }
-void Room::Deserialize(Serializer& ar)
+void Room::Deserialize(TiXmlElement* room)
 {
-    int size,i;
-    Exit* exit=NULL;
+    TiXmlElement* exit = NULL;
+    TiXmlElement* exits = NULL;
+    Exit* ex = NULL;
 
-    Entity::Deserialize(ar);
-
-    ar >> size;
-
-    if (size) {
-        for (i=0; i<size; i++) {
-            exit=new Exit();
-            exit->Deserialize(ar);
-            _exits.push_back(exit);
-            exit=NULL;
-        }
+    exits = room->FirstChild("exits")->ToElement();
+    for (exit = exits->FirstChild()->ToElement(); exit; exit = exit->NextSibling()->ToElement()) {
+        ex = new Exit();
+        ex->Deserialize(exit);
+        _exits.push_back(ex);
+        ex = NULL;
     }
+
+    Entity::Deserialize(room);
 }
 
 

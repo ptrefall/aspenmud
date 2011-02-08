@@ -1,24 +1,5 @@
 /*
 *player.h
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
-/*
-*player.h
 *Contains the main player object prototypes.
 */
 
@@ -28,13 +9,19 @@
 #include <list>
 #include <map>
 #include <ctime>
+#include <tinyxml.h>
 #include "mud.h"
 #include "conf.h"
 #include "living.h"
 #include "event.h"
 #include "option.h"
-#include "serializer.hpp"
-
+#include "exception.h"
+//exceptions:
+class FileLoadException:public Exception
+{
+public:
+    FileLoadException(const std::string &msg):Exception(msg) { }
+};
 //Message types:
 enum MessageType {MSG_NORMAL, MSG_ERROR,MSG_INFO,MSG_CRITICAL,MSG_CHANNEL,MSG_LIST};
 EVENT(HB_OnlineTime);
@@ -48,7 +35,6 @@ class Player:public Living
     std::string _title;
     std::string _prompt;
     int _level;
-    UINT _exp;
     int _rank;
     time_t _firstLogin;
     time_t _onlineTime;
@@ -69,8 +55,8 @@ public:
     *Functions to load and retrieve player data from their file
     *param: [in] a boost archive to use for output.
     */
-    void Serialize(Serializer& ar);
-    void Deserialize(Serializer& ar);
+    void Serialize(TiXmlDocument* doc);
+    void Deserialize(TiXmlElement* root);
     /*
     *Getters and setters
     *Exposes the properties that can be set on the player object.

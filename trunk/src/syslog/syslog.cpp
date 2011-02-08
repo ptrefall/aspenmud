@@ -24,8 +24,8 @@ void InitializeSyslog(void)
 {
 #ifdef MODULE_SYSLOG
     world->WriteLog("Initializing syslog.");
-    world->GetEvent("PlayerConnect")->Add(SYSLOG_PlayerConnect);
-    world->GetEvent("PlayerDisconnect")->Add(SYSLOG_PlayerDisconnect);
+    world->events.GetEvent("PlayerConnect")->Add(SYSLOG_PlayerConnect);
+    world->events.GetEvent("PlayerDisconnect")->Add(SYSLOG_PlayerDisconnect);
     world->AddChannel(new Channel("syslog","",RANK_ADMIN),false);
 #endif
     return;

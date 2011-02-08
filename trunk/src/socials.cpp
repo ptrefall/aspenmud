@@ -191,7 +191,7 @@ void Socials::AddCommands(void)
         com->SetName((*it).second->name);
         com->SetType(social);
         com->SetSubcmd((*it).second->id);
-        world->AddCommand(com);
+        world->commands.AddCommand(com);
     }
 }
 
@@ -225,6 +225,6 @@ BOOL InitializeSocials(void)
     soc->Load();
     soc->AddCommands();
     world->AddProperty("socials", (void*)soc);
-    world->GetEvent("Shutdown")->Add(socials_shutdown);
+    world->events.GetEvent("Shutdown")->Add(socials_shutdown);
     return true;
 }

@@ -19,7 +19,7 @@
 #include "room.h"
 #include "zone.h"
 
-class World:public EventManager, public Commandable
+class World
 {
     Server* _server; //our main server object.
     Log *_log;
@@ -41,6 +41,10 @@ class World:public EventManager, public Commandable
     char* _motd;
     char* _banner;
 public:
+//these are objects we need to store on each entity.
+    EventManager events;
+    Commandable commands;
+
 //Events
 //methods:
     World();

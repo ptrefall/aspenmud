@@ -1,29 +1,10 @@
-/*
-*living.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include "living.h"
 #include "event.h"
-#include "serializer.hpp"
+#include <tinyxml.h>
 
 Living::Living()
 {
-    RegisterEvent("HeartBeat", new DelayedEvent(LIVING_PULSE,0));
+    events.RegisterEvent("HeartBeat", new DelayedEvent(LIVING_PULSE,0));
 }
 Living::~Living()
 {
@@ -38,7 +19,7 @@ void Living::LeaveGame()
 
 void Living::Update()
 {
-    CallEvent("HeartBeat", NULL, (void*)this);
+    events.CallEvent("HeartBeat", NULL, (void*)this);
 }
 
 BOOL Living::IsNpc(void)
@@ -50,11 +31,13 @@ BOOL Living::IsPlayer(void)
     return false;
 }
 
-void Living::Serialize(Serializer& ar)
+void Living::Serialize(TiXmlElement* root)
 {
-    Entity::Serialize(ar);
+    TiXmlElement* node = new TiXmlElement("living");
+    Entity::Serialize(node);
+    root->LinkEndChild(node);
 }
-void Living::Deserialize(Serializer& ar)
+void Living::Deserialize(TiXmlElement* root)
 {
-    Entity::Deserialize(ar);
+    Entity::Deserialize(root->FirstChild("entity")->ToElement());
 }

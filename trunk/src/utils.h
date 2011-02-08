@@ -1,22 +1,3 @@
-/*
-*utils.h
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #ifndef HEADER_UTILS
 #define HEADER_UTILS
 #include <string>
@@ -25,7 +6,6 @@
 #include <vector>
 #include "mud.h"
 #include "conf.h"
-#include "serializer.hpp"
 
 //misc
 inline BOOL IsAlpha(const char* const character);
@@ -98,128 +78,4 @@ public:
     void Calculate(time_t data);
     std::string ToString(void);
 };
-
-template <typename T>
-inline void SerializeDictionary(Serializer& s, std::map<std::string, T > &dict)
-{
-    typename std::map <std::string, T>::iterator it;
-    unsigned int size=dict.size();
-
-    s << size;
-    if (size) {
-        for (it=dict.begin(); it!=dict.end(); it++) {
-            s << (*it).first;
-            s << (*it).second;
-        }
-    }
-}
-template <typename T>
-inline void DeserializeDictionary(Serializer& s, std::map<std::string, T> &dict)
-{
-    unsigned int size;
-    unsigned int i;
-
-    std::string key;
-    T val;
-
-    s >> size;
-    if (size) {
-        for (i=0; i<size; i++) {
-            s >> key;
-            s >> val;
-
-            dict[key]=val;
-        }
-    }
-}
-
-template <typename T>
-inline void SerializeObjects(Serializer& s, std::map<std::string, T*> &dict)
-{
-    typename std::map <std::string, T*>::iterator it;
-    unsigned int size=dict.size();
-
-    s << size;
-    if (size) {
-        for (it=dict.begin(); it!=dict.end(); it++) {
-            s << (*it).first;
-            (*it).second->serialize(s);
-        }
-    }
-}
-template <typename T>
-inline void DeserializeObjects(Serializer& s, std::map<std::string, T*> &dict)
-{
-    std::string key;
-    T* val;
-    unsigned int size, i;
-
-    s >> size;
-    if (size) {
-        for (i=0; i<size; i++) {
-            s >> key;
-            val = new T();
-            val->Deserialize(s);
-            dict[key]=val;
-        }
-    }
-}
-template <typename T>
-inline void SerializeObjects(Serializer& s, std::map<std::string, T> &dict)
-{
-    typename std::map <std::string, T*>::iterator it;
-    unsigned int size=dict.size();
-
-    s << size;
-    if (size) {
-        for (it=dict.begin(); it!=dict.end(); it++) {
-            s << (*it).first;
-            (*it).second.serialize(s);
-        }
-    }
-}
-template <typename T>
-inline void DeserializeObjects(Serializer& s, std::map<std::string, T> &dict)
-{
-    std::string key;
-    T val;
-    unsigned int size, i;
-
-    s >> size;
-    if (size) {
-        for (i=0; i<size; i++) {
-            s >> key;
-            val.Deserialize(s);
-            dict[key]=val;
-        }
-    }
-}
-template <typename T>
-inline void SerializeObjectList(Serializer& s, std::list <T*> &olist)
-{
-    typename std::list<T*>::iterator it;
-    UINT size=olist.size();
-    s << size;
-
-    if (size) {
-        for (it=olist.begin(); it!=olist.end(); it++) {
-            (*it)->Serialize(s);
-        }
-    }
-}
-template <typename T>
-inline void DeserializeObjectList(Serializer& s, std::list <T*> &olist)
-{
-    T* val;
-    UINT size, i;
-    s >> size;
-
-    if (size) {
-        for (i=0; i<size; i++) {
-            val=new T();
-            val->Deserialize(s);
-            olist.push_back(val);
-        }
-    }
-}
 #endif

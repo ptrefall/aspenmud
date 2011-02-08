@@ -37,7 +37,7 @@ command.cpp com_gen.cpp com_wiz.cpp event.cpp menu.cpp\
 living.cpp channel.cpp modules.cpp component.cpp npc.cpp\
 editor.cpp exit.cpp room.cpp zone.cpp com_builder.cpp\
 com_movement.cpp ComponentFactory.cpp components.cpp olc.cpp socials.cpp\
-option.cpp properties.cpp
+option.cpp
 
 ###
 ###YOU SHOULD NOT MODIFY ANYTHING PAST THIS POINT.
@@ -48,7 +48,7 @@ include $(patsubst %,%/include.mod, $(MODULES))
 O_FILES := $(patsubst %.cpp,%.o, $(filter %.cpp, $(S_FILES)))
 
 all:	dependencies $(O_FILES)
-	@$(RM) $OUTPUT
+	@$(RM) $(OUTPUT)
 	@$(ECHO) `date '+%H:%M:%S:'` Linking
 	@$(CC) $(PROF) $(CFLAGS) -o $(OUTPUT) $(O_FILES) $(L_FLAGS)
 .cpp.o: all

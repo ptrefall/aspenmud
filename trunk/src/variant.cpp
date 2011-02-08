@@ -1,26 +1,7 @@
-/*
-*variant.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include "variant.h"
 #include "exception.h"
-#include "serializer.hpp"
 #include "world.h"
+#include <tinyxml.h>
 
 Variant::Variant(void)
 {
@@ -357,82 +338,87 @@ Variant& Variant::operator =(std::string s)
     return (*this);
 }
 
-void Variant::Serialize(Serializer& ar)
+void Variant::Serialize(TiXmlElement* root)
 {
-    VARIABLE_TYPE t=Typeof();
-
-    ar << t;
+    TiXmlElement* var = new TiXmlElement("variable");
+    var->SetAttribute("type", (int)Typeof());
 
     switch (type) {
     case VAR_UINT:
-        ar << u32;
+        var->SetAttribute("value", u32);
         break;
     case VAR_INT:
-        ar << i32;
+        var->SetAttribute("value", i32);
         break;
     case VAR_USHORT:
-        ar << u16;
+        var->SetAttribute("value", u16);
         break;
     case VAR_SHORT:
-        ar << i16;
+        var->SetAttribute("value", i16);
         break;
     case VAR_UBYTE:
-        ar << ubyte;
+        var->SetAttribute("value", ubyte);
         break;
     case VAR_BYTE:
-        ar << byte;
+        var->SetAttribute("value", byte);
         break;
     case VAR_STR:
-        ar << str;
+        var->SetAttribute("value", str.c_str());
         break;
     case VAR_FLOAT:
-        ar << f;
+        var->SetDoubleAttribute("value", f);
         break;
     case VAR_DOUBLE:
-        ar << d;
+        var->SetDoubleAttribute("value", d);
         break;
     case VAR_EMPTY:
-        throw(VariableEmptyException("Tried to serialize value of empty variable."));
+        var->SetAttribute("value", 0);
         break;
     }
+    root->LinkEndChild(var);
 }
-void Variant::Deserialize(Serializer& ar)
+void Variant::Deserialize(TiXmlElement* var)
 {
-    VARIABLE_TYPE t;
-    ar >> t;
-    type = t;
+    int tmp;
+    double dtmp;
+    var->Attribute("type", &tmp);
+    type = (VARIABLE_TYPE)tmp;
 
     switch (type) {
     case VAR_UINT:
-        ar >> u32;
+        var->Attribute("value", &tmp);
+        u32 = (unsigned int)tmp;
         break;
     case VAR_INT:
-        ar >> i32;
+        var->Attribute("value", &i32);
         break;
     case VAR_USHORT:
-        ar >> u16;
+        var->Attribute("value", &tmp);
+        u16 = (unsigned short)tmp;
         break;
     case VAR_SHORT:
-        ar >> i16;
+        var->Attribute("value", &tmp);
+        i16 = (short)tmp;
         break;
     case VAR_UBYTE:
-        ar >> ubyte;
+        var->Attribute("value", &tmp);
+        ubyte = (unsigned char)tmp;
         break;
     case VAR_BYTE:
-        ar >> byte;
+        var->Attribute("value", &tmp);
+        byte = (char)tmp;
         break;
     case VAR_STR:
-        ar >> str;
+        str = var->Attribute("value");
         break;
     case VAR_FLOAT:
-        ar >> f;
+        var->Attribute("value", &dtmp);
+        f = (float)dtmp;
         break;
     case VAR_DOUBLE:
-        ar >> d;
+        var->Attribute("value", &d);
         break;
-//this should *never* happen
     case VAR_EMPTY:
-        throw(VariableEmptyException("Tried to deserialize value of empty variable."));
         break;
     }
 }

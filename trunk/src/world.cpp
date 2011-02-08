@@ -55,16 +55,16 @@ World::World()
     _chanid=1;
 
 //events
-    RegisterEvent("LivingPulse",new DelayedEvent(LIVING_PULSE,0));
-    RegisterEvent("WorldPulse", new DelayedEvent(WORLD_PULSE, 0));
-    RegisterEvent("PlayerConnect", new Event());
-    RegisterEvent("PlayerDisconnect", new Event());
-    RegisterEvent("PlayerCreated", new Event());
-    RegisterEvent("PlayerDeleted", new Event());
-    RegisterEvent("Shutdown", new Event());
+    events.RegisterEvent("LivingPulse",new DelayedEvent(LIVING_PULSE,0));
+    events.RegisterEvent("WorldPulse", new DelayedEvent(WORLD_PULSE, 0));
+    events.RegisterEvent("PlayerConnect", new Event());
+    events.RegisterEvent("PlayerDisconnect", new Event());
+    events.RegisterEvent("PlayerCreated", new Event());
+    events.RegisterEvent("PlayerDeleted", new Event());
+    events.RegisterEvent("Shutdown", new Event());
 #ifdef MODULE_SCRIPTING
-    RegisterEvent("ScriptLoaded", new Event());
-    RegisterEvent("ScriptUnloaded", new Event());
+    events.RegisterEvent("ScriptLoaded", new Event());
+    events.RegisterEvent("ScriptUnloaded", new Event());
 #endif
 }
 
@@ -111,7 +111,7 @@ void World::Shutdown()
         (*it)->Message(MSG_CRITICAL,"The mud is shutting down now. Your Character will be autosaved.");
     }
     _server->FlushSockets();
-    CallEvent("Shutdown", NULL, (void*)this);
+    events.CallEvent("Shutdown", NULL, (void*)this);
     for (it = _users->begin(); it != itEnd; ++it) {
         (*it)->GetSocket()->Kill();
 //since the disconnection removes the user from the list, we need to update our iterator.
@@ -195,7 +195,7 @@ void World::AddChannel(Channel* chan,BOOL command)
         if (chan->GetAlias() != "") {
             com->AddAlias(chan->GetAlias());
         }
-        AddCommand(com);
+        commands.AddCommand(com);
     }
     _chanid++;
 }
@@ -420,6 +420,7 @@ BOOL World::RemoveProperty(const std::string &name)
 
 BOOL World::DoCommand(Player* mobile,std::string args)
 {
+    std::vector<Command*>* cptr = commands.GetPtr();
     std::string cmd = ""; // the parsed command name
     const char *line = args.c_str(); // the command line
     int len = strlen(line); // get length of string
@@ -471,8 +472,8 @@ BOOL World::DoCommand(Player* mobile,std::string args)
     }
 //locate and execute the command:
 //check the built-in commands first, then contents, then location.
-    itEnd = _commands->end();
-    for (it = _commands->begin(); it != itEnd; ++it) {
+    itEnd = cptr->end();
+    for (it = cptr->begin(); it != itEnd; ++it) {
         if (((*it)->GetName() == cmd)||((*it)->HasAlias(cmd, true))) {
             if (!mobile->HasAccess((*it)->GetAccess())) {
                 return false;

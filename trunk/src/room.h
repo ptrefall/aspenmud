@@ -1,29 +1,11 @@
 /*
-*room.h
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
-/*
 *The basic room object
 */
 #ifndef ROOM_H
 #define ROOM_H
 #include <list>
 #include <string>
+#include <tinyxml.h>
 #include "mud.h"
 #include "conf.h"
 #include "entity.h"
@@ -32,7 +14,6 @@
 #include "player.h"
 #include "event.h"
 #include "zone.h"
-#include "serializer.hpp"
 
 EVENT(ROOM_POST_LOOK);
 
@@ -86,8 +67,7 @@ public:
     virtual void TellAll(const std::string &message);
     virtual void TellAllBut(const std::string & message, std::list <Player*>* players);
 //serialization
-    virtual void Serialize(Serializer& ar);
-    virtual void Deserialize(Serializer& ar);
+    virtual void Serialize(TiXmlElement* root);
+    virtual void Deserialize(TiXmlElement* node);
 };
-
 #endif

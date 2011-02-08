@@ -1,26 +1,7 @@
-/*
-*exit.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include <string>
+#include <tinyxml.h>
 #include "exit.h"
 #include "living.h"
-#include "serializer.hpp"
 
 Exit::Exit(VNUM from, VNUM to)
 {
@@ -77,17 +58,19 @@ BOOL Exit::CanEnter(Living* mobile)
     return true;
 }
 
-void Exit::Serialize(Serializer& ar)
+void Exit::Serialize(TiXmlElement* root)
 {
-    ar << _to;
-    ar << _from;
-    ar << _name;
-    ar << _alias;
+    TiXmlElement* node = new TiXmlElement("exit");
+    node->SetAttribute("name", _name.c_str());
+    node->SetAttribute("alias", _alias.c_str());
+    node->SetAttribute("to", _to);
+    node->SetAttribute("from", _from);
+    root->LinkEndChild(root);
 }
-void Exit::Deserialize(Serializer& ar)
+void Exit::Deserialize(TiXmlElement* node)
 {
-    ar >> _to;
-    ar >> _from;
-    ar >> _name;
-    ar >> _alias;
+    node->Attribute("to", &_to);
+    node->Attribute("from", &_from);
+    _name = node->Attribute("name");
+    _alias = node->Attribute("alias");
 }

@@ -26,8 +26,8 @@
 Stats::Stats(void)
 {
     SetName("stats");
-    RegisterEvent("StatChanged", new Event());
-    GetEvent("OnAttach")->Add(STATS_ATTACHED);
+    events.RegisterEvent("StatChanged", new Event());
+    events.GetEvent("OnAttach")->Add(STATS_ATTACHED);
 }
 
 COMCREATE(STATS_CREATE)
@@ -36,8 +36,8 @@ COMCREATE(STATS_CREATE)
 }
 COMINIT(STATS_INIT)
 {
-    world->GetEvent("PlayerCreated")->Add(STATS_ADD);
-    world->GetEvent("PlayerConnect")->Add(STATS_ADD);
+    world->events.GetEvent("PlayerCreated")->Add(STATS_ADD);
+    world->events.GetEvent("PlayerConnect")->Add(STATS_ADD);
 }
 
 EVENT(STATS_ATTACHED)
@@ -45,11 +45,11 @@ EVENT(STATS_ATTACHED)
     OneArg* arg = (OneArg*)args;
     Entity* obj = (Entity*) arg->_arg;
 
-    obj->AddVar("str", 1);
-    obj->AddVar("con", 1);
-    obj->AddVar("dex", 1);
-    obj->AddVar("int", 1);
-    obj->AddVar("wis", 1);
+    obj->variables.AddProperty("str", Variant(1));
+    obj->variables.AddProperty("con", Variant(1));
+    obj->variables.AddProperty("dex", Variant(1));
+    obj->variables.AddProperty("int", Variant(1));
+    obj->variables.AddProperty("wis", Variant(1));
 }
 
 EVENT(STATS_ADD) //called for new player and player logins.

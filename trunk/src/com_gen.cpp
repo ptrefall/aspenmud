@@ -28,16 +28,16 @@
 void InitializeGenCommands()
 {
     world->WriteLog("Initializing general commands.");
-    world->AddCommand(new CMDQuit());
-    world->AddCommand(new CMDSave());
-    world->AddCommand(new CMDWho());
-    world->AddCommand(new CMDToggle());
-    world->AddCommand(new CMDScore());
-    world->AddCommand(new CMDCommands());
-    world->AddCommand(new CMDHist());
-    world->AddCommand(new CMDUptime());
-    world->AddCommand(new CMDWhois());
-    world->AddCommand(new CMDLook());
+    world->commands.AddCommand(new CMDQuit());
+    world->commands.AddCommand(new CMDSave());
+    world->commands.AddCommand(new CMDWho());
+    world->commands.AddCommand(new CMDToggle());
+    world->commands.AddCommand(new CMDScore());
+    world->commands.AddCommand(new CMDCommands());
+    world->commands.AddCommand(new CMDHist());
+    world->commands.AddCommand(new CMDUptime());
+    world->commands.AddCommand(new CMDWhois());
+    world->commands.AddCommand(new CMDLook());
 }
 
 //quit
@@ -149,7 +149,9 @@ BOOL CMDScore::Execute(const std::string &verb, Player* mobile,std::vector<std::
     mobile->Write("Online time:\t"+tm.ToString()+"\n");
     std::stringstream st;
     mobile->Write(Repete("-",80));
-    st << "int: " << mobile->GetInt("int") << "wis: " << mobile->GetInt("wis") << "\nstr: " << mobile->GetInt("str") << " dex: " << mobile->GetInt("dex") << "\nagi: " << mobile->GetInt("agi") << " con: " << mobile->GetInt("con") << "\n";
+    st << "int: " << mobile->variables.GetPropertyRef("stats.int").GetInt() << "wis: " << mobile->variables.GetPropertyRef("stats.wis").GetInt() <<
+       "\nstr: " << mobile->variables.GetPropertyRef("stats.str").GetInt() << " dex: " << mobile->variables.GetPropertyRef("stats.dex").GetInt()
+       << "\nagi: " << mobile->variables.GetPropertyRef("stats.agi").GetInt() << " con: " << mobile->variables.GetPropertyRef("stats.con").GetInt() << "\n";
     mobile->Write(st.str());
     return true;
 }
@@ -201,7 +203,7 @@ BOOL CMDCommands::Execute(const std::string &verb, Player* mobile,std::vector<st
         return false;
     }
 
-    world->ListCommands(&commands,mobile, type);
+    world->commands.ListCommands(&commands,mobile, type);
     mobile->Message(MSG_LIST, Columnize(&commands, 4));
     return true;
 }

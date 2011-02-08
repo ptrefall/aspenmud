@@ -35,13 +35,13 @@ Script::Script()
     state = lua_open();
     luaL_openlibs(state);
     OneArg arg(state);
-    world->CallEvent("ScriptLoaded", &arg, NULL);
+    world->events.CallEvent("ScriptLoaded", &arg, NULL);
     _obj = NULL;
 }
 Script::~Script()
 {
     OneArg arg(state);
-    world->CallEvent("ScriptUnloaded", &arg, NULL);
+    world->events.CallEvent("ScriptUnloaded", &arg, NULL);
     lua_close(state);
 }
 void Script::SetObj(Entity* obj)
@@ -75,8 +75,8 @@ BOOL InitializeScript(void)
 {
 #ifdef MODULE_SCRIPTING
     world->WriteLog("Initializing scripting.");
-    world->AddCallback("ScriptLoaded", EVENT_INIT_PLAYER_SCRIPT);
-    world->AddCommand(new CMDExecute());
+    world->events.AddCallback("ScriptLoaded", EVENT_INIT_PLAYER_SCRIPT);
+    world->commands.AddCommand(new CMDExecute());
     if (!InitWorldScript()) {
         world->WriteLog("Initialization of world script system failed.", ERR);
         return false;
