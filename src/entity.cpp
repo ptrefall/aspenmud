@@ -149,22 +149,38 @@ void Entity::Deserialize(TiXmlElement* root)
     TiXmlElement* component = NULL;
     TiXmlElement* obj = NULL;
     TiXmlElement* contents = NULL;
+    TiXmlElement* properties = NULL;
+    TiXmlNode* node = NULL;
     int loc;
 
-    contents = root->FirstChild("contents")->ToElement();
-    for (obj = contents->FirstChild()->ToElement(); obj; obj = obj->NextSibling()->ToElement()) {
-        Entity* object = new Entity();
-        object->Deserialize(obj);
-        object->SetLocation(this);
-        _contents.push_back(object);
+//contents
+    node = root->FirstChild("contents");
+    if (node) {
+        contents = node->ToElement();
+        for (node = contents->FirstChild(); node; node = node->NextSibling()) {
+            obj = node->ToElement();
+            Entity* object = new Entity();
+            object->Deserialize(obj);
+            object->SetLocation(this);
+            _contents.push_back(object);
+        }
     }
 
-    components = root->FirstChild("components")->ToElement();
-    for (component = components->FirstChild()->ToElement(); component; component = component->NextSibling()->ToElement()) {
-        AddComponent(world->CreateComponent(component->Attribute("name")));
+    node = root->FirstChild("components");
+    if (node) {
+        components = node->ToElement();
+        for (node = components->FirstChild(); node; node = node->NextSibling()) {
+            component = node->ToElement();
+            AddComponent(world->CreateComponent(component->Attribute("name")));
+        }
     }
 
-    variables.Deserialize(root->FirstChild("properties")->ToElement());
+    node = root->FirstChild("properties");
+    if (node) {
+        properties = node->ToElement();
+        variables.Deserialize(properties);
+    }
+
     _name = root->Attribute("name");
     _desc = root->Attribute("desc");
     _script = root->Attribute("script");

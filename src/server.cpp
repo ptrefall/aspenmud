@@ -20,8 +20,6 @@
 *A basic server class.
 *Manages all game connections and socket operations for the game.
 */
-extern unsigned int tcount;
-extern unsigned int lcount;
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -340,12 +338,10 @@ void Server::Sleep(DWORD pps)
         usecs += 1000000;
         secs  -= 1;
     }
-    lcount += 1;
     while (usecs >= 1000000) {
         usecs -= 1000000;
         secs  += 1;
     }
-    tcount = (secs*1000000)+usecs;
     // sleep if needed
     if (secs > 0 || (secs == 0 && usecs > 0)) {
         struct timeval sleepTime;

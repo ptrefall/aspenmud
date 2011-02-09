@@ -6,6 +6,7 @@
 Variant::Variant(void)
 {
     type=VAR_EMPTY;
+    i32 = 0;
 }
 Variant::Variant(unsigned int s)
 {

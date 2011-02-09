@@ -107,12 +107,19 @@ void Zone::Serialize(TiXmlElement* root)
 void Zone::Deserialize(TiXmlElement* zone)
 {
     Room* room=NULL;
-    TiXmlElement* rooms = zone->FirstChild("rooms")->ToElement();
-    TiXmlElement* node = NULL;
+    TiXmlElement* rooms = NULL;
+    TiXmlElement* iterator = NULL;
+    TiXmlNode* node = NULL;
+    node = zone->FirstChild("rooms");
+    if (!node) {
+        return;
+    }
+    rooms = node->ToElement();
 
-    for (node = rooms->FirstChild()->ToElement(); node; node = node->NextSibling()->ToElement()) {
+    for (node = rooms->FirstChild(); node; node = node->NextSibling()) {
+        iterator = node->ToElement();
         room=new Room();
-        room->Deserialize(node);
+        room->Deserialize(iterator);
         world->AddRoom(room->GetOnum(),room);
         AddRoom(room->GetOnum());
         room=NULL;
@@ -186,13 +193,26 @@ BOOL SaveZones(void)
 BOOL LoadZones(void)
 {
     TiXmlDocument doc(AREA_FILE);
-    Zone* zone=NULL;
-    TiXmlElement* zones = doc.FirstChild("zones");
-    TiXmlElement* node = NULL;
+    if (!doc.LoadFile()) {
+        return false;
+    }
 
-    for (node = zones->FirstChild()->ToElement(); node; node = node->NextSibling()->ToElement()) {
+    Zone* zone=NULL;
+    TiXmlElement* zones = NULL;
+    TiXmlElement* iterator = NULL;
+    TiXmlNode* node = NULL;
+
+    node = doc.FirstChild("zones");
+    if (!node) {
+        return false;
+    }
+    zones = node->ToElement();
+
+
+    for (node = zones->FirstChild(); node; node = node->NextSibling()) {
+        iterator = node->ToElement();
         zone=new Zone();
-        zone->Deserialize(node);
+        zone->Deserialize(iterator);
         world->AddZone(zone);
     }
     return true;
