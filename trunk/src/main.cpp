@@ -1,29 +1,9 @@
-/*
-*main.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-unsigned int lcount, tcount;
 #include <unistd.h>
 #include <signal.h>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <cstdio>
-#include <iostream>
 #include "mud.h"
 #include "conf.h"
 #include "socket.h"
@@ -56,7 +36,6 @@ BOOL running;
 
 int main(int argc, char** argv)
 {
-    tcount = lcount = 0;
     BOOL copyover=false; //are we rebooting for copyover?
     int listener=0; //the socket to listen on when recovering from copyover
     world=new World();
@@ -136,7 +115,6 @@ int main(int argc, char** argv)
     GameLoop();
     world->WriteLog("Game loop finished, exiting.");
     delete world;
-    std::cout << "slept for a total of " << (float)tcount/1000.0 << "ms, with a total of " << lcount << " iterations, with an average sleep time of " << (float)tcount/(float)lcount << "." << std::endl;
     return 0;
 }
 

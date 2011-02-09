@@ -185,14 +185,25 @@ public:
     }
     void Deserialize(TiXmlElement* root, Property* parent = NULL) {
         TiXmlElement* property = NULL;
-        Property node;
+        TiXmlNode *node = NULL;
+        Property prop;
+        const char* val = NULL;
 
-        Name = root->Attribute("name");
-        Value.Deserialize(root->FirstChild("variable")->ToElement());
+        val = root->Attribute("name");
+        if (val) {
+            Name = val;
+        }
+
+        node = root->FirstChild("variable");
+        if (node) {
+            Value.Deserialize(node->ToElement());
+        }
+
         SetParent(parent);
-        for (property = root->FirstChild()->ToElement(); property; property = property->NextSibling()->ToElement()) {
-            node = Property();
-            node.Deserialize(property, this);
+        for (node = root->FirstChild(); node; node = node->NextSibling()) {
+            property = node->ToElement();
+            prop = Property();
+            prop.Deserialize(property, this);
         }
     }
 

@@ -123,6 +123,7 @@ void Player::Deserialize(TiXmlElement* root)
     TiXmlElement* tinfo = NULL;
     TiXmlElement* option = NULL;
     TiXmlElement* options = NULL;
+    TiXmlNode* node = NULL;
     Variant* var = NULL;
     std::string name;
 
@@ -130,17 +131,19 @@ void Player::Deserialize(TiXmlElement* root)
         throw(FileLoadException("Error loading file: player element was not found."));
     }
 
-    password = root->FirstChild("password")->ToElement();
-    if (!password) {
+    node = root->FirstChild("password");
+    if (!node) {
         throw(FileLoadException("Error loading file: password element was not found."));
     }
+    password = node->ToElement();
     memcpy(_password, password->Attribute("value"), SHA256_DIGEST_LENGTH);
     password->Attribute("invalid", &_invalidPassword);
 
-    tinfo = root->FirstChild("timeinfo")->ToElement();
-    if (!tinfo) {
+    node = root->FirstChild("timeinfo");
+    if (!node) {
         throw(FileLoadException("Could not find timeinfo element."));
     }
+    tinfo = node->ToElement();
     tinfo->Attribute("firstLogin", &tmp);
     _firstLogin = tmp;
     tinfo->Attribute("onlineTime", &tmp);
@@ -148,12 +151,14 @@ void Player::Deserialize(TiXmlElement* root)
     tinfo->Attribute("lastLogin", &tmp);
     _lastLogin = tmp;
 
-    options=root->FirstChild("options")->ToElement();
-    if (!options) {
+    node = root->FirstChild("options")->ToElement();
+    if (!node) {
         throw(FileLoadException("Error: options node was not found."));
     }
+    options = node->ToElement();
 //now we iterate through the options list, and pull in the options to deserialize.
-    for (option = options->FirstChild()->ToElement(); option; option = option->NextSibling()->ToElement()) {
+    for (node = options->FirstChild(); node; node = node->NextSibling()) {
+        option = node->ToElement();
         name = option->Attribute("name");
         var = new Variant();
         var->Deserialize(option->FirstChild("variable")->ToElement());

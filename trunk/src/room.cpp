@@ -154,17 +154,19 @@ void Room::Deserialize(TiXmlElement* room)
 {
     TiXmlElement* exit = NULL;
     TiXmlElement* exits = NULL;
+    TiXmlNode* node = NULL;
     Exit* ex = NULL;
 
     exits = room->FirstChild("exits")->ToElement();
-    for (exit = exits->FirstChild()->ToElement(); exit; exit = exit->NextSibling()->ToElement()) {
+    for (node = exits->FirstChild(); node; node = node->NextSibling()) {
+        exit = node->ToElement();
         ex = new Exit();
         ex->Deserialize(exit);
         _exits.push_back(ex);
         ex = NULL;
     }
 
-    Entity::Deserialize(room);
+    Entity::Deserialize(room->FirstChild("entity")->ToElement());
 }
 
 
