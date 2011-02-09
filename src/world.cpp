@@ -104,21 +104,17 @@ void World::Shutdown()
 {
     std::list <Player*>::iterator it;
     std::list <Player*>::iterator itEnd;
+    std::list<Player*> players(_users->begin(), _users->end());
 
-    itEnd=_users->end();
-    for (it = _users->begin(); it != itEnd; ++it) {
-        (*it)->Save();
-        (*it)->Message(MSG_CRITICAL,"The mud is shutting down now. Your Character will be autosaved.");
+    Player* person = NULL;
+
+    itEnd = players.end();
+    for (it = players.begin(); it != itEnd; ++it) {
+        person = (*it);
+        person->Message(MSG_CRITICAL,"The mud is shutting down now. Your Character will be autosaved.");
+        person->GetSocket()->Kill();
     }
-    _server->FlushSockets();
     events.CallEvent("Shutdown", NULL, (void*)this);
-    for (it = _users->begin(); it != itEnd; ++it) {
-        (*it)->GetSocket()->Kill();
-//since the disconnection removes the user from the list, we need to update our iterator.
-        it = _users->begin();
-    }
-    Update();
-
     running = false;
 }
 
