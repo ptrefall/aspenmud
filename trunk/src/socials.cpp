@@ -63,7 +63,8 @@ void Socials::Save(void)
     SOCIAL_DATA* d = NULL;
 
     if (!output) {
-//todo: do something to scream about not being able to save here
+        world->WriteLog("Could not save to socials file.");
+        return;
     }
 //print the number of socials.
     fprintf(output, "%u\n", (UINT)_slist->size());
