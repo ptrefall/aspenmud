@@ -199,10 +199,8 @@ void Socials::AddCommands(void)
 EVENT(socials_shutdown)
 {
     world->WriteLog("Cleaning up socials.");
-    Socials* soc = (Socials*)world->GetProperty("socials");
+    Socials* soc = Socials::GetPtr();
     soc->Save();
-    world->RemoveProperty("socials");
-    delete soc;
 }
 
 CMDSocials::CMDSocials()
@@ -225,7 +223,6 @@ BOOL InitializeSocials(void)
     Socials* soc = Socials::GetPtr();
     soc->Load();
     soc->AddCommands();
-    world->AddProperty("socials", (void*)soc);
     world->events.GetEvent("Shutdown")->Add(socials_shutdown);
     return true;
 }
