@@ -169,10 +169,10 @@ BOOL InitializeZones(void)
 
 BOOL SaveZones(void)
 {
-    std::list<Zone*> *zones=new std::list <Zone*>();
+    std::vector<Zone*> *zones=new std::vector<Zone*>();
     world->GetZones(zones);
-    std::list<Zone*>::iterator it;
-    std::list<Zone*>::iterator itEnd;
+    std::vector<Zone*>::iterator it;
+    std::vector<Zone*>::iterator itEnd;
     TiXmlDocument doc;
     TiXmlElement* zlist = new TiXmlElement("zones");
 

@@ -105,7 +105,7 @@ public:
     *EnterGame and LeaveGame are called when the player enters or leaves the game, and should be used to initialize the player after this stage.
     *Param: [in] True if EnterGame shouldn't print messages (used for copyover), false otherwise (default).
     */
-    void EnterGame(BOOL quiet = true);
+    void EnterGame(BOOL quiet = false);
     void LeaveGame();
     /*
     *A low-level write, used for communicating with the socket.

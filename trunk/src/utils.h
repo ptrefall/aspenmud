@@ -30,10 +30,10 @@ FLAG BitSet(FLAG flag,int pos);
 FLAG BitClear(FLAG flag,int pos);
 BOOL BitIsSet(FLAG flag,int pos);
 //minmax
-template <typename _v>
-BOOL Min(const _v a,const _v b);
-template <typename _v>
-BOOL Max(const _v a,const _v b);
+template <typename T>
+inline T Min(const T a,const T b);
+template <typename T>
+inline T Max(const T a,const T b);
 /*
 *converts a list of strings to an english list (a, b, c, and d).
 *Param: [in] a pointer to a list of std::string.
