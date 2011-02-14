@@ -43,9 +43,9 @@ CMDZlist::CMDZlist()
 BOOL CMDZlist::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
     std::stringstream st;
-    std::list<Zone*> *zones=new std::list <Zone*>();
-    std::list<Zone*>::iterator it;
-    std::list <Zone*>::iterator itEnd;
+    std::vector<Zone*> *zones=new std::vector<Zone*>();
+    std::vector<Zone*>::iterator it;
+    std::vector<Zone*>::iterator itEnd;
 
     world->GetZones(zones);
 

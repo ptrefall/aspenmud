@@ -32,7 +32,6 @@ static void GameLoop();
 void sig(int sig);
 
 World* world;
-BOOL running;
 
 int main(int argc, char** argv)
 {
@@ -110,7 +109,6 @@ int main(int argc, char** argv)
     signal(SIGQUIT,sig);
     signal(SIGHUP,sig);
 //start the game loop:
-    running=true;
     world->WriteLog("Entering game loop.");
     GameLoop();
     world->WriteLog("Game loop finished, exiting.");
@@ -171,7 +169,7 @@ static void CopyoverRecover(void)
 
 static void GameLoop()
 {
-    while (running) {
+    while (world->IsRunning()) {
 //update our world:
         world->Update();
     }
@@ -183,5 +181,5 @@ static void GameLoop()
 void sig(int sig)
 {
     world->WriteLog("Caught signal, cleaning up.");
-    running=false;
+    world->SetRunning(false);
 }

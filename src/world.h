@@ -27,16 +27,17 @@ class World
     std::list <Player*> *_users; //a list of the currently connected players.
     std::map <int,Channel*>* _channels;
     std::map <std::string,void*> *_properties;
-    std::list<Zone*> *_zones;
+    std::vector<Zone*> *_zones;
     std::map<VNUM,Room*> *_rooms;
     std::map<VNUM,Entity*> *_objects;
-    std::list<VNUM> *_onumPool;
-    std::list <VNUM> *_rnumPool;
+    std::vector<VNUM> *_onumPool;
+    std::vector <VNUM> *_rnumPool;
     VNUM _maxOnum;
     VNUM _maxRnum;
     int _chanid;
     time_t _ruptime; //real uptime.
     time_t _cuptime; //uptime since last copyover.
+    BOOL _running;
 //mud text buffers
     char* _motd;
     char* _banner;
@@ -70,12 +71,12 @@ public:
     *Only connected players should be added. Inactive players shouldn't be in this list.
     *Param: [in] a pointer to the player object to add.
     */
-    void AddPlayer(Player* player);
+    BOOL AddPlayer(Player* player);
     /*
     *Removes the specified player from the list of active players.
     *Param: [in] A pointer to the player object
     */
-    void RemovePlayer(Player* player);
+    BOOL RemovePlayer(Player* player);
     /*
     *Locates the specified player:
     *Param: [in] The name of the player.
@@ -260,7 +261,12 @@ public:
     *Return: A pointer to the object, NULLif it wasn't found.
     */
     Zone* GetZone(const std::string &name);
-    void GetZones(std::list <Zone*> *zones);
+    /*
+    *Populates a vector with pointers to the currently loaded zones.
+    *Param: [in] a pointer to the vector to populate.
+    *Return: True on success, false on failure.
+    */
+    BOOL GetZones(std::vector<Zone*> *zones);
     /*
     *Assigns a vnum to the object, and adds it to the registry.
     *Param: [in] a pointer to the object.
@@ -270,6 +276,17 @@ public:
     BOOL  CreateRoom(Room* room);
     void InitializeNums(void);
     void WriteLog(const std::string &data,LOG_LEVEL l=INFORM);
+    /*
+    *Checks to see if the game engine is still running.
+    *Return: True if the game loop should continue, false otherwise.
+    */
+    BOOL IsRunning() const;
+    /*
+    *Sets whether the game loop should continue.
+    *This will be caught each iteration.
+    *Param: [in] A boolian value that controls the game loop.
+    */
+    void SetRunning(BOOL running);
 };
 
 #endif

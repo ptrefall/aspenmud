@@ -214,13 +214,13 @@ BOOL BitIsSet(FLAG flag,int pos)
     return flag&(1<<(pos-1));
 }
 
-template <typename _v>
-BOOL Min(const _v a,const _v b)
+template <typename T>
+inline T Min(const T a, const T b)
 {
     return (a<b?a:b);
 }
-template <typename _v>
-BOOL Max(const _v a,const _v b)
+template <typename T>
+inline T Max(const T a, const T b)
 {
     return (a>b?a:b);
 }

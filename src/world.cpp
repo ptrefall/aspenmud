@@ -1,21 +1,3 @@
-/*
-*world.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
 #include <sys/stat.h>
 #include <list>
 #include <map>
@@ -34,10 +16,10 @@
 #include "utils.h"
 #include "zone.h"
 #include "option.h"
-extern BOOL running;
 
 World::World()
 {
+    _running = true;
     _server=new Server();
     _log=new Log();
     _log->Open(EVENT_FILE);
@@ -45,11 +27,11 @@ World::World()
     _channels=new std::map<int,Channel*>();
     _cfactory=new ComponentFactory();
     _properties=new std::map<std::string,void*>();
-    _zones=new std::list<Zone*>();
+    _zones=new std::vector<Zone*>();
     _rooms=new std::map<VNUM,Room*>();
     _objects=new std::map<VNUM,Entity*>();
-    _onumPool=new std::list <VNUM>();
-    _rnumPool=new std::list<VNUM>();
+    _onumPool=new std::vector <VNUM>();
+    _rnumPool=new std::vector<VNUM>();
     _maxOnum=0;
     _maxRnum=0;
     _chanid=1;
@@ -72,8 +54,8 @@ World::~World()
 {
     std::map<int,Channel*>::iterator cit;
     std::map<int,Channel*>::iterator citEnd;
-    std::list<Zone*>::iterator zit;
-    std::list<Zone*>::iterator zitEnd;
+    std::vector<Zone*>::iterator zit;
+    std::vector<Zone*>::iterator zitEnd;
 
     delete [] _motd;
     delete [] _banner;
@@ -115,7 +97,7 @@ void World::Shutdown()
         person->GetSocket()->Kill();
     }
     events.CallEvent("Shutdown", NULL, (void*)this);
-    running = false;
+    _running = false;
 }
 
 Server* World::GetServer(void) const
@@ -133,13 +115,33 @@ std::list <Player*> *World::GetPlayers(void) const
     return _users;
 }
 
-void World::AddPlayer(Player* player)
+BOOL World::AddPlayer(Player* player)
 {
+    if (!player) {
+        return false;
+    }
+    if (player->GetSocket()->GetConnectionType() != con_game) {
+        return false;
+    }
+
     _users->push_back(player);
+    return true;
 }
-void World::RemovePlayer(Player* player)
+BOOL World::RemovePlayer(Player* player)
 {
-    _users->remove(player);
+    std::list<Player*>::iterator it;
+    std::list<Player*>::iterator itEnd = _users->end();
+
+    if (_users->size()) {
+        for (it = _users->begin(); it != itEnd; ++it) {
+            if ((*it) == player) {
+                _users->erase(it);
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 Player* World::FindPlayer(const std::string &name) const
 {
@@ -147,11 +149,14 @@ Player* World::FindPlayer(const std::string &name) const
     std::list <Player*>::iterator itEnd;
 
     itEnd=_users->end();
-    for (it = _users->begin(); it != itEnd; ++it) {
-        if ((*it)->GetName()==name) {
-            return (*it);
+    if (_users->size()) {
+        for (it = _users->begin(); it != itEnd; ++it) {
+            if ((*it)->GetName()==name) {
+                return (*it);
+            }
         }
     }
+
     return NULL;
 }
 Player* World::LoadPlayer(const std::string &name) const
@@ -507,10 +512,11 @@ Entity* World::MatchObject(const std::string &name,Player* caller)
 
 BOOL World::AddZone(Zone* zone)
 {
-    std::list<Zone*>::iterator it;
+    std::vector<Zone*>::iterator it;
+    std::vector<Zone*>::iterator itEnd = _zones->end();
 
     if (_zones->size()) {
-        for (it=_zones->begin(); it!=_zones->end(); it++) {
+        for (it=_zones->begin(); it != itEnd; ++it) {
             if ((*it)==zone) {
                 return false;
             }
@@ -521,9 +527,9 @@ BOOL World::AddZone(Zone* zone)
 }
 BOOL World::RemoveZone(Zone* zone)
 {
-    std::list<Zone*>::iterator it;
-
-    for (it=_zones->begin(); it!=_zones->end(); it++) {
+    std::vector<Zone*>::iterator it;
+    std::vector <Zone*>::iterator itEnd = _zones->end();
+    for (it = _zones->begin(); it != itEnd; ++it) {
         if ((*it)==zone) {
             _zones->erase(it);
             return true;
@@ -534,9 +540,11 @@ BOOL World::RemoveZone(Zone* zone)
 }
 Zone* World::GetZone(const std::string &name)
 {
-    std::list<Zone*>::iterator it;
+    std::vector <Zone*>::iterator it;
+    std::vector<Zone*>::iterator itEnd = _zones->end();
 
-    for (it=_zones->begin(); it!=_zones->end(); it++) {
+
+    for (it=_zones->begin(); it != itEnd; it++) {
         if (name==(*it)->GetName()) {
             return (*it);
         }
@@ -544,12 +552,21 @@ Zone* World::GetZone(const std::string &name)
 
     return NULL;
 }
-void World::GetZones(std::list <Zone*> *zones)
+BOOL World::GetZones(std::vector<Zone*> *zones)
 {
-    std::list<Zone*>::iterator it;
-    for (it=_zones->begin(); it!=_zones->end(); it++) {
-        zones->push_back((*it));
+    if (!zones) {
+        return false;
     }
+
+    std::vector<Zone*>::iterator it;
+    std::vector<Zone*>::iterator itEnd = _zones->end();
+
+    if (_zones->size()) {
+        for (it=_zones->begin(); it != itEnd; ++it) {
+            zones->push_back((*it));
+        }
+    }
+    return true;
 }
 
 BOOL World::CreateObject(Entity* obj)
@@ -633,4 +650,13 @@ void World::InitializeNums(void)
 void World::WriteLog(const std::string &data,LOG_LEVEL l)
 {
     _log->Write(data, l);
+}
+
+BOOL World::IsRunning() const
+{
+    return _running;
+}
+void World::SetRunning(BOOL running)
+{
+    _running = running;
 }
