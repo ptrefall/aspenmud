@@ -24,7 +24,7 @@
 
 #ifndef CONFIG_H
 #define CONFIG_H
-
+//#define ASPEN_i64
 //Mud configuration constants
 #define DEFAULT_PORT 6666 //our default port: The mud will use this, if the port isn't provided as an argument.
 #define LISTEN_BACKLOG 5 //the backlog for the listening socket.
