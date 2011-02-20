@@ -80,6 +80,7 @@ enum POSITION {any, unconcious, sleeping, laying, resting, sitting, standing, fl
 #define DIR_SOUTHWEST 8
 #define DIR_UP 9
 #define DIR_DOWN 10
+enum ExitDirection {nowhere, north, south, east, west, northeast, northwest, southeast, southwest, up, down};
 //colors:
 #define C_NORMAL "\x1B[0m"
 #define C_RED "\x1B[31m"

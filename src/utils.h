@@ -55,6 +55,18 @@ int Roll(int n,int s);
 */
 std::string SwapExit(const std::string &exit);
 /*
+*Checks to see if the exit name given is a valid exit.
+*Param: [in] the name or alias of the exit.\
+*return: true on success, false on failure.
+*/
+BOOL IsValidExit(const std::string &name);
+/*
+*Returns the exit direction associated with each exit.
+*Param: [in] the name of the exit.
+*return: The number associated with that direction.
+*/
+ExitDirection GetDirectionByName(const std::string &name);
+/*
 *Returns a string with the inputted list of data columnized
 *Param: [in] a vector of strings with the data to columnize.
 *[in] The number of columns to create.

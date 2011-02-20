@@ -294,6 +294,43 @@ std::string SwapExit(const std::string &exit)
     }
 }
 
+BOOL IsValidExit(const std::string &name)
+{
+    if ((name == "north" || name == "n") ||
+            (name == "south" || name == "s") ||
+            (name == "east" || name == "e") ||
+            (name == "west" || name == "w") ||
+            (name == "northeast" || name == "ne") ||
+            (name == "northwest" || name == "nw") ||
+            (name == "southeast" || name == "se") ||
+            (name == "southwest" || name == "sw")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+ExitDirection GetDirectionByName(const std::string &name)
+{
+    if (name == "north" || name == "n")
+        return north;
+    else if (name == "south" || name == "s")
+        return south;
+    else if (name == "east" || name == "e")
+        return east;
+    else if (name == "west" || name == "w")
+        return west;
+    else if (name == "northeast" || name == "ne")
+        return northeast;
+    else if (name == "northwest" || name == "nw")
+        return northwest;
+    else if (name == "southwest" || name == "sw")
+        return southwest;
+    else if (name == "southeast" || name == "se")
+        return southeast;
+    else
+        return nowhere;
+}
+
 void TimeInfo::Initialize(void)
 {
     hour=0;
