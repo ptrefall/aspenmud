@@ -22,7 +22,7 @@ class Zone;
 class Room:public Entity
 {
     std::list <Living*> _mobiles;
-    std::list <Exit*> _exits;
+    std::vector<Exit*> *_exits;
     Zone* _zone;
 public:
     Room(void);
@@ -34,22 +34,22 @@ public:
     */
     virtual BOOL AddExit(Exit* exit);
     /*
-    *Checks for the existance of an exit either in name, or by alias.
-    *Param: [in] the name of the exit to check for.
+    *Checks for the existance of an exit
+    *Param: [in] the direction of the exit to check for.
     *Return: True if the exit exists, false otherwise.
     */
-    virtual BOOL ExitExists(const std::string &name);
+    virtual BOOL ExitExists(ExitDirection dir);
     /*
     *Finds the specified exit.
     *Param: [in] the name of the exit.
     *Return: a pointer to the exit object found, or NULL if none was found.
     */
-    virtual Exit* GetExit(const std::string &name);
+    virtual Exit* GetExit(ExitDirection dir);
     /*
     *Returns a pointer to the list of exits.
-    *Return: a pointer to a list of Exit* objects
+    *Return: a pointer to a vector of pointers to Exit objects
     */
-    std::list<Exit*>* GetExits(void);
+    std::vector<Exit*>* GetExits(void);
     /*
     *Sets the zone object on the room.
     *Param: [in] a pointer to a zone.

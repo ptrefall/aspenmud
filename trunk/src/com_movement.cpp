@@ -40,49 +40,12 @@ void InitializeMovementCommands(void)
 
 BOOL DoMove(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
-    std::string direction;
+    ExitDirection direction = (ExitDirection)subcmd;
     Room* room;
     Room* dest;
     Exit* exit;
 
-    switch (subcmd) {
-    case DIR_NORTH:
-        direction="north";
-        break;
-    case DIR_SOUTH:
-        direction="south";
-        break;
-    case DIR_EAST:
-        direction="east";
-        break;
-    case DIR_WEST:
-        direction="west";
-        break;
-    case DIR_NORTHEAST:
-        direction="northeast";
-        break;
-    case DIR_NORTHWEST:
-        direction="northwest";
-        break;
-    case DIR_SOUTHEAST:
-        direction="southeast";
-        break;
-    case DIR_SOUTHWEST:
-        direction="southwest";
-        break;
-    case DIR_UP:
-        direction="up";
-        break;
-    case DIR_DOWN:
-        direction="down";
-        break;
-    default:
-        world->WriteLog("Invalid subcmd in do_move");
-        return false;
-        break;
-    }
     room=(Room*)mobile->GetLocation();
-
     if (!room) {
         mobile->Message(MSG_ERROR,"There are no exits here.");
         return false;

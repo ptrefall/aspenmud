@@ -16,7 +16,7 @@ Room::Room(void)
     events.RegisterEvent("OnEnter", new Event());
     events.RegisterEvent("OnExit", new Event());
     events.RegisterEvent("OnLook", new Event());
-
+    _exits = new std::vector<Exit*>();
     _zone=NULL;
     SetOnum(ROOM_NOWHERE);
     SetType(2);
@@ -24,62 +24,78 @@ Room::Room(void)
 }
 Room::~Room(void)
 {
-    std::list <Exit*>::iterator it;
+    std::vector<Exit*>::iterator it;
+    std::vector<Exit*>::iterator itEnd = _exits->end();
 
 //delete exits:
-    if (_exits.size()) {
-        for (it=_exits.begin(); it!=_exits.end(); it++) {
+    if (_exits->size()) {
+        for (it=_exits->begin(); it != itEnd; ++it) {
             delete (*it);
         }
     }
+    delete _exits;
+    _exits = NULL;
 }
 
 BOOL Room::AddExit(Exit* exit)
 {
-    std::list<Exit*>::iterator it;
+    std::vector<Exit*>::iterator it;
+    std::vector<Exit*>::iterator itEnd = _exits->end();
     if (exit==NULL) {
         return false;
     }
 
-    for (it=_exits.begin(); it!=_exits.end(); it++) {
-        if (exit==(*it)) {
-            return false;
+    if (_exits->size()) {
+        for (it=_exits->begin(); it != itEnd; ++it) {
+            if (exit==(*it)) {
+                return false;
+            }
         }
     }
 
-    if (ExitExists(exit->GetName())) {
+    if (ExitExists(exit->GetDirection())) {
         return false;
     }
 
-    _exits.push_back(exit);
+    _exits->push_back(exit);
     return true;
 }
 
-BOOL Room::ExitExists(const std::string &name)
+BOOL Room::ExitExists(ExitDirection dir)
 {
-    std::list<Exit*>::iterator it;
-    for (it=_exits.begin(); it!=_exits.end(); it++) {
-        if (((*it)->GetName()==name)||((*it)->GetAlias()==name)) {
-            return true;
+    std::vector<Exit*>::iterator it;
+    std::vector<Exit*>::iterator itEnd = _exits->end();
+
+    if (_exits->size()) {
+        for (it=_exits->begin(); it != itEnd; ++it) {
+            if ((*it)->GetDirection() == dir) {
+                return true;
+            }
         }
     }
+
     return false;
 }
 
-Exit* Room::GetExit(const std::string &name)
+Exit* Room::GetExit(ExitDirection dir)
 {
-    std::list<Exit*>::iterator it;
+    std::vector<Exit*>::iterator it;
+    std::vector<Exit*>::iterator itEnd = _exits->end();
 
-    for (it=_exits.begin(); it!=_exits.end(); it++) {
-        if ((*it)->GetName()==name) {
-            return (*it);
+    if (_exits->size()) {
+        for (it = _exits->begin(); it != itEnd; ++it) {
+            if ((*it)->GetDirection() == dir) {
+                return (*it);
+            }
         }
     }
+
     return NULL;
 }
-std::list<Exit*>* Room::GetExits(void)
+
+std::vector<Exit*>* Room::GetExits(void)
 {
-    return &_exits;
+    return _exits;
 }
 
 void Room::SetZone(Zone* s)
@@ -138,11 +154,11 @@ void Room::Serialize(TiXmlElement* root)
 {
     TiXmlElement* room = new TiXmlElement("room");
     TiXmlElement* exits = new TiXmlElement("exits");
-    std::list <Exit*>::iterator it;
-    std::list<Exit*>::iterator itEnd = _exits.end();
+    std::vector<Exit*>::iterator it;
+    std::vector<Exit*>::iterator itEnd = _exits->end();
 
-    if (_exits.size()) {
-        for (it=_exits.begin(); it != itEnd; ++it) {
+    if (_exits->size()) {
+        for (it=_exits->begin(); it != itEnd; ++it) {
             (*it)->Serialize(exits);
         }
     }
@@ -162,7 +178,7 @@ void Room::Deserialize(TiXmlElement* room)
         exit = node->ToElement();
         ex = new Exit();
         ex->Deserialize(exit);
-        _exits.push_back(ex);
+        _exits->push_back(ex);
         ex = NULL;
     }
 
@@ -173,7 +189,7 @@ void Room::Deserialize(TiXmlElement* room)
 //events
 EVENT(ROOM_POST_LOOK)
 {
-    std::list<Exit*>::iterator it;
+    std::vector<Exit*>::iterator it;
     std::stringstream st;
     LookArgs* largs=(LookArgs*)args;
     Room* targ=(Room*)largs->_targ;

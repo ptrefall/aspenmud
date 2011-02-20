@@ -35,22 +35,37 @@ void Exit::SetTo(VNUM to)
     _to=to;
 }
 
-std::string Exit::GetName(void) const
+ExitDirection Exit::GetDirection(void) const
 {
-    return _name;
+    return _direction;
 }
-void Exit::SetName(const std::string &name)
+void Exit::SetDirection(ExitDirection dir)
 {
-    _name=name;
+    _direction = dir;
 }
 
-std::string Exit::GetAlias(void) const
+std::string Exit::GetName() const
 {
-    return _alias;
-}
-void Exit::SetAlias(const std::string &alias)
-{
-    _alias=alias;
+    switch(_direction) {
+    case north:
+        return "north";
+    case south:
+        return "south";
+    case east:
+        return "east";
+    case west:
+        return "west";
+    case northwest:
+        return "northwest";
+    case northeast:
+        return "northeast";
+    case southwest:
+        return "southwest";
+    case southeast:
+        return "southeast";
+    default:
+        return "unknown";
+    }
 }
 
 BOOL Exit::CanEnter(Living* mobile)
@@ -61,16 +76,20 @@ BOOL Exit::CanEnter(Living* mobile)
 void Exit::Serialize(TiXmlElement* root)
 {
     TiXmlElement* node = new TiXmlElement("exit");
-    node->SetAttribute("name", _name.c_str());
-    node->SetAttribute("alias", _alias.c_str());
+
+    int tmp = (int)_direction;
+    node->SetAttribute("direction", tmp);
     node->SetAttribute("to", _to);
     node->SetAttribute("from", _from);
     root->LinkEndChild(root);
 }
 void Exit::Deserialize(TiXmlElement* node)
 {
+    int tmp = 0;
+
     node->Attribute("to", &_to);
     node->Attribute("from", &_from);
-    _name = node->Attribute("name");
-    _alias = node->Attribute("alias");
+
+    node->Attribute("direction", &tmp);
+    _direction = (ExitDirection)tmp;
 }

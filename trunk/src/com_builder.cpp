@@ -118,6 +118,10 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
         mobile->Message(MSG_ERROR,"Syntax: dig <direction>\nCreates another room in the direction you specified.");
         return false;
     }
+    if (!IsValidExit(args[0])) {
+        mobile->Message(MSG_ERROR, "Syntax: dig <north|n, south|s, east|e, west|w,\nnortheast|ne, southeast|se, northwest|sw, or southwest|sw");
+        return false;
+    }
 
     Room* room;
     Room* location;
@@ -140,12 +144,12 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
     zone->AddRoom(room->GetOnum());
 
     orig=new Exit(location->GetOnum(),room->GetOnum());
-    orig->SetName(args[0]);
+    orig->SetDirection(GetDirectionByName(args[0]));
     location->AddExit(orig);
     if (dir!="") {
         other=new Exit(room->GetOnum(),location->GetOnum());
+        other->SetDirection(GetDirectionByName(dir));
         room->AddExit(other);
-        other->SetName(dir);
     }
     SaveZones();
     return true;
