@@ -37,13 +37,14 @@ int main(int argc, char** argv)
 {
     BOOL copyover=false; //are we rebooting for copyover?
     int listener=0; //the socket to listen on when recovering from copyover
-    world=new World();
-    world->WriteLog("Initializing "+MUD_NAME+".");
-//make sure the mud isn't ran as root:
-    if (getuid()==0) {
-        world->WriteLog("This program may not be ran as root, now exiting.");
+#ifdef SECURE_INITIALIZATION
+    if (getuid() == 0) {
+        printf("You should not be running as root.\nAspen will now exit.\n");
         return 1;
     }
+#endif
+    world=new World();
+    world->WriteLog("Initializing "+MUD_NAME+".");
 //initialize the server class:
     int port;
 //determine if a port was specified. If not, use default.

@@ -1,22 +1,3 @@
-/*
-*conf.h
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 /**
 *configuration defines for the mud
 *Holds configuration and other constants.
@@ -31,10 +12,10 @@
 #define PULSES_PER_SECOND 60 //how many game loop itterations will be ran each second
 #define LOG_CONSOLE //will tell the logger to write to console. Comment out if you do not wish this.
 #define MIN_LOG_LEVEL (LOG_LEVEL)WARN //the minimum level of logging that will be written to console.
-#define MUD_NAME std::string("Falcon") //name of your mud.
+#define MUD_NAME std::string("Aspen") //name of your mud.
 #define MAX_CHAN_HISTORY_LENGTH 20 //the maximum number of entries channels will log.
-#define GAME_IDLE_TIME (60*45)
-#define LOGIN_IDLE_TIME (45)
+#define GAME_IDLE_TIME (60*45) //the amount of time someone will be able to idle before they are kicked.
+#define LOGIN_IDLE_TIME (30) //the amount of time someone will be able to idle at login.
 /*
 *Comment this out if you want all scripting functions enabled by default.
 *Leaving it commented will remove functions like SetPassword on player from being exposed to scripting.
@@ -62,7 +43,8 @@
 #define RANK_NEWBIE 1<<5|RANK_PLAYER
 #define RANK_ADMIN 1<<29|RANK_BUILDER|RANK_NEWBIEHELPER|RANK_PLAYTESTER|RANK_PLAYER
 #define RANK_GOD 1<<30|RANK_ADMIN|RANK_BUILDER|RANK_NEWBIEHELPER|RANK_PLAYTESTER|RANK_PLAYER
-
+//logger levels
+enum LOG_LEVEL {INFORM,WARN,ERR,CRIT,SCRIPT, PLAYER, CONNECTION};
 //positions:
 enum POSITION {any, unconcious, sleeping, laying, resting, sitting, standing, flying};
 //exit/room constants:
@@ -108,8 +90,6 @@ enum ExitDirection {nowhere, north, south, east, west, northeast, northwest, sou
 //if this is defined, the program will try to secure it's process environment when
 //starting up. Leaving it defined can't hurt, but comment it out if this is giving you some sort of problem.
 #define SECURE_INITIALIZATION
-// conditional whether we are compiling for Windows or Unix
-#ifndef OPEN_MAX
-#define OPEN_MAX 256
-#endif
+//uncomment this if you want the code to check for files and create them if they do not exist. see socials.cpp and zone.cpp for examples.
+#define NO_INIT_FILES
 #endif
