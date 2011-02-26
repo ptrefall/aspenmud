@@ -32,6 +32,10 @@ void Tokenize(const std::string &str, std::vector<std::string> &tokens, const st
 {
     std::string::size_type lpos=str.find_first_not_of(del,0);
     std::string::size_type pos=str.find_first_of(del,lpos);
+    if (pos == std::string::npos) {
+        tokens.push_back(str);
+        return;
+    }
 //our loop for tokenizing:
     while ((std::string::npos!=pos)||(std::string::npos!=lpos)) {
         tokens.push_back(str.substr(lpos,(pos-lpos)));

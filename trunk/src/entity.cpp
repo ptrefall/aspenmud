@@ -341,8 +341,8 @@ OLC_INPUT(olc_entity_description)
 EVENT(entity_description_editor_load)
 {
     OneArg* arg = (OneArg*)args;
-    Editor* ed = (Editor*)caller;
-    Entity* obj = (Entity*)arg->_arg;
+    Editor* ed = (Editor*)arg->_arg;
+    Entity* obj = (Entity*)ed->GetArg();
     std::vector<std::string> lines;
     std::vector<std::string>::iterator it;
     std::vector<std::string>::iterator itEnd;
@@ -356,8 +356,8 @@ EVENT(entity_description_editor_load)
 EVENT(entity_description_editor_save)
 {
     OneArg* arg = (OneArg*)args;
-    Editor* ed = (Editor*)caller;
-    Entity* obj = (Entity*)arg->_arg;
+    Editor* ed = (Editor*)arg->_arg;
+    Entity* obj = (Entity*)ed->GetArg();
     std::string desc;
     std::vector<std::string>::iterator it;
     std::vector<std::string>::iterator itEnd;
