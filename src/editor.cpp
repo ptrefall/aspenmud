@@ -139,7 +139,7 @@ void Editor::Save(void)
 {
     _dirty=false;
     OneArg* arg = new OneArg((void*)this);
-    events.CallEvent("save", arg, _mobile);
+    events.CallEvent("save", arg, this);
     delete arg;
     return;
 }
@@ -288,18 +288,16 @@ BOOL Editor::EnterEditor(Player* mobile)
     _handler->args = (void*)this;
     _mobile->GetSocket()->SetInput(_handler);
     _mobile->Message(MSG_INFO,"Entering editor. use \'h\' for help.");
+    Load();
     return true;
 }
 void Editor::LeaveEditor()
 {
     _mobile->GetSocket()->ClearInput();
-    if (_handler) {
-        delete _handler;
-        _handler=NULL;
-    }
     OneArg* arg = new OneArg((void*)this);
-    events.CallEvent("atexit", arg, _mobile);
+    events.CallEvent("atexit", arg, this);
     delete arg;
+    delete this;
 }
 void Editor::SetArg(void* arg)
 {

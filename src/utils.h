@@ -11,7 +11,14 @@
 //misc
 inline BOOL IsAlpha(const char* const character);
 BOOL FileExists(const std::string &name);
-//parsing
+/*
+*Tokenizes the string into chunks based on the delimiter.
+*Param: [in] the string to tokenize.
+*[out] a vector of strings, where the parts will go.
+*param: [in] The delimiter.
+*Return: void
+*note: The slices will be put into tokens. If no tokens are found, the vector will contain the string passed in.
+*/
 void Tokenize(const std::string &str, std::vector<std::string> &tokens, const std::string &del=" ");
 //player validation functions
 BOOL IsValidUserName(const std::string &input);
