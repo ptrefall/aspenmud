@@ -223,6 +223,7 @@ BOOL InitializeSocials(void)
     Socials* soc = Socials::GetPtr();
     soc->Load();
     soc->AddCommands();
-    world->events.GetEvent("Shutdown")->Add(socials_shutdown);
+    world->events.AddCallback("Shutdown", socials_shutdown);
+    world->events.AddCallback("Copyover", socials_shutdown);
     return true;
 }

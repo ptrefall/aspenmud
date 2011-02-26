@@ -44,6 +44,7 @@ World::World()
     events.RegisterEvent("PlayerCreated", new Event());
     events.RegisterEvent("PlayerDeleted", new Event());
     events.RegisterEvent("Shutdown", new Event());
+    events.RegisterEvent("Copyover", new Event());
 #ifdef MODULE_SCRIPTING
     events.RegisterEvent("ScriptLoaded", new Event());
     events.RegisterEvent("ScriptUnloaded", new Event());
@@ -98,6 +99,48 @@ void World::Shutdown()
     }
     events.CallEvent("Shutdown", NULL, (void*)this);
     _running = false;
+}
+void World::Copyover(Player* mobile)
+{
+    int cuptime=(int)GetCopyoverUptime();
+    int ruptime = (int)GetRealUptime();
+
+    FILE* copyover=fopen(COPYOVER_FILE,"wb");
+    if (copyover==NULL) {
+        mobile->Message(MSG_ERROR,"couldn't open the copyover file.\nCopyover will not continue.");
+        return;
+    }
+    Player* person;
+
+    fprintf(copyover, "%d %d\n", cuptime, ruptime);
+    sockaddr_in* addr=NULL;
+//itterate through the players and write info to their copyover file:
+    std::list <Player*>::iterator it, itEnd;
+    char buff[16];
+
+    itEnd=GetPlayers()->end();
+    for (it = GetPlayers()->begin(); it != itEnd; ++it) {
+        person = (*it);
+        if (person->GetSocket()->GetConnectionType()!=con_game) {
+            person->Write("We're sorry, but we are currently rebooting; please come back again soon.\n");
+            person->GetSocket()->Kill();
+            continue;
+        }
+        addr=person->GetSocket()->GetAddr();
+        person->Save();
+        fprintf(copyover,"%d %s %hd %hu %lu %s\n",
+                person->GetSocket()->GetControl(), person->GetName().c_str(),
+                addr->sin_family,addr->sin_port,(long int)addr->sin_addr.s_addr, person->GetSocket()->GetHost().c_str());
+        person->Write("Copyover initiated by "+mobile->GetName()+".\n");
+    }
+    world->Update();
+    fprintf(copyover,"-1\n");
+    fclose(copyover);
+    events.CallEvent("Copyover", NULL, (void*)this);
+    memset(buff,0,16);
+    snprintf(buff,16,"%d",world->GetServer()->GetListener());
+    execl(BIN_FILE,BIN_FILE,"-c",buff,(char*)NULL);
+    mobile->Write("Copyover failed!\n");
 }
 
 Server* World::GetServer(void) const

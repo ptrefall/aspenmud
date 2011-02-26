@@ -40,43 +40,8 @@ CMDCopyover::CMDCopyover()
 }
 BOOL CMDCopyover::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
-    FILE* copyover=fopen(COPYOVER_FILE,"wb");
-    int cuptime=(int)world->GetCopyoverUptime();
-    int ruptime = (int)world->GetRealUptime();
-    if (copyover==NULL) {
-        mobile->Message(MSG_ERROR,"couldn't open the copyover file.\nCopyover will not continue.");
-        return false;
-    }
-
-    fprintf(copyover, "%d %d\n", cuptime, ruptime);
-    sockaddr_in* addr=NULL;
-//itterate through the players and write info to their copyover file:
-    std::list <Player*>::iterator it;
-    std::list <Player*>::iterator itEnd;
-    char buff[16];
-
-    itEnd=world->GetPlayers()->end();
-    for (it = world->GetPlayers()->begin(); it != itEnd; ++it) {
-        if ((*it)->GetSocket()->GetConnectionType()!=con_game) {
-            (*it)->Write("We're sorry, but we are currently rebooting; please come back again soon.\n");
-            (*it)->GetSocket()->Kill();
-            continue;
-        }
-        addr=(*it)->GetSocket()->GetAddr();
-        (*it)->Save();
-        fprintf(copyover,"%d %s %hd %hu %lu %s\n",
-                (*it)->GetSocket()->GetControl(),(*it)->GetName().c_str(),
-                addr->sin_family,addr->sin_port,(long int)addr->sin_addr.s_addr, (*it)->GetSocket()->GetHost().c_str());
-        (*it)->Write("Copyover started.\n");
-    }
-    world->Update();
-    fprintf(copyover,"-1\n");
-    fclose(copyover);
-    memset(buff,0,16);
-    snprintf(buff,16,"%d",world->GetServer()->GetListener());
-    execl(BIN_FILE,BIN_FILE,"-c",buff,(char*)NULL);
-    mobile->Write("Copyover failed!\n");
-    return false;
+    world->Copyover(mobile);
+    return true;
 }
 
 CMDMkgod::CMDMkgod()
