@@ -130,10 +130,9 @@ void Zone::Deserialize(TiXmlElement* zone)
 BOOL InitializeZones(void)
 {
     struct stat FInfo;
-    std::string path=AREA_FILE;
     world->WriteLog("Initializing areas.");
-    if ((stat(path.c_str(),&FInfo))!=-1) {
-        return LoadZones();
+    if ((stat(AREA_FILE,&FInfo))!=-1) {
+        LoadZones();
     } else {
         world->WriteLog("No area found, creating default.");
 //no zones and rooms exist, create a first zone/room.
@@ -159,11 +158,12 @@ BOOL InitializeZones(void)
         if (!SaveZones()) {
             return false;
         }
-        zone_saves = 0;
-        world->events.AddCallback("WorldPulse", AUTOSAVE_ZONES);
-        world->events.AddCallback("Shutdown", SHUTDOWN_ZONES);
-        return true;
     }
+
+    zone_saves = 0;
+    world->events.AddCallback("WorldPulse", AUTOSAVE_ZONES);
+    world->events.AddCallback("Shutdown", SHUTDOWN_ZONES);
+    world->events.AddCallback("Copyover", SHUTDOWN_ZONES);
     return true;
 }
 

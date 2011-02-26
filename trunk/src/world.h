@@ -55,6 +55,11 @@ public:
     */
     void Shutdown(void);
     /*
+    *Performs a copyover.
+    *Param: [in] the person who initiated the copyover.
+    */
+    void Copyover(Player* mobile);
+    /*
     *Returns: a pointer to the main server object.
     */
     Server* GetServer(void) const;

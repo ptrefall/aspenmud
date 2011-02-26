@@ -118,10 +118,12 @@ int main(int argc, char** argv)
 
 static void CopyoverRecover(void)
 {
-    FILE* recover;
-    short family;
-    unsigned short port;
-    unsigned long addr;
+    Player* person = NULL;
+    sockaddr_in* saddr = NULL;
+    FILE* recover = NULL;
+    short family = 0;
+    unsigned short port = 0;
+    unsigned long addr = 0;
     char *name=new char[15];
     char* host=new char[256];
     int desc;
@@ -146,18 +148,20 @@ static void CopyoverRecover(void)
             break;
         }
         Socket* sock=new Socket(desc);
-        sock->GetAddr()->sin_family=family;
-        sock->GetAddr()->sin_port=port;
-        sock->GetAddr()->sin_addr.s_addr=addr;
+        saddr = sock->GetAddr();
+        saddr->sin_family=family;
+        saddr->sin_port=port;
+        saddr->sin_addr.s_addr=addr;
         sock->SetHost(host);
         sock->AllocatePlayer();
         world->WriteLog("Loading "+std::string(name)+".");
-        sock->GetPlayer()->SetName(name);
-        sock->GetPlayer()->Load();
+        person = sock->GetPlayer();
+        person->SetName(name);
+        person->Load();
         sock->SetConnectionType(con_game);
         world->GetServer()->AddSock(sock);
-        sock->GetPlayer()->SetSocket(sock);
-        sock->GetPlayer()->EnterGame(false);
+        person->SetSocket(sock);
+        person->EnterGame(true);
         sock->Write("Copyover complete.\n");
     }
     delete []name;

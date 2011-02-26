@@ -116,16 +116,13 @@ Editor::Editor()
     events.RegisterEvent("load", new Event());
     events.RegisterEvent("atexit", new Event());
 
-    _cursor=0;
+    _cursor = -1;
     _dirty=false;
     _handler=NULL;
     _arg = NULL;
 }
 Editor::~Editor()
 {
-    if (_handler) {
-        delete _handler;
-    }
 }
 
 BOOL Editor::Load(void)
@@ -138,6 +135,7 @@ BOOL Editor::Load(void)
 void Editor::Save(void)
 {
     _dirty=false;
+    _mobile->Message(MSG_INFO, "saved.");
     OneArg* arg = new OneArg((void*)this);
     events.CallEvent("save", arg, this);
     delete arg;
@@ -161,7 +159,7 @@ void Editor::Abort(void)
 
 void Editor::List(BOOL num)
 {
-    std::vector <std::string>::iterator it;
+    std::vector <std::string>::iterator it, itEnd;
     int i;
     std::stringstream st;
 
@@ -170,12 +168,13 @@ void Editor::List(BOOL num)
         return;
     }
 
-    for (i=1,it=_lines.begin(); it!=_lines.end(); i++,it++) {
-        if (_cursor==(i-1)) {
+    itEnd = _lines.end();
+    for (i=0,it=_lines.begin(); it != itEnd; i++,++it) {
+        if (_cursor == i) {
             st << "||";
         }
         if (num) {
-            st << i << " ";
+            st << i+1 << ": ";
         }
         st << (*it);
         _mobile->Message(MSG_LIST,st.str());
@@ -215,9 +214,8 @@ void Editor::Insert(int index)
         return;
     }
 
-    index--; //so it will match up with our cursor.
-    _cursor=index;
-    st << "Insertion point set at line " << index+1 << ".";
+    _cursor=index-1;
+    st << "Insertion point set at line " << index << ".";
     _mobile->Message(MSG_INFO,st.str());
 }
 
@@ -230,14 +228,26 @@ void Editor::Delete(void)
         _mobile->Message(MSG_INFO,"Buffer is empty.");
         return;
     }
+
     if (_cursor==-1) {
-        _mobile->Message(MSG_INFO,"Cursor is already at the end of the buffer.");
-        return;
+        if (!_lines.size()) {
+            _mobile->Message(MSG_INFO,"Buffer is empty.");
+            return;
+        } else {
+            _lines.erase(_lines.end());
+            _mobile->Message(MSG_INFO, "Deleted line.");
+            return;
+        }
     }
 
-    for (it=_lines.begin(),i=0; i!=_cursor; i++,it++);
+    for (it=_lines.begin(),i=0; i!=_cursor; i++, ++it);
 
     _lines.erase(it);
+    _cursor++;
+    if (_cursor > ((int)_lines.size()-1)) {
+        _cursor = -1;
+    }
+
     _mobile->Message(MSG_INFO,"Line erased.");
 }
 void Editor::Delete(int index)
@@ -245,7 +255,7 @@ void Editor::Delete(int index)
     std::vector<std::string>::iterator it;
     int i=0;
 
-    if ((index<=0)||(index>(int)_lines.size())) {
+    if ((index<=0)||(index+1>(int)_lines.size())) {
         _mobile->Message(MSG_INFO,"Line out of range.");
         return;
     }
@@ -254,6 +264,9 @@ void Editor::Delete(int index)
 
     _lines.erase(it);
     _mobile->Message(MSG_INFO,"Line erased.");
+    if ((_cursor != -1) && (i < _cursor)) {
+        _cursor--;
+    }
 }
 void Editor::Delete(int first, int second)
 {
@@ -277,6 +290,7 @@ void Editor::Delete(int first, int second)
     }
 
     _lines.erase(top,bottom);
+    _cursor = -1; //we jump the cursor to the end.
     _mobile->Message(MSG_INFO,"Lines deleted.");
 }
 
