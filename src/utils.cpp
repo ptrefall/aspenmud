@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include "utils.h"
+#include "editor.h"
 
 inline BOOL IsAlpha(const char* const character)
 {
@@ -151,14 +152,17 @@ std::string Center(const std::string &str,const int width)
     return temp;
 }
 
-std::string Explode(std::vector <std::string> &parts)
+std::string Explode(std::vector <std::string> &parts, const std::string &del)
 {
     std::vector<std::string>::iterator it;
+    std::vector<std::string>::iterator itEnd;
     std::stringstream st;
 
-    for (it=parts.begin(); it!=parts.end(); it++) {
-        st << " " << (*it);
+    itEnd = parts.end();
+    for (it=parts.begin(); it != itEnd; ++it) {
+        st << del << (*it);
     }
+
     return st.str();
 }
 std::string StripWhitespace(const std::string &str)

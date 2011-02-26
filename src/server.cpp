@@ -112,7 +112,8 @@ BOOL Server::PollSockets()
         switch(sock->GetConnectionType()) {
         case con_game:
             if (res>=GAME_IDLE_TIME) {
-                sock->Write("You idled out, thanks for playing!\n");
+                if (sock->GetPlayer() && (!BitIsSet(sock->GetPlayer()->GetRank(), RANK_ADMIN)))
+                    sock->Write("You idled out, thanks for playing!\n");
                 sock->Kill();
             }
             break;
@@ -282,7 +283,7 @@ BOOL Server::PollSockets()
             sock->Write(TELNET_ECHO_OFF);
 //passwords matched, see if the player is the first user. If so, make it a god.
             if (IsFirstUser()) {
-                mob->SetRank(BitSet(mob->GetRank(),RANK_GOD));
+                mob->SetRank(RANK_GOD);
                 sock->Write("You are the first player to create, rank set to God.\n");
             }
 

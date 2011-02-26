@@ -1,22 +1,3 @@
-/*
-*editor.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include <sstream>
 #include <vector>
 #include <string>
@@ -24,6 +5,8 @@
 #include "socket.h"
 #include "utils.h"
 #include "editor.h"
+#include "event.h"
+#include "eventargs.h"
 
 INPUT(editor_ed)
 {
@@ -129,9 +112,14 @@ INPUT(editor_ed)
 
 Editor::Editor()
 {
+    events.RegisterEvent("save", new Event());
+    events.RegisterEvent("load", new Event());
+    events.RegisterEvent("atexit", new Event());
+
     _cursor=0;
     _dirty=false;
     _handler=NULL;
+    _arg = NULL;
 }
 Editor::~Editor()
 {
@@ -142,11 +130,17 @@ Editor::~Editor()
 
 BOOL Editor::Load(void)
 {
+    OneArg* arg = new OneArg((void*)this);
+    events.CallEvent("load", arg, _mobile);
+    delete arg;
     return true;
 }
 void Editor::Save(void)
 {
     _dirty=false;
+    OneArg* arg = new OneArg((void*)this);
+    events.CallEvent("save", arg, _mobile);
+    delete arg;
     return;
 }
 
@@ -167,7 +161,7 @@ void Editor::Abort(void)
 
 void Editor::List(BOOL num)
 {
-    std::list <std::string>::iterator it;
+    std::vector <std::string>::iterator it;
     int i;
     std::stringstream st;
 
@@ -195,7 +189,7 @@ void Editor::List(BOOL num)
 void Editor::Add(const std::string &line)
 {
     std::stringstream st;
-    std::list <std::string>::iterator it;
+    std::vector <std::string>::iterator it;
     int i=0;
 
     if (_cursor==-1) {
@@ -229,7 +223,7 @@ void Editor::Insert(int index)
 
 void Editor::Delete(void)
 {
-    std::list <std::string>::iterator it;
+    std::vector <std::string>::iterator it;
     int i=0;
 
     if (!_lines.size()) {
@@ -248,7 +242,7 @@ void Editor::Delete(void)
 }
 void Editor::Delete(int index)
 {
-    std::list <std::string>::iterator it;
+    std::vector<std::string>::iterator it;
     int i=0;
 
     if ((index<=0)||(index>(int)_lines.size())) {
@@ -264,7 +258,7 @@ void Editor::Delete(int index)
 void Editor::Delete(int first, int second)
 {
     int i=0;
-    std::list <std::string>::iterator top,bottom;
+    std::vector <std::string>::iterator top,bottom;
 
     if (((first>second)&&(second!=-1))||(first==second)||(first<=0)||(second>(int)_lines.size())) {
         _mobile->Message(MSG_ERROR,"Invalid range.");
@@ -303,4 +297,19 @@ void Editor::LeaveEditor()
         delete _handler;
         _handler=NULL;
     }
+    OneArg* arg = new OneArg((void*)this);
+    events.CallEvent("atexit", arg, _mobile);
+    delete arg;
+}
+void Editor::SetArg(void* arg)
+{
+    _arg = arg;
+}
+void* Editor::GetArg() const
+{
+    return _arg;
+}
+std::vector<std::string>* Editor::GetLines()
+{
+    return &_lines;
 }

@@ -45,6 +45,6 @@ class Variant;
 extern World* world;
 //olc forward declarations
 struct OLC_DATA;
-enum OLC_INPUT_TYPE {NUM, STRING};
+enum OLC_INPUT_TYPE {NUM, STRING, BOOLEAN, EDITOR};
 typedef void (*FP_INPUT)(Entity*, Player*, const Variant*);
 #endif
