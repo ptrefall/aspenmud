@@ -14,8 +14,8 @@ INPUT(editor_ed)
         return;
     }
 
-    Player* mobile;
-    Editor* ed;
+    Player* mobile = NULL;
+    Editor* ed = NULL;
     int index=0;
 
     std::vector <std::string> tokens;
@@ -285,7 +285,7 @@ BOOL Editor::EnterEditor(Player* mobile)
     _mobile=mobile;
     _handler=new in_data();
     _handler->handle=editor_ed;
-    _handler->args=NULL;
+    _handler->args = (void*)this;
     _mobile->GetSocket()->SetInput(_handler);
     _mobile->Message(MSG_INFO,"Entering editor. use \'h\' for help.");
     return true;
