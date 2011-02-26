@@ -9,9 +9,11 @@
 #include "utils.h"
 #include "command.h"
 #include "olc.h"
+#include "editor.h"
 
 #ifdef OLC
 OLC_INPUT(olc_entity_name);
+OLC_INPUT(olc_entity_description);
 #endif
 
 Entity::Entity(void)
@@ -26,6 +28,7 @@ Entity::Entity(void)
 #ifdef OLC
     _olcs = new std::vector<struct OLC_DATA*>();
     AddOlc("name", "Please enter the name of the object", STRING, olc_entity_name);
+    AddOlc("description", "Editing object description", EDITOR, olc_entity_description);
 #endif
 
     events.RegisterEvent("PostLook", new Event());
@@ -308,7 +311,7 @@ OLC_DATA* Entity::GetOlcByIndex(int index)
 {
     index--;
 
-    if (((int)_olcs->size() > index+1) || (index < 0 )) {
+    if (((int)_olcs->size() < index+1) || (index < 0 )) {
         return NULL;
     }
 
@@ -324,5 +327,45 @@ OLC_INPUT(olc_entity_name)
 
 //we have a string, lets set that to the name.
     ed->SetName(input->GetStr());
+}
+
+OLC_INPUT(olc_entity_description)
+{
+    Editor* edit = new Editor();
+    edit->SetArg(ed);
+    edit->events.AddCallback("load", entity_description_editor_load);
+    edit->events.AddCallback("save", entity_description_editor_save);
+    edit->EnterEditor(mob);
+}
+EVENT(entity_description_editor_load)
+{
+    OneArg* arg = (OneArg*)args;
+    Editor* ed = (Editor*)caller;
+    Entity* obj = (Entity*)arg->_arg;
+    std::vector<std::string> lines;
+    std::vector<std::string>::iterator it;
+    std::vector<std::string>::iterator itEnd;
+    Tokenize(obj->GetDescription(), lines, "\n");
+
+    itEnd = lines.end();
+    for (it = lines.begin(); it != itEnd; ++it) {
+        ed->Add((*it));
+    }
+}
+EVENT(entity_description_editor_save)
+{
+    OneArg* arg = (OneArg*)args;
+    Editor* ed = (Editor*)caller;
+    Entity* obj = (Entity*)arg->_arg;
+    std::string desc;
+    std::vector<std::string>::iterator it;
+    std::vector<std::string>::iterator itEnd;
+
+    std::vector<std::string>* lines = ed->GetLines();
+    itEnd = lines->end();
+    for (it = lines->begin(); it != itEnd; ++it) {
+        desc += "\n" + (*it);
+    }
+    obj->SetDescription(desc);
 }
 #endif

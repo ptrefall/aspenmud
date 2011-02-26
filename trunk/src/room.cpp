@@ -20,7 +20,7 @@ Room::Room(void)
     _zone=NULL;
     SetOnum(ROOM_NOWHERE);
     SetType(2);
-    events.GetEvent("PostLook")->Add(ROOM_POST_LOOK);
+    events.AddCallback("PostLook", ROOM_POST_LOOK);
 }
 Room::~Room(void)
 {

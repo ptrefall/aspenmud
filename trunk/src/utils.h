@@ -1,11 +1,12 @@
-#ifndef HEADER_UTILS
-#define HEADER_UTILS
+#ifndef UTILS_H
+#define UTILS_H
 #include <string>
 #include <map>
 #include <list>
 #include <vector>
 #include "mud.h"
 #include "conf.h"
+#include "editor.h"
 
 //misc
 inline BOOL IsAlpha(const char* const character);
@@ -22,7 +23,7 @@ void Lower(std::string &str);
 std::string Capitalize(const std::string &str);
 std::string Repete(const std::string &filler,const int count);
 std::string Center(const std::string &str,const int width);
-std::string Explode(std::vector <std::string> &parts);
+std::string Explode(std::vector <std::string> &parts, const std::string &del = " ");
 std::string StripWhitespace(const std::string &str);
 
 //bitfield manipulation
@@ -74,7 +75,6 @@ ExitDirection GetDirectionByName(const std::string &name);
 *Return: A string with the columnized data.
 */
 std::string Columnize(std::vector<std::string> *data, int cols, int width=80);
-
 //time functions:
 class TimeInfo
 {

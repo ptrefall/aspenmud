@@ -487,7 +487,8 @@ BOOL World::DoCommand(Player* mobile,std::string args)
             case social:
             case movement:
             case channel:
-                return (*it)->Execute((*it)->GetName(), mobile, params, (*it)->GetSubcmd());
+                (*it)->Execute((*it)->GetName(), mobile, params, (*it)->GetSubcmd());
+                return true;
                 break;
             case script:
                 break;
