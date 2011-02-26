@@ -337,6 +337,7 @@ OLC_INPUT(olc_entity_description)
     edit->events.AddCallback("save", entity_description_editor_save);
     edit->EnterEditor(mob);
 }
+
 EVENT(entity_description_editor_load)
 {
     OneArg* arg = (OneArg*)args;
