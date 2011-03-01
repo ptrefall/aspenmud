@@ -1,24 +1,6 @@
-/*
-*scripts.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include <string>
 #include <sstream>
+#include <sys/time.h>
 #include "scripts.h"
 #include "../mud.h"
 #include "../conf.h"
@@ -60,6 +42,11 @@ const char* Script::Execute(const std::string &code)
         return NULL;
     }
 }
+lua_State* Script::GetState() const
+{
+    return state;
+}
+
 EVENT(EVENT_INIT_SCRIPT)
 {
     lua_State* lstate = (lua_State*)((OneArg*)args)->_arg;
@@ -67,8 +54,6 @@ EVENT(EVENT_INIT_SCRIPT)
 //open the lua libraries here
     luaL_openlibs(lstate);
 }
-
-Script *globl;
 #endif
 
 BOOL InitializeScript(void)
@@ -85,7 +70,6 @@ BOOL InitializeScript(void)
         world->WriteLog("Initialization of player script system failed.", ERR);
         return false;
     }
-    globl = new Script();
 #endif
     return true;
 }
@@ -95,19 +79,41 @@ CMDExecute::CMDExecute()
 {
     SetName("execute");
     AddAlias("exec");
+    AddAlias("eval");
     SetAccess(RANK_BUILDER);
 }
 BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
-    std::vector<std::string>::iterator it;
+    timeval prev, now; //used for timing the whole thing.
+    const char* ret = NULL;
+    std::stringstream st;
+    std::vector<std::string>::iterator it, itEnd;
     std::string input;
-    for (it = args.begin(); it != args.end(); it++) {
+    int elapsed = 0;
+    Script* scr = NULL;
+
+    scr = new Script();
+    if (!scr) {
+        mobile->Message(MSG_INFO, "could not create script interface.");
+        return false;
+    }
+
+    gettimeofday(&prev, NULL);
+
+    itEnd = args.end();
+    for (it = args.begin(); it != itEnd; ++it) {
         input += (*it);
     }
-    const char* ret = NULL;
-    ret = globl->Execute(input);
-    std::stringstream st;
+
+    ret = scr->Execute(input);
     st << "Result: " << (ret == NULL?"no return":ret) << "\n";
+    delete scr;
+
+    gettimeofday(&now, NULL);
+    elapsed = (now.tv_sec - prev.tv_sec) * 1000;
+    elapsed += (now.tv_usec - prev.tv_usec) / 1000;
+    st << "[execution took " << elapsed << " ms].";
+
     mobile->Message(MSG_INFO, st.str());
     return true;
 }

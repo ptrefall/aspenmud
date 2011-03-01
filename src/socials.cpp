@@ -1,22 +1,3 @@
-/*
-*socials.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
-
 #include <string>
 #include <map>
 #include "socials.h"
@@ -84,7 +65,11 @@ void Socials::Save(void)
 void Socials::Load(void)
 {
     if (!FileExists(SOCIALS_FILE)) {
+#ifdef NO_INIT_DEFAULTS
         InitializeDefaultSocials();
+#else
+        world->WriteLog("No socials file exists, and NO_INIT_DEFAULTS was enabled.", CRIT);
+#endif
         return;
     }
     FILE* input = fopen(SOCIALS_FILE, "r");
@@ -167,6 +152,7 @@ SOCIAL_DATA* Socials::GetSocial(const std::string &name) const
 
 void Socials::InitializeDefaultSocials(void)
 {
+#ifndef NO_INIT_DEFAULTS
     AddSocial("smile", "You %a %v.", "%N %a %vs.", "You %a %v at %T.", "%N %a %vs at %T.", "%N %a %vs at you.");
     AddSocial("grin", "You %v %a.", "%N %vs %a.", "You %v %a at %T.", "%N %vs %a at %T.", "%N %vs %a at you.");
     AddSocial("nod", "You %v %a.", "%N %vs %a.", "You %v %a at %T.", "%N %vs %a at %T.", "%N %vs %a at you.");
@@ -177,6 +163,7 @@ void Socials::InitializeDefaultSocials(void)
     AddSocial("cower", "You %v in a corner.", "%N %vs in a corner.", "You %v in fear from %T.", "%N %vs in fear from %T.", "%N %vs in fear from you.");
     AddSocial("cry", "You %v.", "%N %vs.", "You %v on %T's shoulder.", "%N %vs on %T's shoulder.", "%N %vs on your shoulder.");
     Save();
+#endif
 }
 
 void Socials::AddCommands(void)

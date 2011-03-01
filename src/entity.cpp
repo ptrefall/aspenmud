@@ -36,16 +36,17 @@ Entity::Entity(void)
 }
 Entity::~Entity(void)
 {
-    std::list <Component*>::iterator it;
-#ifdef OLC
-    std::vector<struct OLC_DATA*>::iterator oit;
-#endif
-    for (it=_components->begin(); it!=_components->end(); it++) {
+    std::list <Component*>::iterator it, itEnd;
+    itEnd = _components->end();
+    for (it=_components->begin(); it != itEnd; ++it) {
         delete (*it);
     }
     delete _components;
+
 #ifdef OLC
-    for (oit=_olcs->begin(); oit!=_olcs->end(); oit++) {
+    std::vector<struct OLC_DATA*>::iterator oit, oitEnd;
+    oitEnd = _olcs->end();
+    for (oit=_olcs->begin(); oit != oitEnd; ++oit) {
         delete (*oit);
     }
     delete _olcs;
@@ -248,26 +249,31 @@ BOOL Entity::RemoveComponent(Component* component)
     if (!HasComponent(component->GetName())) {
         return false;
     }
+
     _components->remove(component);
     component->Detach();
     return true;
 }
 bool Entity::HasComponent(const std::string &name)
 {
-    std::list <Component*>::iterator it;
+    std::list <Component*>::iterator it, itEnd;
 
-    for (it=_components->begin(); it!=_components->end(); it++) {
+    itEnd = _components->end();
+    for (it = _components->begin(); it != itEnd; ++it) {
         if ((*it)->GetName()==name) {
             return true;
         }
     }
+
     return false;
 }
 
 void Entity::Attach(Entity* obj)
 {
-    std::list <Component*>::iterator it;
-    for (it=_components->begin(); it!=_components->end(); it++) {
+    std::list <Component*>::iterator it, itEnd;
+
+    itEnd = _components->end();
+    for (it = _components->begin(); it != itEnd; ++it) {
         (*it)->Attach(obj);
     }
 }
@@ -289,10 +295,12 @@ void Entity::AddOlc(const std::string &name, const std::string &prompt, OLC_INPU
 }
 BOOL Entity::RemoveOlc(const std::string &name)
 {
-    std::vector<struct OLC_DATA*>::iterator oit;
-    for (oit=_olcs->begin(); oit != _olcs->end(); oit++) {
-        if ((*oit)->name == name) {
-            _olcs->erase(oit);
+    std::vector<struct OLC_DATA*>::iterator it, itEnd;
+
+    itEnd = _olcs->end();
+    for (it = _olcs->begin(); it != itEnd; ++it) {
+        if ((*it)->name == name) {
+            _olcs->erase(it);
             return true;
         }
     }
@@ -303,6 +311,7 @@ void Entity::ListOlcs(std::vector<struct OLC_DATA*> &out)
 {
     std::vector<struct OLC_DATA*>::iterator it;
     std::vector<struct OLC_DATA*>::iterator end = _olcs->end();
+
     for (it = _olcs->begin(); it != end; it++) {
         out.push_back((*it));
     }

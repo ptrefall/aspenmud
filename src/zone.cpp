@@ -134,6 +134,11 @@ BOOL InitializeZones(void)
     if ((stat(AREA_FILE,&FInfo))!=-1) {
         LoadZones();
     } else {
+#ifndef NO_INIT_DEFAULTS
+        world->WriteLog("No area file exists, and NO_INIT_DEFAULTS was enabled, exiting.");
+        return false;
+    }
+#else
         world->WriteLog("No area found, creating default.");
 //no zones and rooms exist, create a first zone/room.
         Zone*zone=new Zone();
@@ -159,6 +164,7 @@ BOOL InitializeZones(void)
             return false;
         }
     }
+#endif
 
     zone_saves = 0;
     world->events.AddCallback("WorldPulse", AUTOSAVE_ZONES);
