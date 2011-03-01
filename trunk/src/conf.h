@@ -91,5 +91,5 @@ enum ExitDirection {nowhere, north, south, east, west, northeast, northwest, sou
 //starting up. Leaving it defined can't hurt, but comment it out if this is giving you some sort of problem.
 #define SECURE_INITIALIZATION
 //uncomment this if you want the code to check for files and create them if they do not exist. see socials.cpp and zone.cpp for examples.
-#define NO_INIT_FILES
+#define NO_INIT_DEFAULTS
 #endif

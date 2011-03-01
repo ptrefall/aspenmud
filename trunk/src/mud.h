@@ -1,7 +1,6 @@
 //mud constants and values:
 #ifndef MUD_H
 #define MUD_H
-#include "conf.h"
 //used to show where an exception was thrown:
 #define WHERE() std::string(" In ")+std::string(__FUNCTION__)+std::string(" at ")+std::string(__FILE__)+std::string(".")
 //typedefs:

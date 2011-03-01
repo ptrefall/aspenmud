@@ -31,7 +31,7 @@ public:
 };
 
 //variable types
-enum VARIABLE_TYPE { VAR_EMPTY, VAR_INT, VAR_DOUBLE, VAR_BYTE, VAR_STR};
+enum VARIABLE_TYPE { VAR_EMPTY, VAR_BYTE, VAR_INT, VAR_DOUBLE, VAR_STR};
 
 class Variant
 {
@@ -44,6 +44,7 @@ class Variant
     VARIABLE_TYPE type;
 public:
     Variant();
+    Variant(const Variant &var);
     Variant(int s);
     Variant(char s);
     Variant(const std::string &s);
@@ -109,6 +110,7 @@ public:
     Variant& operator =(char s);
     Variant& operator =(double s);
     Variant& operator =(std::string s);
+
     template <class T>
     T operator ()()const {
         switch(type) {
@@ -130,6 +132,7 @@ public:
             break;
         }
     }
+    void SetType(VARIABLE_TYPE t);
 
 //serialization
     void Serialize(TiXmlElement* var);
@@ -138,5 +141,25 @@ public:
 //prefix ++ and --
     Variant& operator ++();
     Variant& operator --();
+    Variant operator --(int x) {
+        switch(type) {
+        default:
+            throw(InvalidVariableTypeException("Tried to use \'--\' on a variable that isn't a number."));
+            break;
+        case VAR_INT:
+            return Variant(i32--);
+        }
+    }
+    Variant operator ++(int x) {
+        switch(type) {
+        default:
+            throw(InvalidVariableTypeException("Tried to use \'++\' on a variable that isn't a number."));
+            break;
+        case VAR_INT:
+            return Variant(i32++);
+        }
+    }
+    Variant operator +(Variant var);
+    Variant& operator +=(Variant var);
 };
 #endif
