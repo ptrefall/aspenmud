@@ -140,27 +140,52 @@ BOOL Variant::IsString() const
 
 BOOL Variant::Compare(const Variant &var) const
 {
-    if (var.Typeof()!=Typeof()) {
-        return false;
+    VARIABLE_TYPE vtype = var.Typeof();
+    switch(type) {
+    case VAR_STR:
+        switch(vtype) {
+        case VAR_STR:
+            return (str == var.GetStr()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare a string with an illegal value."));
+        }
+    case VAR_INT:
+        switch(vtype) {
+        case VAR_INT:
+            return (i32 == var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (i32 == var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (i32 == var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare integer with an illegal type."));
+        }
+    case VAR_DOUBLE:
+        switch(vtype) {
+        case VAR_INT:
+            return (d == var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (d == var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (d == var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare double with an illegal type."));
+        }
+    case VAR_BYTE:
+        switch(vtype) {
+        case VAR_INT:
+            return (byte == var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (byte == var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (byte == var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare byte with an illegal type."));
+        }
+    default:
+        throw(InvalidVariableTypeException("Tried to compare with an illegal type."));
     }
 
-    switch (type) {
-    case VAR_INT:
-        return (GetInt()==var.GetInt());
-        break;
-    case VAR_BYTE:
-        return (GetByte()==var.GetByte());
-        break;
-    case VAR_STR:
-        return (GetStr()==var.GetStr());
-        break;
-    case VAR_DOUBLE:
-        return (GetDouble()==var.GetDouble());
-        break;
-    case VAR_EMPTY:
-        throw(VariableEmptyException("Tried to compare value of empty variable."));
-        break;
-    }
     return false;
 }
 BOOL Variant::operator ==(const Variant &var)
@@ -343,6 +368,119 @@ Variant Variant::operator +(Variant var)
 }
 Variant& Variant::operator +=(Variant var)
 {
-    (*this)+var;
+    *this = (*this)+var;
     return (*this);
+}
+
+Variant Variant::operator -(Variant var)
+{
+    VARIABLE_TYPE vtype = var.Typeof();
+
+    switch(type) {
+    case VAR_INT:
+        switch(vtype) {
+        case VAR_INT:
+            return Variant(i32 - var.GetInt());
+        case VAR_DOUBLE:
+            return Variant(i32 - var.GetDouble());
+        default:
+            throw(InvalidVariableTypeException("Tried to subtract illegal value."));
+        }
+    case VAR_DOUBLE:
+        switch(vtype) {
+        case VAR_INT:
+            return Variant(d - var.GetInt());
+        case VAR_DOUBLE:
+            return Variant(d - var.GetDouble());
+        default:
+            throw(InvalidVariableTypeException("Tried to subtract illegal value."));
+        }
+    default:
+        throw(InvalidVariableTypeException("Tried to subtract illegal value."));
+    }
+}
+Variant& Variant::operator -=(Variant var)
+{
+    *this = (*this)-var;
+    return *this;
+}
+
+Variant Variant::operator *(Variant var)
+{
+    VARIABLE_TYPE vtype = var.Typeof();
+
+    switch(type) {
+    case VAR_INT:
+        switch(vtype) {
+        case VAR_INT:
+            return Variant(i32 * var.GetInt());
+        case VAR_DOUBLE:
+            return Variant(i32 * var.GetDouble());
+        default:
+            throw(InvalidVariableTypeException("Tried to multiply illegal value."));
+        }
+    case VAR_DOUBLE:
+        switch(vtype) {
+        case VAR_INT:
+            return Variant(d * var.GetInt());
+        case VAR_DOUBLE:
+            return Variant(d * var.GetDouble());
+        default:
+            throw(InvalidVariableTypeException("Tried to multiply illegal value."));
+        }
+    default:
+        throw(InvalidVariableTypeException("Tried to multiply illegal value."));
+    }
+}
+Variant& Variant::operator *=(Variant var)
+{
+    (*this) = (*this)*var;
+    return (*this);
+}
+
+Variant Variant::operator /(Variant var)
+{
+    VARIABLE_TYPE vtype = var.Typeof();
+
+    switch(type) {
+    case VAR_INT:
+        switch(vtype) {
+        case VAR_INT:
+            return Variant(i32 / var.GetInt());
+        case VAR_DOUBLE:
+            return Variant(i32 / var.GetDouble());
+        default:
+            throw(InvalidVariableTypeException("Tried to divide illegal value."));
+        }
+    case VAR_DOUBLE:
+        switch(vtype) {
+        case VAR_INT:
+            return Variant(d / var.GetInt());
+        case VAR_DOUBLE:
+            return Variant(d / var.GetDouble());
+        default:
+            throw(InvalidVariableTypeException("Tried to divide illegal value."));
+        }
+    default:
+        throw(InvalidVariableTypeException("Tried to divide illegal value."));
+    }
+}
+Variant& Variant::operator /=(Variant var)
+{
+    *this = (*this)/var;
+    return *this;
+}
+
+Variant Variant::operator %(Variant var)
+{
+    if ((var.Typeof() == VAR_INT) && (type == VAR_INT)) {
+        return Variant(i32 % var.GetInt());
+    } else {
+        throw(InvalidVariableTypeException("Tried to get modulous of illegal value."));
+    }
+}
+Variant& Variant::operator %=(Variant var)
+{
+    *this = (*this)%var;
+    return *this;
 }
