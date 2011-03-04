@@ -161,5 +161,13 @@ public:
     }
     Variant operator +(Variant var);
     Variant& operator +=(Variant var);
+    Variant operator -(Variant var);
+    Variant& operator -=(Variant var);
+    Variant operator *(Variant var);
+    Variant& operator *=(Variant var);
+    Variant operator /(Variant var);
+    Variant& operator /=(Variant var);
+    Variant operator %(Variant var);
+    Variant& operator %=(Variant var);
 };
 #endif
