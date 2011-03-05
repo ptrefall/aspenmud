@@ -169,5 +169,9 @@ public:
     Variant& operator /=(Variant var);
     Variant operator %(Variant var);
     Variant& operator %=(Variant var);
+    bool operator <(Variant var);
+    bool operator <=(Variant var);
+    bool operator >(Variant var);
+    bool operator >=(Variant var);
 };
 #endif

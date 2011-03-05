@@ -484,3 +484,110 @@ Variant& Variant::operator %=(Variant var)
     *this = (*this)%var;
     return *this;
 }
+
+bool Variant::operator <(Variant var)
+{
+    VARIABLE_TYPE vtype = var.Typeof();
+    switch(type) {
+    case VAR_STR:
+        switch(vtype) {
+        case VAR_STR:
+            return (str < var.GetStr()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare a string with an illegal value."));
+        }
+    case VAR_INT:
+        switch(vtype) {
+        case VAR_INT:
+            return (i32 < var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (i32 < var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (i32 < var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare integer with an illegal type."));
+        }
+    case VAR_DOUBLE:
+        switch(vtype) {
+        case VAR_INT:
+            return (d < var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (d < var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (d < var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare double with an illegal type."));
+        }
+    case VAR_BYTE:
+        switch(vtype) {
+        case VAR_INT:
+            return (byte < var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (byte < var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (byte < var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare byte with an illegal type."));
+        }
+    default:
+        throw(InvalidVariableTypeException("Tried to compare with an illegal type."));
+    }
+}
+bool Variant::operator <=(Variant var)
+{
+    return (((*this) == var)||((*this) < var))? true:false;
+}
+
+bool Variant::operator >(Variant var)
+{
+    VARIABLE_TYPE vtype = var.Typeof();
+    switch(type) {
+    case VAR_STR:
+        switch(vtype) {
+        case VAR_STR:
+            return (str > var.GetStr()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare a string with an illegal value."));
+        }
+    case VAR_INT:
+        switch(vtype) {
+        case VAR_INT:
+            return (i32 > var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (i32 > var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (i32 > var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare integer with an illegal type."));
+        }
+    case VAR_DOUBLE:
+        switch(vtype) {
+        case VAR_INT:
+            return (d > var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (d > var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (d > var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare double with an illegal type."));
+        }
+    case VAR_BYTE:
+        switch(vtype) {
+        case VAR_INT:
+            return (byte > var.GetInt()?1:0);
+        case VAR_DOUBLE:
+            return (byte > var.GetDouble()?1:0);
+        case VAR_BYTE:
+            return (byte > var.GetByte()?1:0);
+        default:
+            throw(InvalidVariableTypeException("Tried to compare byte with an illegal type."));
+        }
+    default:
+        throw(InvalidVariableTypeException("Tried to compare with an illegal type."));
+    }
+}
+
+bool Variant::operator >=(Variant var)
+{
+    return (((*this) == var)||((*this) > var))? true:false;
+}
