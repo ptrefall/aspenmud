@@ -24,7 +24,8 @@ Entity::Entity(void)
     _location=NULL;
     _type=1;
     _onum=0;
-    _components=new std::list <Component*>();
+    _components=new std::vector<Component*>();
+    _aliases = new std::vector<std::string>();
 #ifdef OLC
     _olcs = new std::vector<struct OLC_DATA*>();
     AddOlc("name", "Please enter the name of the object", STRING, olc_entity_name);
@@ -36,12 +37,13 @@ Entity::Entity(void)
 }
 Entity::~Entity(void)
 {
-    std::list <Component*>::iterator it, itEnd;
+    std::vector<Component*>::iterator it, itEnd;
     itEnd = _components->end();
     for (it=_components->begin(); it != itEnd; ++it) {
         delete (*it);
     }
     delete _components;
+    delete _aliases;
 
 #ifdef OLC
     std::vector<struct OLC_DATA*>::iterator oit, oitEnd;
@@ -69,6 +71,15 @@ std::string Entity::GetDescription(void) const
 void Entity::SetDescription(const std::string &s)
 {
     _desc=s;
+}
+
+std::string Entity::GetPlural()
+{
+    return _plural;
+}
+void Entity::SetPlural(const std::string &s)
+{
+    _plural = s;
 }
 
 std::string Entity::GetScript(void) const
@@ -114,10 +125,10 @@ void Entity::Serialize(TiXmlElement* root)
     TiXmlElement* component = NULL;
     TiXmlElement* contents = new TiXmlElement("contents");
     TiXmlElement* properties = new TiXmlElement("properties");
-    std::list <Component*>::iterator it;
-    std::list<Component*>::iterator itEnd = _components->end();
-    std::list<Entity*>::iterator cit;
-    std::list<Entity*>::iterator citEnd=_contents.end();
+    std::vector <Component*>::iterator it, itEnd;
+    itEnd = _components->end();
+    std::list<Entity*>::iterator cit, citEnd;
+    citEnd=_contents.end();
 
     if (_contents.size()) {
         for (cit = _contents.begin(); cit != citEnd; ++cit) {
@@ -246,22 +257,33 @@ BOOL Entity::AddComponent(Component* component)
 }
 BOOL Entity::RemoveComponent(Component* component)
 {
+    std::vector<Component*>::iterator it, itEnd;
+
     if (!HasComponent(component->GetName())) {
         return false;
     }
 
-    _components->remove(component);
-    component->Detach();
-    return true;
+    itEnd = _components->end();
+    for (it = _components->begin(); it != itEnd; ++it) {
+        if ((*it) == component) {
+            component->Detach();
+            _components->erase(it);
+            return true;
+        }
+    }
+
+    return false; //should never happen.
 }
 bool Entity::HasComponent(const std::string &name)
 {
-    std::list <Component*>::iterator it, itEnd;
+    std::vector <Component*>::iterator it, itEnd;
 
-    itEnd = _components->end();
-    for (it = _components->begin(); it != itEnd; ++it) {
-        if ((*it)->GetName()==name) {
-            return true;
+    if (_components->size()) {
+        itEnd = _components->end();
+        for (it = _components->begin(); it != itEnd; ++it) {
+            if ((*it)->GetName()==name) {
+                return true;
+            }
         }
     }
 
@@ -270,12 +292,42 @@ bool Entity::HasComponent(const std::string &name)
 
 void Entity::Attach(Entity* obj)
 {
-    std::list <Component*>::iterator it, itEnd;
-
-    itEnd = _components->end();
-    for (it = _components->begin(); it != itEnd; ++it) {
-        (*it)->Attach(obj);
+    std::vector <Component*>::iterator it, itEnd;
+    if (_components->size()) {
+        itEnd = _components->end();
+        for (it = _components->begin(); it != itEnd; ++it) {
+            (*it)->Attach(obj);
+        }
     }
+}
+
+BOOL Entity::AddAlias(const std::string &alias)
+{
+    if (AliasExists(alias) && alias != "") {
+        return false;
+    }
+
+    _aliases->push_back(alias);
+    return true;
+}
+BOOL Entity::AliasExists(const std::string & name)
+{
+    std::vector<std::string>::iterator it, itEnd;
+
+    if (_aliases->size()) {
+        itEnd = _aliases->end();
+        for (it = _aliases->begin(); it != itEnd; ++it) {
+            if ((*it) == name) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+std::vector<std::string>* Entity::GetAliases()
+{
+    return _aliases;
 }
 
 #ifdef OLC
