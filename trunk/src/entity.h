@@ -20,7 +20,8 @@ EVENT(entity_description_editor_save);
 class Entity
 {
     std::list <Entity*> _contents;
-    std::list <Component*> *_components;
+    std::vector <Component*> *_components;
+    std::vector<std::string>* _aliases;
 #ifdef OLC
     std::vector <struct OLC_DATA*> *_olcs;
 #endif
@@ -30,6 +31,7 @@ class Entity
     std::string _name;
     std::string _desc;
     std::string _script; //the scripting associated with this object.
+    std::string _plural;
 public:
 //these are objects we need to store on each entity.
     EventManager events;
@@ -42,6 +44,8 @@ public:
     virtual void SetName(const std::string &s);
     virtual std::string GetDescription(void) const;
     virtual void SetDescription(const std::string &s);
+    virtual std::string GetPlural();
+    virtual void SetPlural(const std::string &s);
     virtual std::string GetScript(void) const;
     virtual void SetScript(const std::string &script);
     /*
@@ -117,6 +121,23 @@ public:
     *Param: [in] the object to attach the components to.
     */
     void Attach(Entity * obj);
+    /*
+    *Adds the specified alias.
+    *Param: [in] the name of the alias to add.
+    *Return: True if the alias could be added, false otherwise.
+    */
+    BOOL AddAlias(const std::string &alias);
+    /*
+    *checks to see if the alias exists.
+    *Param: [in] the name of the alias.
+    *Return: True on success, false on failure.
+    */
+    BOOL AliasExists(const std::string &name);
+    /*
+    *Returns a pointer to the list of aliases.
+    *Return: a pointer to a vector of strings.
+    */
+    std::vector<std::string>* GetAliases();
 #ifdef OLC
 //olc-based functions.
     /*
