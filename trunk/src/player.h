@@ -38,6 +38,8 @@ class Player:public Living
   time_t _firstLogin;
   time_t _onlineTime;
   time_t _lastLogin;
+  time_t _lastSave;
+  time_t _lastBackup;
   std::map <std::string,Option> *_config;
   std::map <MessageType,std::string> *_messages;
   Socket *_sock;
@@ -98,7 +100,8 @@ public:
   /*
   *Functions directly called to load and save the player object.
   */
-  void Save(void);
+  BOOL Save(BOOL force=false);
+  BOOL Backup();
   void Load(void);
   /*
   *EnterGame and LeaveGame are called when the player enters or leaves the game, and should be used to initialize the player after this stage.

@@ -231,7 +231,7 @@ void Socket::Kill()
         {
           if (GetConnectionType()==con_game)
             {
-              _mobile->Save();
+              _mobile->Save(true);
               _mobile->LeaveGame();
             }
         }

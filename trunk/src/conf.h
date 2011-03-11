@@ -24,6 +24,8 @@
 //delayed defines
 #define LIVING_PULSE 2 //seconds for each living heartbeat to take place.
 #define WORLD_PULSE 10 //the world pulse, used for room resets, etc.
+#define SAVE_INTERVAL 90 //90 seconds.
+#define BACKUP_INTERVAL 120 //2 minutes.
 //Defines for locating files:
 #define MOTD_FILE "../txt/motd" //message of the day shown after login
 #define LOGIN_FILE "../txt/welcome" //banner shown at login
@@ -34,6 +36,8 @@
 #define SOCIALS_FILE "../data/socials.dat"
 //directories:
 #define PLAYER_DIR "../data/players/"
+#define BACKUP_DIR "../data/backups/"
+
 #define AREA_FILE "../data/area.dat"
 //player rankings:
 #define RANK_PLAYER 1<<1

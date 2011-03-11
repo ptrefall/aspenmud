@@ -25,6 +25,8 @@ Player::Player()
   _firstLogin=0;
   _onlineTime=0;
   _lastLogin=0;
+  _lastSave = 0;
+  _lastBackup = 0;
 //config defaults:
   _config=new std::map<std::string, Option>();
 //messages:
@@ -231,16 +233,38 @@ BOOL Player::ComparePassword(void)
 void Player::IncInvalidPassword(void)
 {
   _invalidPassword++;
-  Save();
+  Save(true);
 }
 
-void Player::Save(void)
+BOOL Player::Save(BOOL force)
 {
+  if (!force)
+    {
+      if ((time(NULL)-_lastSave) < SAVE_INTERVAL)
+        {
+          return false;
+        }
+
+      _lastSave = time(NULL);
+    }
+
   TiXmlDocument doc;
   Serialize(&doc);
   doc.SaveFile((std::string(PLAYER_DIR)+GetName()).c_str());
+  return true;
 }
+BOOL Player::Backup()
+{
+  if ((time(NULL)-_lastBackup) < BACKUP_INTERVAL)
+    {
+      return false;
+    }
 
+  TiXmlDocument doc;
+  Serialize(&doc);
+  doc.SaveFile((std::string(BACKUP_DIR)+GetName()).c_str());
+  return true;
+}
 void Player::Load(void)
 {
   TiXmlDocument doc((std::string(PLAYER_DIR)+GetName()).c_str());

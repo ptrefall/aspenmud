@@ -19,6 +19,12 @@ public:
   CMDSave();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+class CMDBackup:public Command
+{
+public:
+  CMDBackup();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
 class CMDWho:public Command
 {
 public:
