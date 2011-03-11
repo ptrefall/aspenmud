@@ -17,6 +17,7 @@
 //events
 EVENT(entity_description_editor_load);
 EVENT(entity_description_editor_save);
+
 class Entity
 {
   std::list <Entity*> _contents;

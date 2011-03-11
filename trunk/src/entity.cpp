@@ -124,9 +124,12 @@ void Entity::Serialize(TiXmlElement* root)
 {
   TiXmlElement* ent = new TiXmlElement("entity");
   TiXmlElement *components = new TiXmlElement("components");
+  TiXmlElement* aliases = new TiXmlElement("aliases");
+  TiXmlElement* alias = NULL;
   TiXmlElement* component = NULL;
   TiXmlElement* contents = new TiXmlElement("contents");
   TiXmlElement* properties = new TiXmlElement("properties");
+  std::vector<std::string>::iterator ait, aitEnd;
   std::vector <Component*>::iterator it, itEnd;
   itEnd = _components->end();
   std::list<Entity*>::iterator cit, citEnd;
@@ -152,12 +155,25 @@ void Entity::Serialize(TiXmlElement* root)
     }
   ent->LinkEndChild(components);
 
+  if (_aliases->size())
+    {
+      aitEnd = _aliases->end();
+      for (ait = _aliases->begin(); ait != aitEnd; ++ait)
+        {
+          alias = new TiXmlElement("alias");
+          alias->SetAttribute("name", (*ait).c_str());
+          aliases->LinkEndChild(alias);
+        }
+    }
+  ent->LinkEndChild(aliases);
+
   variables.Serialize(properties);
   ent->LinkEndChild(properties);
 
   ent->SetAttribute("name", _name.c_str());
   ent->SetAttribute("desc", _desc.c_str());
   ent->SetAttribute("script", _script.c_str());
+  ent->SetAttribute("plural", _plural.c_str());
   ent->SetAttribute("onum", _onum);
   ent->SetAttribute("type", _type);
   ent->SetAttribute("location", (_location?_location->GetOnum():0));
@@ -168,6 +184,8 @@ void Entity::Deserialize(TiXmlElement* root)
 {
   TiXmlElement* components = NULL;
   TiXmlElement* component = NULL;
+  TiXmlElement* alias = NULL;
+  TiXmlElement*aliases = NULL;
   TiXmlElement* obj = NULL;
   TiXmlElement* contents = NULL;
   TiXmlElement* properties = NULL;
@@ -200,6 +218,17 @@ void Entity::Deserialize(TiXmlElement* root)
         }
     }
 
+  node = root->FirstChild("aliases");
+  if (node)
+    {
+      aliases = node->ToElement();
+      for (node = aliases->FirstChild(); node; node = node->NextSibling())
+        {
+          alias=node->ToElement();
+          AddAlias(alias->Attribute("name"));
+        }
+    }
+
   node = root->FirstChild("properties");
   if (node)
     {
@@ -210,6 +239,7 @@ void Entity::Deserialize(TiXmlElement* root)
   _name = root->Attribute("name");
   _desc = root->Attribute("desc");
   _script = root->Attribute("script");
+  _plural = root->Attribute("plural");
   root->Attribute("onum", &_onum);
   root->Attribute("type", &_type);
   root->Attribute("location", &loc);
