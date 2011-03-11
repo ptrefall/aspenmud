@@ -30,19 +30,19 @@
 */
 class Log
 {
-    FILE* out;
+  FILE* out;
 public:
-    Log();
-    ~Log();
-    /*
-    *Opens a log file.
-    *Params: [in] The name of the file to open.
-    */
-    void Open(std::string name);
-    /*
-    *Writes the data to the console and the file if possible.
-    *Param: [in] The message to write.
-    */
-    void Write(const std::string &data,LOG_LEVEL l=INFORM);
+  Log();
+  ~Log();
+  /*
+  *Opens a log file.
+  *Params: [in] The name of the file to open.
+  */
+  void Open(std::string name);
+  /*
+  *Writes the data to the console and the file if possible.
+  *Param: [in] The message to write.
+  */
+  void Write(const std::string &data,LOG_LEVEL l=INFORM);
 };
 #endif

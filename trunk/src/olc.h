@@ -17,26 +17,28 @@
 #define OLC_INPUT(name)\
 void name(Entity* ed, Player* mob, const Variant* input)
 
-struct OLC_DATA {
-    std::string name; //the name of the option.
-    std::string prompt;
-    OLC_INPUT_TYPE type;
-    FP_INPUT callback;
+struct OLC_DATA
+{
+  std::string name; //the name of the option.
+  std::string prompt;
+  OLC_INPUT_TYPE type;
+  FP_INPUT callback;
 };
 
-struct OLC_IN_DATA {
-    Entity* obj;
-    OLC_DATA* olc;
-    Player*mobile;
-    MENU_DATA* menu;
+struct OLC_IN_DATA
+{
+  Entity* obj;
+  OLC_DATA* olc;
+  Player*mobile;
+  MENU_DATA* menu;
 };
 
 BOOL InitializeOlc(void);
 class CMDOedit:public Command
 {
 public:
-    CMDOedit();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDOedit();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 MENU(olc_menu_cb);
 INPUT(olc_input);

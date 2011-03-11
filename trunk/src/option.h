@@ -32,28 +32,29 @@
 
 class Option
 {
-    int _rank;
-    Variant _data; //the value.
-    VARIABLE_TYPE _type; //the type that the value should hold.
-    BOOL _toggle;
-    std::string _help; //a brief description of the option.
-    std::string _name; //the name of the option.
+  int _rank;
+  Variant _data; //the value.
+  VARIABLE_TYPE _type; //the type that the value should hold.
+  BOOL _toggle;
+  std::string _help; //a brief description of the option.
+  std::string _name; //the name of the option.
 public:
-    Option();
-    Option(const std::string &name, const std::string & help, int rank, Variant value, VARIABLE_TYPE type, BOOL toggle=false);
-    ~Option();
-    template <class T>
-    inline T GetValue() const {
-        return _data.Get<T>();
-    }
-    Variant GetData(void) const;
-    void SetBool(BOOL val);
-    void SetInt(int val);
-    void SetString(const std::string &val);
-    std::string GetName(void) const;
-    std::string GetHelp(void) const;
-    int GetRank(void) const;
-    BOOL CanToggle() const;
+  Option();
+  Option(const std::string &name, const std::string & help, int rank, Variant value, VARIABLE_TYPE type, BOOL toggle=false);
+  ~Option();
+  template <class T>
+  inline T GetValue() const
+  {
+    return _data.Get<T>();
+  }
+  Variant GetData(void) const;
+  void SetBool(BOOL val);
+  void SetInt(int val);
+  void SetString(const std::string &val);
+  std::string GetName(void) const;
+  std::string GetHelp(void) const;
+  int GetRank(void) const;
+  BOOL CanToggle() const;
 };
 
 BOOL RegisterOption(const std::string &name, const std::string & help, int rank, Variant value, VARIABLE_TYPE type, BOOL toggle = false);

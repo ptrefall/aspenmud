@@ -27,61 +27,61 @@ BOOL DoMove(const std::string &verb, Player* mobile,std::vector<std::string> &ar
 class CMDNorth:public Command
 {
 public:
-    CMDNorth();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDNorth();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDSouth:public Command
 {
 public:
-    CMDSouth();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDSouth();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDEast:public Command
 {
 public:
-    CMDEast();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDEast();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDWest:public Command
 {
 public:
-    CMDWest();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDWest();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDNortheast:public Command
 {
 public:
-    CMDNortheast();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDNortheast();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDSoutheast:public Command
 {
 public:
-    CMDSoutheast();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDSoutheast();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDSouthwest:public Command
 {
 public:
-    CMDSouthwest();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDSouthwest();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDNorthwest:public Command
 {
 public:
-    CMDNorthwest();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDNorthwest();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDUp:public Command
 {
 public:
-    CMDUp();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDUp();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDDown:public Command
 {
 public:
-    CMDDown();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDDown();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 #endif

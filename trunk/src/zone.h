@@ -12,49 +12,49 @@
 */
 class Zone
 {
-    std::string _name;
-    std::list <VNUM> _rnums;
-    int _maxRooms;
+  std::string _name;
+  std::list <VNUM> _rnums;
+  int _maxRooms;
 public:
-    Zone();
-    virtual ~Zone();
-    /**
-    *Retrieves the set name of the zone.
-    *\return The name of the zone, or "" if a name hasn't been set.
-    */
-    std::string GetName(void) const;
-    /**
-    *Sets the name of the zone object.
-    *\param name The name of the zone.
-    */
-    void SetName(const std::string &name);
+  Zone();
+  virtual ~Zone();
+  /**
+  *Retrieves the set name of the zone.
+  *\return The name of the zone, or "" if a name hasn't been set.
+  */
+  std::string GetName(void) const;
+  /**
+  *Sets the name of the zone object.
+  *\param name The name of the zone.
+  */
+  void SetName(const std::string &name);
 
-    /**
-    *Retrieves the number of rooms that this zone can contain.
-    *\return The number of max rooms.
-    *\note The number of max rooms returned may or may not be higher than the actual amount of rooms in the zone.
-    */
-    int GetMaxRooms(void) const;
-    /**
-    *Sets the number of max rooms that the zone can hold.
-    *\param max [in] The number of rooms this zone should be able to hold.
-    *\note The number of max rooms set may or may not be higher than the actual amount of rooms in the zone. The function will only
-    *set the number of rooms and prevent adding of rooms if the limit has been reached.
-    */
-    void SetMaxRooms(int max);
+  /**
+  *Retrieves the number of rooms that this zone can contain.
+  *\return The number of max rooms.
+  *\note The number of max rooms returned may or may not be higher than the actual amount of rooms in the zone.
+  */
+  int GetMaxRooms(void) const;
+  /**
+  *Sets the number of max rooms that the zone can hold.
+  *\param max [in] The number of rooms this zone should be able to hold.
+  *\note The number of max rooms set may or may not be higher than the actual amount of rooms in the zone. The function will only
+  *set the number of rooms and prevent adding of rooms if the limit has been reached.
+  */
+  void SetMaxRooms(int max);
 
-    /**
-    *Adds the specified room.
-    *\param num [in] the VNUM of the room to add.
-    *\return True if the room was added successfully, false otherwise.
-    *\note The zone pointer on the Room object is set to the zone to which the room was added.
-    */
-    BOOL AddRoom(VNUM num);
-    BOOL RemoveRoom(VNUM num);
-    void GetRooms(std::list<VNUM>* rooms);
+  /**
+  *Adds the specified room.
+  *\param num [in] the VNUM of the room to add.
+  *\return True if the room was added successfully, false otherwise.
+  *\note The zone pointer on the Room object is set to the zone to which the room was added.
+  */
+  BOOL AddRoom(VNUM num);
+  BOOL RemoveRoom(VNUM num);
+  void GetRooms(std::list<VNUM>* rooms);
 
-    virtual void Serialize(TiXmlElement* root);
-    virtual void Deserialize(TiXmlElement* zone);
+  virtual void Serialize(TiXmlElement* root);
+  virtual void Deserialize(TiXmlElement* zone);
 };
 
 BOOL InitializeZones(void);

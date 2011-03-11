@@ -19,688 +19,761 @@
 
 World::World()
 {
-    _running = true;
-    _server=new Server();
-    _log=new Log();
-    _log->Open(EVENT_FILE);
-    _users=new std::list<Player*>();
-    _channels=new std::map<int,Channel*>();
-    _cfactory=new ComponentFactory();
-    _properties=new std::map<std::string,void*>();
-    _zones=new std::vector<Zone*>();
-    _rooms=new std::map<VNUM,Room*>();
-    _objects=new std::map<VNUM,Entity*>();
-    _onumPool=new std::vector <VNUM>();
-    _rnumPool=new std::vector<VNUM>();
-    _maxOnum=0;
-    _maxRnum=0;
-    _chanid=1;
+  _running = true;
+  _server=new Server();
+  _log=new Log();
+  _log->Open(EVENT_FILE);
+  _users=new std::list<Player*>();
+  _channels=new std::map<int,Channel*>();
+  _cfactory=new ComponentFactory();
+  _properties=new std::map<std::string,void*>();
+  _zones=new std::vector<Zone*>();
+  _rooms=new std::map<VNUM,Room*>();
+  _objects=new std::map<VNUM,Entity*>();
+  _onumPool=new std::vector <VNUM>();
+  _rnumPool=new std::vector<VNUM>();
+  _maxOnum=0;
+  _maxRnum=0;
+  _chanid=1;
 
 //events
-    events.RegisterEvent("LivingPulse",new DelayedEvent(LIVING_PULSE,0));
-    events.RegisterEvent("WorldPulse", new DelayedEvent(WORLD_PULSE, 0));
-    events.RegisterEvent("PlayerConnect", new Event());
-    events.RegisterEvent("PlayerDisconnect", new Event());
-    events.RegisterEvent("PlayerCreated", new Event());
-    events.RegisterEvent("PlayerDeleted", new Event());
-    events.RegisterEvent("Shutdown", new Event());
-    events.RegisterEvent("Copyover", new Event());
+  events.RegisterEvent("LivingPulse",new DelayedEvent(LIVING_PULSE,0));
+  events.RegisterEvent("WorldPulse", new DelayedEvent(WORLD_PULSE, 0));
+  events.RegisterEvent("PlayerConnect", new Event());
+  events.RegisterEvent("PlayerDisconnect", new Event());
+  events.RegisterEvent("PlayerCreated", new Event());
+  events.RegisterEvent("PlayerDeleted", new Event());
+  events.RegisterEvent("Shutdown", new Event());
+  events.RegisterEvent("Copyover", new Event());
 #ifdef MODULE_SCRIPTING
-    events.RegisterEvent("ScriptLoaded", new Event());
-    events.RegisterEvent("ScriptUnloaded", new Event());
+  events.RegisterEvent("ScriptLoaded", new Event());
+  events.RegisterEvent("ScriptUnloaded", new Event());
 #endif
 }
 
 World::~World()
 {
-    std::map<int,Channel*>::iterator cit;
-    std::map<int,Channel*>::iterator citEnd;
-    std::vector<Zone*>::iterator zit;
-    std::vector<Zone*>::iterator zitEnd;
+  std::map<int,Channel*>::iterator cit;
+  std::map<int,Channel*>::iterator citEnd;
+  std::vector<Zone*>::iterator zit;
+  std::vector<Zone*>::iterator zitEnd;
 
-    delete [] _motd;
-    delete [] _banner;
-    delete _log;
-    delete _server;
-    delete _users;
+  delete [] _motd;
+  delete [] _banner;
+  delete _log;
+  delete _server;
+  delete _users;
 
-    citEnd=_channels->end();
-    for (cit = _channels->begin(); cit != citEnd; ++cit) {
-        delete (*cit).second;
+  citEnd=_channels->end();
+  for (cit = _channels->begin(); cit != citEnd; ++cit)
+    {
+      delete (*cit).second;
     }
-    delete _channels;
-    delete _cfactory;
-    delete _properties;
+  delete _channels;
+  delete _cfactory;
+  delete _properties;
 
-    zitEnd = _zones->end();
-    for (zit = _zones->begin(); zit != zitEnd; ++zit) {
-        delete (*zit);
+  zitEnd = _zones->end();
+  for (zit = _zones->begin(); zit != zitEnd; ++zit)
+    {
+      delete (*zit);
     }
-    delete _zones;
-    delete _rooms;
-    delete _objects;
-    delete _onumPool;
-    delete _rnumPool;
+  delete _zones;
+  delete _rooms;
+  delete _objects;
+  delete _onumPool;
+  delete _rnumPool;
 }
 
 void World::Shutdown()
 {
-    std::list <Player*>::iterator it;
-    std::list <Player*>::iterator itEnd;
-    std::list<Player*> players(_users->begin(), _users->end());
+  std::list <Player*>::iterator it;
+  std::list <Player*>::iterator itEnd;
+  std::list<Player*> players(_users->begin(), _users->end());
 
-    Player* person = NULL;
+  Player* person = NULL;
 
-    itEnd = players.end();
-    for (it = players.begin(); it != itEnd; ++it) {
-        person = (*it);
-        person->Message(MSG_CRITICAL,"The mud is shutting down now. Your Character will be autosaved.");
-        person->GetSocket()->Kill();
+  itEnd = players.end();
+  for (it = players.begin(); it != itEnd; ++it)
+    {
+      person = (*it);
+      person->Message(MSG_CRITICAL,"The mud is shutting down now. Your Character will be autosaved.");
+      person->GetSocket()->Kill();
     }
-    events.CallEvent("Shutdown", NULL, (void*)this);
-    _running = false;
+  events.CallEvent("Shutdown", NULL, (void*)this);
+  _running = false;
 }
 void World::Copyover(Player* mobile)
 {
-    int cuptime=(int)GetCopyoverUptime();
-    int ruptime = (int)GetRealUptime();
+  int cuptime=(int)GetCopyoverUptime();
+  int ruptime = (int)GetRealUptime();
 
-    FILE* copyover=fopen(COPYOVER_FILE,"wb");
-    if (copyover==NULL) {
-        mobile->Message(MSG_ERROR,"couldn't open the copyover file.\nCopyover will not continue.");
-        return;
+  FILE* copyover=fopen(COPYOVER_FILE,"wb");
+  if (copyover==NULL)
+    {
+      mobile->Message(MSG_ERROR,"couldn't open the copyover file.\nCopyover will not continue.");
+      return;
     }
-    Player* person;
+  Player* person;
 
-    fprintf(copyover, "%d %d\n", cuptime, ruptime);
-    sockaddr_in* addr=NULL;
+  fprintf(copyover, "%d %d\n", cuptime, ruptime);
+  sockaddr_in* addr=NULL;
 //itterate through the players and write info to their copyover file:
-    std::list <Player*>::iterator it, itEnd;
-    char buff[16];
+  std::list <Player*>::iterator it, itEnd;
+  char buff[16];
 
-    itEnd=GetPlayers()->end();
-    for (it = GetPlayers()->begin(); it != itEnd; ++it) {
-        person = (*it);
-        if (person->GetSocket()->GetConnectionType()!=con_game) {
-            person->Write("We're sorry, but we are currently rebooting; please come back again soon.\n");
-            person->GetSocket()->Kill();
-            continue;
+  itEnd=GetPlayers()->end();
+  for (it = GetPlayers()->begin(); it != itEnd; ++it)
+    {
+      person = (*it);
+      if (person->GetSocket()->GetConnectionType()!=con_game)
+        {
+          person->Write("We're sorry, but we are currently rebooting; please come back again soon.\n");
+          person->GetSocket()->Kill();
+          continue;
         }
-        addr=person->GetSocket()->GetAddr();
-        person->Save();
-        fprintf(copyover,"%d %s %hd %hu %lu %s\n",
-                person->GetSocket()->GetControl(), person->GetName().c_str(),
-                addr->sin_family,addr->sin_port,(long int)addr->sin_addr.s_addr, person->GetSocket()->GetHost().c_str());
-        person->Write("Copyover initiated by "+mobile->GetName()+".\n");
+      addr=person->GetSocket()->GetAddr();
+      person->Save();
+      fprintf(copyover,"%d %s %hd %hu %lu %s\n",
+              person->GetSocket()->GetControl(), person->GetName().c_str(),
+              addr->sin_family,addr->sin_port,(long int)addr->sin_addr.s_addr, person->GetSocket()->GetHost().c_str());
+      person->Write("Copyover initiated by "+mobile->GetName()+".\n");
     }
-    world->Update();
-    fprintf(copyover,"-1\n");
-    fclose(copyover);
-    events.CallEvent("Copyover", NULL, (void*)this);
-    memset(buff,0,16);
-    snprintf(buff,16,"%d",world->GetServer()->GetListener());
-    execl(BIN_FILE,BIN_FILE,"-c",buff,(char*)NULL);
-    mobile->Write("Copyover failed!\n");
+  world->Update();
+  fprintf(copyover,"-1\n");
+  fclose(copyover);
+  events.CallEvent("Copyover", NULL, (void*)this);
+  memset(buff,0,16);
+  snprintf(buff,16,"%d",world->GetServer()->GetListener());
+  execl(BIN_FILE,BIN_FILE,"-c",buff,(char*)NULL);
+  mobile->Write("Copyover failed!\n");
 }
 
 Server* World::GetServer(void) const
 {
-    return _server;
+  return _server;
 }
 
 Log* World::GetLog(void) const
 {
-    return _log;
+  return _log;
 }
 
 std::list <Player*> *World::GetPlayers(void) const
 {
-    return _users;
+  return _users;
 }
 
 BOOL World::AddPlayer(Player* player)
 {
-    if (!player) {
-        return false;
+  if (!player)
+    {
+      return false;
     }
-    if (player->GetSocket()->GetConnectionType() != con_game) {
-        return false;
+  if (player->GetSocket()->GetConnectionType() != con_game)
+    {
+      return false;
     }
 
-    _users->push_back(player);
-    return true;
+  _users->push_back(player);
+  return true;
 }
 BOOL World::RemovePlayer(Player* player)
 {
-    std::list<Player*>::iterator it;
-    std::list<Player*>::iterator itEnd = _users->end();
+  std::list<Player*>::iterator it;
+  std::list<Player*>::iterator itEnd = _users->end();
 
-    if (_users->size()) {
-        for (it = _users->begin(); it != itEnd; ++it) {
-            if ((*it) == player) {
-                _users->erase(it);
-                return true;
+  if (_users->size())
+    {
+      for (it = _users->begin(); it != itEnd; ++it)
+        {
+          if ((*it) == player)
+            {
+              _users->erase(it);
+              return true;
             }
         }
     }
 
-    return false;
+  return false;
 }
 Player* World::FindPlayer(const std::string &name) const
 {
-    std::list<Player*>::iterator it;
-    std::list <Player*>::iterator itEnd;
+  std::list<Player*>::iterator it;
+  std::list <Player*>::iterator itEnd;
 
-    itEnd=_users->end();
-    if (_users->size()) {
-        for (it = _users->begin(); it != itEnd; ++it) {
-            if ((*it)->GetName()==name) {
-                return (*it);
+  itEnd=_users->end();
+  if (_users->size())
+    {
+      for (it = _users->begin(); it != itEnd; ++it)
+        {
+          if ((*it)->GetName()==name)
+            {
+              return (*it);
             }
         }
     }
 
-    return NULL;
+  return NULL;
 }
 Player* World::LoadPlayer(const std::string &name) const
 {
 
-    if (PlayerExists(name)) {
-        Player* p=new Player();
-        p->SetName(name);
-        p->Load();
-        return p;
+  if (PlayerExists(name))
+    {
+      Player* p=new Player();
+      p->SetName(name);
+      p->Load();
+      return p;
     }
 
-    return NULL;
+  return NULL;
 }
 
 void World::GetChannelNames(std::list <std::string>* out)
 {
-    std::map<int,Channel*>::iterator it;
-    std::map<int, Channel*>::iterator itEnd;
+  std::map<int,Channel*>::iterator it;
+  std::map<int, Channel*>::iterator itEnd;
 
-    itEnd = _channels->end();
-    for (it = _channels->begin(); it != itEnd; ++it) {
-        out->push_back(((*it).second)->GetName());
+  itEnd = _channels->end();
+  for (it = _channels->begin(); it != itEnd; ++it)
+    {
+      out->push_back(((*it).second)->GetName());
     }
 }
 
 void World::AddChannel(Channel* chan,BOOL command)
 {
-    (*_channels)[_chanid]=chan;
-    RegisterOption(chan->GetName(),
-                   "Controls whether or not you can hear and broadcast to "+chan->GetName()+".",
-                   chan->GetAccess(), (chan->GetName()=="newbie"?Variant((int)1):Variant((int)0)), VAR_INT, true);
-    if (command) {
-        CMDChan* com = new CMDChan();
-        com->SetName(chan->GetName());
-        com->SetAccess(chan->GetAccess());
-        if (chan->GetAlias() != "") {
-            com->AddAlias(chan->GetAlias());
+  (*_channels)[_chanid]=chan;
+  RegisterOption(chan->GetName(),
+                 "Controls whether or not you can hear and broadcast to "+chan->GetName()+".",
+                 chan->GetAccess(), (chan->GetName()=="newbie"?Variant((int)1):Variant((int)0)), VAR_INT, true);
+  if (command)
+    {
+      CMDChan* com = new CMDChan();
+      com->SetName(chan->GetName());
+      com->SetAccess(chan->GetAccess());
+      if (chan->GetAlias() != "")
+        {
+          com->AddAlias(chan->GetAlias());
         }
-        commands.AddCommand(com);
+      commands.AddCommand(com);
     }
-    _chanid++;
+  _chanid++;
 }
 
 Channel* World::FindChannel(const int id) const
 {
-    if (!_channels->count(id)) {
-        return NULL;
+  if (!_channels->count(id))
+    {
+      return NULL;
     }
-    return (*_channels)[id];
+  return (*_channels)[id];
 }
 
 Channel* World::FindChannel(const std::string &name)
 {
 //This method is a bit slower because we have to iterate through the mapping ourselves.
-    std::map<int,Channel*>::iterator it;
-    std::map<int, Channel*>::iterator itEnd;
+  std::map<int,Channel*>::iterator it;
+  std::map<int, Channel*>::iterator itEnd;
 
-    for (it = _channels->begin(); it != itEnd; ++it) {
-        if ((*it).second->GetName()==name) {
-            return ((*it).second);
+  for (it = _channels->begin(); it != itEnd; ++it)
+    {
+      if ((*it).second->GetName()==name)
+        {
+          return ((*it).second);
         }
     }
-    return NULL;
+  return NULL;
 }
 
 BOOL World::InitializeFiles(void)
 {
-    struct stat *fs; //holds file stats
+  struct stat *fs; //holds file stats
 //load our banner:
 //retrieve size of file so we can create the buffer:
-    fs=new struct stat();
-    if(stat(LOGIN_FILE,fs)) {
-        WriteLog("Could not stat login file.", CRIT);
-        return false;
+  fs=new struct stat();
+  if(stat(LOGIN_FILE,fs))
+    {
+      WriteLog("Could not stat login file.", CRIT);
+      return false;
     }
-    _banner=new char[fs->st_size+1];
-    memset(_banner,0,fs->st_size+1);
+  _banner=new char[fs->st_size+1];
+  memset(_banner,0,fs->st_size+1);
 //open and load the banner:
-    FILE* banner_fd=fopen(LOGIN_FILE,"r");
-    if (!banner_fd) {
-        WriteLog("Could not fopen banner file.", CRIT);
-        delete []_banner;
-        return false;
+  FILE* banner_fd=fopen(LOGIN_FILE,"r");
+  if (!banner_fd)
+    {
+      WriteLog("Could not fopen banner file.", CRIT);
+      delete []_banner;
+      return false;
     }
-    if ((int)fread(_banner,1,fs->st_size,banner_fd)!=(int)fs->st_size) {
-        WriteLog("Error loading banner.", CRIT);
-        return false;
+  if ((int)fread(_banner,1,fs->st_size,banner_fd)!=(int)fs->st_size)
+    {
+      WriteLog("Error loading banner.", CRIT);
+      return false;
     }
-    fclose(banner_fd);
-    delete fs;
+  fclose(banner_fd);
+  delete fs;
 //load our motd:
 //retrieve size of file so we can create the buffer:
-    fs=new struct stat();
-    if (stat(MOTD_FILE,fs)) {
-        WriteLog("Could not stat MOTD file.", CRIT);
-        return false;
+  fs=new struct stat();
+  if (stat(MOTD_FILE,fs))
+    {
+      WriteLog("Could not stat MOTD file.", CRIT);
+      return false;
     }
 
-    _motd=new char[fs->st_size+1];
-    memset(_motd,0,fs->st_size+1);
-    FILE* motd_fd=fopen(MOTD_FILE,"r");
-    if (!motd_fd) {
-        WriteLog("Could not fopen MOTD.", CRIT);
-        return false;
+  _motd=new char[fs->st_size+1];
+  memset(_motd,0,fs->st_size+1);
+  FILE* motd_fd=fopen(MOTD_FILE,"r");
+  if (!motd_fd)
+    {
+      WriteLog("Could not fopen MOTD.", CRIT);
+      return false;
     }
 
-    if ((int)fread(_motd,1,fs->st_size,motd_fd)!=(int)fs->st_size) {
-        WriteLog("Error loading MOTD.", CRIT);
-        return false;
+  if ((int)fread(_motd,1,fs->st_size,motd_fd)!=(int)fs->st_size)
+    {
+      WriteLog("Error loading MOTD.", CRIT);
+      return false;
     }
-    fclose(motd_fd);
-    delete fs;
-    WriteLog("Files loaded successfully");
-    return true;
+  fclose(motd_fd);
+  delete fs;
+  WriteLog("Files loaded successfully");
+  return true;
 }
 
 const char* World::GetBanner(void) const
 {
-    return _banner;
+  return _banner;
 }
 
 const char* World::GetMotd(void) const
 {
-    return _motd;
+  return _motd;
 }
 
 void World::Update(void) const
 {
-    std::list <Player*>::iterator pit;
-    std::list<Player*>::iterator pitEnd;
+  std::list <Player*>::iterator pit;
+  std::list<Player*>::iterator pitEnd;
 //flushes the output buffers of all sockets.
-    _server->FlushSockets();
+  _server->FlushSockets();
 //checks for incoming connections or commands
-    _server->PollSockets();
+  _server->PollSockets();
 //update living objects:
-    if (_users->size()) {
-        pitEnd = _users->end();
-        for (pit = _users->begin(); pit != pitEnd; ++pit) {
-            (*pit)->Update();
+  if (_users->size())
+    {
+      pitEnd = _users->end();
+      for (pit = _users->begin(); pit != pitEnd; ++pit)
+        {
+          (*pit)->Update();
         }
     }
 
 //sleep so that we don't kill our cpu
-    _server->Sleep(10);
+  _server->Sleep(10);
 }
 
 BOOL World::RegisterComponent(const std::string &name,COMCREATECB cb, COMINITCB ib)
 {
-    if (ib!=NULL) {
-        (ib)();
+  if (ib!=NULL)
+    {
+      (ib)();
     }
 
-    return _cfactory->RegisterComponent(name,cb);
+  return _cfactory->RegisterComponent(name,cb);
 }
 Component*  World::CreateComponent(const std::string &name)
 {
-    return _cfactory->Create(name);
+  return _cfactory->Create(name);
 }
 
 BOOL World::AddRoom(VNUM num,Room* room)
 {
-    if (RoomExists(num)) {
-        return false;
+  if (RoomExists(num))
+    {
+      return false;
     }
 
-    (*_rooms)[num]=room;
-    return true;
+  (*_rooms)[num]=room;
+  return true;
 }
 Room* World::GetRoom(VNUM num)
 {
-    if (!RoomExists(num)) {
-        return NULL;
+  if (!RoomExists(num))
+    {
+      return NULL;
     }
-    return (*_rooms)[num];
+  return (*_rooms)[num];
 }
 BOOL World::RemoveRoom(VNUM num)
 {
-    if (!RoomExists(num)) {
-        return false;
+  if (!RoomExists(num))
+    {
+      return false;
     }
-    _rooms->erase(num);
-    return true;
+  _rooms->erase(num);
+  return true;
 }
 BOOL World::RoomExists(VNUM num)
 {
-    return (_rooms->count(num)==0?false:true);
+  return (_rooms->count(num)==0?false:true);
 }
 
 BOOL World::AddObject(VNUM num, Entity* obj)
 {
-    if (ObjectExists(num)) {
-        return false;
+  if (ObjectExists(num))
+    {
+      return false;
     }
 
-    (*_objects)[num]=obj;
-    return true;
+  (*_objects)[num]=obj;
+  return true;
 }
 Entity* World::GetObject(VNUM num)
 {
-    if (ObjectExists(num)) {
-        return (*_objects)[num];
+  if (ObjectExists(num))
+    {
+      return (*_objects)[num];
     }
 
-    return false;
+  return false;
 }
 BOOL World::RemoveObject(VNUM num)
 {
-    if (ObjectExists(num)) {
-        _objects->erase(num);
-        return true;
+  if (ObjectExists(num))
+    {
+      _objects->erase(num);
+      return true;
     }
 
-    return false;
+  return false;
 }
 BOOL World::ObjectExists(VNUM num)
 {
-    return (_objects->count(num)==0?false:true);
+  return (_objects->count(num)==0?false:true);
 }
 
 time_t World::GetRealUptime(void) const
 {
-    return _ruptime;
+  return _ruptime;
 }
 void World::SetRealUptime(time_t tm)
 {
-    _ruptime=tm;
+  _ruptime=tm;
 }
 
 time_t World::GetCopyoverUptime(void) const
 {
-    return _cuptime;
+  return _cuptime;
 }
 void World::SetCopyoverUptime(time_t tm)
 {
-    _cuptime=tm;
+  _cuptime=tm;
 }
 
 BOOL World::AddProperty(const std::string &name,void* ptr)
 {
-    if (!_properties->count(name)) {
-        (*_properties)[name]=ptr;
-        return true;
+  if (!_properties->count(name))
+    {
+      (*_properties)[name]=ptr;
+      return true;
     }
-    return false;
+  return false;
 }
 void* World::GetProperty(const std::string &name) const
 {
-    if (_properties->count(name)) {
-        return (*_properties)[name];
+  if (_properties->count(name))
+    {
+      return (*_properties)[name];
     }
-    return NULL;
+  return NULL;
 }
 BOOL World::RemoveProperty(const std::string &name)
 {
-    if (_properties->count(name)) {
-        _properties->erase(name);
-        return true;
+  if (_properties->count(name))
+    {
+      _properties->erase(name);
+      return true;
     }
-    return false;
+  return false;
 }
 
 BOOL World::DoCommand(Player* mobile,std::string args)
 {
-    std::vector<Command*>* cptr = commands.GetPtr();
-    std::string cmd = ""; // the parsed command name
-    const char *line = args.c_str(); // the command line
-    int len = strlen(line); // get length of string
-    int i = 0; // counter
-    std::vector<std::string> params; // the parameters being passed to the command
-    //std::list<Command*>* externals; //external commands
-    std::vector <Command*>::iterator it; //an iterator for iterating through the command list
-    std::vector <Command*>::iterator itEnd; //an iterator to point to the end of the commands list.
-    // parse command name
-    for (i = 0; i < len; i++) {
-        if (line[i] == ' ') break;
+  std::vector<Command*>* cptr = commands.GetPtr();
+  std::string cmd = ""; // the parsed command name
+  const char *line = args.c_str(); // the command line
+  int len = strlen(line); // get length of string
+  int i = 0; // counter
+  std::vector<std::string> params; // the parameters being passed to the command
+  //std::list<Command*>* externals; //external commands
+  std::vector <Command*>::iterator it; //an iterator for iterating through the command list
+  std::vector <Command*>::iterator itEnd; //an iterator to point to the end of the commands list.
+  // parse command name
+  for (i = 0; i < len; i++)
+    {
+      if (line[i] == ' ') break;
     }
 
-    // copy the command
-    cmd = args.substr(0, i);
+  // copy the command
+  cmd = args.substr(0, i);
 //make the command lowercase
-    /*
-        for (int n = 0; n < (int)cmd.length(); n++) {
-            cmd[n] = tolower(cmd[n]);
-        }
-    */
+  /*
+      for (int n = 0; n < (int)cmd.length(); n++) {
+          cmd[n] = tolower(cmd[n]);
+      }
+  */
 
-    // are there any arguments to parse?
-    if (i != len) {
-        // parse arguments
-        for (; i < len; i++) {
-            if (line[i] == ' ') continue;
-            // is it a quoated argument
-            /*
-                        if ((line[i] == '\'') || (line[i] == '"')) {
-                            char match = line[i];
-                            int arg_start = i + 1;
-                            i++;
-                            // loop until we reach the closing character
-                            for (; i < len; i++) if (line[i] == match) break;
-                            int arg_end = i;
-                            params.push_back(args.substr(arg_start, arg_end - arg_start));
-                        }
-            */
-            if (isalnum(line[i])) {
-                int arg_start = i;
-                for (; i < len; i++)
-                    if ((line[i] == ' '))
-                        break;
-                int arg_end = i;
-                params.push_back(args.substr(arg_start, arg_end - arg_start));
+  // are there any arguments to parse?
+  if (i != len)
+    {
+      // parse arguments
+      for (; i < len; i++)
+        {
+          if (line[i] == ' ') continue;
+          // is it a quoated argument
+          /*
+                      if ((line[i] == '\'') || (line[i] == '"')) {
+                          char match = line[i];
+                          int arg_start = i + 1;
+                          i++;
+                          // loop until we reach the closing character
+                          for (; i < len; i++) if (line[i] == match) break;
+                          int arg_end = i;
+                          params.push_back(args.substr(arg_start, arg_end - arg_start));
+                      }
+          */
+          if (isalnum(line[i]))
+            {
+              int arg_start = i;
+              for (; i < len; i++)
+                if ((line[i] == ' '))
+                  break;
+              int arg_end = i;
+              params.push_back(args.substr(arg_start, arg_end - arg_start));
             }
         }
     }
 //locate and execute the command:
 //check the built-in commands first, then contents, then location.
-    itEnd = cptr->end();
-    for (it = cptr->begin(); it != itEnd; ++it) {
-        if (((*it)->GetName() == cmd)||((*it)->HasAlias(cmd, true))) {
-            if (!mobile->HasAccess((*it)->GetAccess())) {
-                return false;
+  itEnd = cptr->end();
+  for (it = cptr->begin(); it != itEnd; ++it)
+    {
+      if (((*it)->GetName() == cmd)||((*it)->HasAlias(cmd, true)))
+        {
+          if (!mobile->HasAccess((*it)->GetAccess()))
+            {
+              return false;
             }
-            switch((*it)->GetType()) {
+          switch((*it)->GetType())
+            {
             default:
-                WriteLog("Invalid command type.");
-                break;
+              WriteLog("Invalid command type.");
+              break;
             case normal:
             case social:
             case movement:
             case channel:
-                (*it)->Execute((*it)->GetName(), mobile, params, (*it)->GetSubcmd());
-                return true;
-                break;
+              (*it)->Execute((*it)->GetName(), mobile, params, (*it)->GetSubcmd());
+              return true;
+              break;
             case script:
-                break;
+              break;
             }
         }
     }
 //todo: check inventory and room commands here.
-    return false;
+  return false;
 }
 
 Entity* World::MatchObject(const std::string &name,Player* caller)
 {
-    if ((name=="me")||(name==caller->GetName())) {
-        return (Entity*)caller;
+  if ((name=="me")||(name==caller->GetName()))
+    {
+      return (Entity*)caller;
     }
-    if (name == "here") {
-        return (caller->GetLocation());
+  if (name == "here")
+    {
+      return (caller->GetLocation());
     }
 
-    return NULL;
+  return NULL;
 }
 
 BOOL World::AddZone(Zone* zone)
 {
-    std::vector<Zone*>::iterator it;
-    std::vector<Zone*>::iterator itEnd = _zones->end();
+  std::vector<Zone*>::iterator it;
+  std::vector<Zone*>::iterator itEnd = _zones->end();
 
-    if (_zones->size()) {
-        for (it=_zones->begin(); it != itEnd; ++it) {
-            if ((*it)==zone) {
-                return false;
+  if (_zones->size())
+    {
+      for (it=_zones->begin(); it != itEnd; ++it)
+        {
+          if ((*it)==zone)
+            {
+              return false;
             }
         }
     }
-    _zones->push_back(zone);
-    return true;
+  _zones->push_back(zone);
+  return true;
 }
 BOOL World::RemoveZone(Zone* zone)
 {
-    std::vector<Zone*>::iterator it;
-    std::vector <Zone*>::iterator itEnd = _zones->end();
-    for (it = _zones->begin(); it != itEnd; ++it) {
-        if ((*it)==zone) {
-            _zones->erase(it);
-            return true;
+  std::vector<Zone*>::iterator it;
+  std::vector <Zone*>::iterator itEnd = _zones->end();
+  for (it = _zones->begin(); it != itEnd; ++it)
+    {
+      if ((*it)==zone)
+        {
+          _zones->erase(it);
+          return true;
         }
     }
 
-    return false;
+  return false;
 }
 Zone* World::GetZone(const std::string &name)
 {
-    std::vector <Zone*>::iterator it;
-    std::vector<Zone*>::iterator itEnd = _zones->end();
+  std::vector <Zone*>::iterator it;
+  std::vector<Zone*>::iterator itEnd = _zones->end();
 
 
-    for (it=_zones->begin(); it != itEnd; it++) {
-        if (name==(*it)->GetName()) {
-            return (*it);
+  for (it=_zones->begin(); it != itEnd; it++)
+    {
+      if (name==(*it)->GetName())
+        {
+          return (*it);
         }
     }
 
-    return NULL;
+  return NULL;
 }
 BOOL World::GetZones(std::vector<Zone*> *zones)
 {
-    if (!zones) {
-        return false;
+  if (!zones)
+    {
+      return false;
     }
 
-    std::vector<Zone*>::iterator it;
-    std::vector<Zone*>::iterator itEnd = _zones->end();
+  std::vector<Zone*>::iterator it;
+  std::vector<Zone*>::iterator itEnd = _zones->end();
 
-    if (_zones->size()) {
-        for (it=_zones->begin(); it != itEnd; ++it) {
-            zones->push_back((*it));
+  if (_zones->size())
+    {
+      for (it=_zones->begin(); it != itEnd; ++it)
+        {
+          zones->push_back((*it));
         }
     }
-    return true;
+  return true;
 }
 
 BOOL World::CreateObject(Entity* obj)
 {
-    VNUM id;
+  VNUM id;
 
-    if (_onumPool->size()) {
-        id=_onumPool->back();
-        _onumPool->pop_back();
-        obj->SetOnum(id);
-        AddObject(id,obj);
-        return true;
-    } else {
-        _maxOnum++;
-        id=_maxOnum;
-        obj->SetOnum(id);
-        AddObject(id,obj);
-        return true;
+  if (_onumPool->size())
+    {
+      id=_onumPool->back();
+      _onumPool->pop_back();
+      obj->SetOnum(id);
+      AddObject(id,obj);
+      return true;
+    }
+  else
+    {
+      _maxOnum++;
+      id=_maxOnum;
+      obj->SetOnum(id);
+      AddObject(id,obj);
+      return true;
     }
 
-    return false;
+  return false;
 }
 BOOL World::CreateRoom(Room* room)
 {
-    VNUM id;
+  VNUM id;
 
-    if (_rnumPool->size()) {
-        id=_rnumPool->back();
-        _rnumPool->pop_back();
-        room->SetOnum(id);
-        AddRoom(id,room);
-        return true;
-    } else {
-        _maxOnum++;
-        id=_maxOnum;
-        room->SetOnum(id);
-        AddRoom(id,room);
-        return true;
+  if (_rnumPool->size())
+    {
+      id=_rnumPool->back();
+      _rnumPool->pop_back();
+      room->SetOnum(id);
+      AddRoom(id,room);
+      return true;
+    }
+  else
+    {
+      _maxOnum++;
+      id=_maxOnum;
+      room->SetOnum(id);
+      AddRoom(id,room);
+      return true;
     }
 
-    return false;
+  return false;
 }
 
 void World::InitializeNums(void)
 {
-    WriteLog("Initializing vnums for pool.");
-    int max=0;
-    int i;
-    std::map<VNUM,Room*>::iterator rt;
-    std::map<VNUM,Entity*>::iterator ot;
+  WriteLog("Initializing vnums for pool.");
+  int max=0;
+  int i;
+  std::map<VNUM,Room*>::iterator rt;
+  std::map<VNUM,Entity*>::iterator ot;
 
 //iterate through rooms first and find the max number.
-    for (rt=_rooms->begin(); rt!=_rooms->end(); rt++) {
-        if ((*rt).first>max) {
-            max=(*rt).first;
+  for (rt=_rooms->begin(); rt!=_rooms->end(); rt++)
+    {
+      if ((*rt).first>max)
+        {
+          max=(*rt).first;
         }
     }
-    _maxRnum=max;
-    for (i=0; i!=max; i++) {
-        if (!GetRoom(i)) {
+  _maxRnum=max;
+  for (i=0; i!=max; i++)
+    {
+      if (!GetRoom(i))
+        {
 //GetRoom returned NULL, we have an empty number to add to the pool
-            _rnumPool->push_back(i);
+          _rnumPool->push_back(i);
         }
     }
 
 //now we do the same with objects:
-    max=0;
-    for (ot=_objects->begin(); ot!=_objects->end(); ot++) {
-        if ((*ot).first>max) {
-            max=(*ot).first;
+  max=0;
+  for (ot=_objects->begin(); ot!=_objects->end(); ot++)
+    {
+      if ((*ot).first>max)
+        {
+          max=(*ot).first;
         }
     }
-    _maxOnum=max;
-    for (i=0; i!=max; i++) {
-        if (!GetObject(i)) {
-            _onumPool->push_back(i);
+  _maxOnum=max;
+  for (i=0; i!=max; i++)
+    {
+      if (!GetObject(i))
+        {
+          _onumPool->push_back(i);
         }
     }
 }
 
 void World::WriteLog(const std::string &data,LOG_LEVEL l)
 {
-    _log->Write(data, l);
+  _log->Write(data, l);
 }
 
 BOOL World::IsRunning() const
 {
-    return _running;
+  return _running;
 }
 void World::SetRunning(BOOL running)
 {
-    _running = running;
+  _running = running;
 }

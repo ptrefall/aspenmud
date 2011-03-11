@@ -11,7 +11,7 @@
 class FileLoadException:public Exception
 {
 public:
-    FileLoadException(const std::string &msg):Exception(msg) { }
+  FileLoadException(const std::string &msg):Exception(msg) { }
 };
 
 #endif

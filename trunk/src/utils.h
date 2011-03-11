@@ -85,16 +85,16 @@ std::string Columnize(std::vector<std::string> *data, int cols, int width=80);
 //time functions:
 class TimeInfo
 {
-    int hour;
-    int minute;
-    int second;
+  int hour;
+  int minute;
+  int second;
 
-    void Initialize(void);
+  void Initialize(void);
 public:
-    TimeInfo(time_t data);
-    TimeInfo(UINT data);
-    TimeInfo();
-    void Calculate(time_t data);
-    std::string ToString(void);
+  TimeInfo(time_t data);
+  TimeInfo(UINT data);
+  TimeInfo();
+  void Calculate(time_t data);
+  std::string ToString(void);
 };
 #endif

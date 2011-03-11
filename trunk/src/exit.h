@@ -12,35 +12,35 @@
 
 class Exit
 {
-    VNUM _to; //the vnum that the exit points to.
-    VNUM _from; //where the exit is located.
-    ExitDirection _direction;
+  VNUM _to; //the vnum that the exit points to.
+  VNUM _from; //where the exit is located.
+  ExitDirection _direction;
 public:
-    Exit(VNUM from,VNUM to);
-    Exit(void);
-    virtual ~Exit(void);
+  Exit(VNUM from,VNUM to);
+  Exit(void);
+  virtual ~Exit(void);
 
 //getters and setters:
-    virtual VNUM GetFrom(void) const;
-    virtual void SetFrom(VNUM from);
-    virtual VNUM GetTo(void) const;
-    virtual void SetTo(VNUM to);
-    virtual ExitDirection GetDirection(void) const;
-    virtual void SetDirection(ExitDirection dir);
-    /*
-    *Translates the direction to a human-readable name.
-    *Return: The name of the direction for the exit.
-    */
-    std::string GetName() const;
-    /*
-    *Checks to see if the npc/player can enter through the exit.
-    *Return: true if the player/npc can enter, false otherwise.
-    */
-    virtual BOOL CanEnter(Living* mobile);
+  virtual VNUM GetFrom(void) const;
+  virtual void SetFrom(VNUM from);
+  virtual VNUM GetTo(void) const;
+  virtual void SetTo(VNUM to);
+  virtual ExitDirection GetDirection(void) const;
+  virtual void SetDirection(ExitDirection dir);
+  /*
+  *Translates the direction to a human-readable name.
+  *Return: The name of the direction for the exit.
+  */
+  std::string GetName() const;
+  /*
+  *Checks to see if the npc/player can enter through the exit.
+  *Return: true if the player/npc can enter, false otherwise.
+  */
+  virtual BOOL CanEnter(Living* mobile);
 
 //serialization
-    virtual void Serialize(TiXmlElement* root);
-    virtual void Deserialize(TiXmlElement* node);
+  virtual void Serialize(TiXmlElement* root);
+  virtual void Deserialize(TiXmlElement* node);
 };
 
 #endif

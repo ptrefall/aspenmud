@@ -12,24 +12,24 @@
 
 class Exception:public std::exception
 {
-    std::string _message;
+  std::string _message;
 public:
-    Exception(const std::string &m):
-        _message(m) {}
-    ~Exception(void) throw();
-    const std::string GetMessage(void) const;
-    const char* what(void) const throw();
+  Exception(const std::string &m):
+    _message(m) {}
+  ~Exception(void) throw();
+  const std::string GetMessage(void) const;
+  const char* what(void) const throw();
 };
 
 //some aspen-specific exceptions
 class VarNotFoundException:public Exception
 {
 public:
-    VarNotFoundException(const std::string &msg):Exception(msg) {}
+  VarNotFoundException(const std::string &msg):Exception(msg) {}
 };
 class EventNotFoundException:public Exception
 {
 public:
-    EventNotFoundException(const std::string &msg):Exception(msg) {}
+  EventNotFoundException(const std::string &msg):Exception(msg) {}
 };
 #endif

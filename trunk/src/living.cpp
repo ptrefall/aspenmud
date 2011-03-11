@@ -4,7 +4,7 @@
 
 Living::Living()
 {
-    events.RegisterEvent("HeartBeat", new DelayedEvent(LIVING_PULSE,0));
+  events.RegisterEvent("HeartBeat", new DelayedEvent(LIVING_PULSE,0));
 }
 Living::~Living()
 {
@@ -19,25 +19,25 @@ void Living::LeaveGame()
 
 void Living::Update()
 {
-    events.CallEvent("HeartBeat", NULL, (void*)this);
+  events.CallEvent("HeartBeat", NULL, (void*)this);
 }
 
 BOOL Living::IsNpc(void)
 {
-    return false;
+  return false;
 }
 BOOL Living::IsPlayer(void)
 {
-    return false;
+  return false;
 }
 
 void Living::Serialize(TiXmlElement* root)
 {
-    TiXmlElement* node = new TiXmlElement("living");
-    Entity::Serialize(node);
-    root->LinkEndChild(node);
+  TiXmlElement* node = new TiXmlElement("living");
+  Entity::Serialize(node);
+  root->LinkEndChild(node);
 }
 void Living::Deserialize(TiXmlElement* root)
 {
-    Entity::Deserialize(root->FirstChild("entity")->ToElement());
+  Entity::Deserialize(root->FirstChild("entity")->ToElement());
 }

@@ -35,156 +35,173 @@ World* world;
 
 int main(int argc, char** argv)
 {
-    BOOL copyover=false; //are we rebooting for copyover?
-    int listener=0; //the socket to listen on when recovering from copyover
+  BOOL copyover=false; //are we rebooting for copyover?
+  int listener=0; //the socket to listen on when recovering from copyover
 #ifdef SECURE_INITIALIZATION
-    if (getuid() == 0) {
-        printf("You should not be running as root.\nAspen will now exit.\n");
-        return 1;
+  if (getuid() == 0)
+    {
+      printf("You should not be running as root.\nAspen will now exit.\n");
+      return 1;
     }
 #endif
-    world=new World();
-    world->WriteLog("Initializing "+MUD_NAME+".");
+  world=new World();
+  world->WriteLog("Initializing "+MUD_NAME+".");
 //initialize the server class:
-    int port;
+  int port;
 //determine if a port was specified. If not, use default.
-    switch (argc) {
-    case 2: {
-        port = atoi(argv[1]);
-        if ((port < 1024)||(port>65535)) {
-            world->WriteLog("Invalid port specified, program will now exit.");
-            return 1;
+  switch (argc)
+    {
+    case 2:
+    {
+      port = atoi(argv[1]);
+      if ((port < 1024)||(port>65535))
+        {
+          world->WriteLog("Invalid port specified, program will now exit.");
+          return 1;
         }
-        break;
+      break;
     }
-    case 3: {
-        if ((!strcmp(argv[1],"-c"))&&(atoi(argv[2])>0)) {
-            copyover=true;
-            listener=atoi(argv[2]);
+    case 3:
+    {
+      if ((!strcmp(argv[1],"-c"))&&(atoi(argv[2])>0))
+        {
+          copyover=true;
+          listener=atoi(argv[2]);
         }
     }
     default:
-        port=DEFAULT_PORT;
-        break;
+      port=DEFAULT_PORT;
+      break;
     }
-    if (!world->InitializeFiles()) {
-        return 1;
+  if (!world->InitializeFiles())
+    {
+      return 1;
     }
 //game initialization calls
-    InitializeCommands();
-    InitializeChannels();
+  InitializeCommands();
+  InitializeChannels();
 #ifdef MODULE_SCRIPTING
-    if (!InitializeScript()) {
-        return 1;
+  if (!InitializeScript())
+    {
+      return 1;
     }
 #endif
 #ifdef OLC
-    InitializeOlc();
+  InitializeOlc();
 #endif
-    InitializeModules();
-    if (!InitializeZones()) {
-        return 1;
+  InitializeModules();
+  if (!InitializeZones())
+    {
+      return 1;
     }
-    world->InitializeNums();
-    InitializeSocials();
-    CreateComponents();
-    world->SetRealUptime(time(NULL));
-    world->SetCopyoverUptime(time(NULL));
-    srand(time(NULL));
+  world->InitializeNums();
+  InitializeSocials();
+  CreateComponents();
+  world->SetRealUptime(time(NULL));
+  world->SetCopyoverUptime(time(NULL));
+  srand(time(NULL));
 //make the server listen:
-    world->WriteLog("Attempting to establish listening point.");
-    if (copyover) {
+  world->WriteLog("Attempting to establish listening point.");
+  if (copyover)
+    {
 //set the listening socket to the descripter specified
-        world->GetServer()->Recover(listener);
+      world->GetServer()->Recover(listener);
 //load all saved connections
-        CopyoverRecover();
-    } else {
-        if (!world->GetServer()->Listen(port)) {
-            return 1;
+      CopyoverRecover();
+    }
+  else
+    {
+      if (!world->GetServer()->Listen(port))
+        {
+          return 1;
         }
     }
 //initialize signal callbacks
-    world->WriteLog("Initializing signal callbacks.");
-    signal(SIGTERM,sig);
-    signal(SIGINT,sig);
-    signal(SIGQUIT,sig);
-    signal(SIGHUP,sig);
+  world->WriteLog("Initializing signal callbacks.");
+  signal(SIGTERM,sig);
+  signal(SIGINT,sig);
+  signal(SIGQUIT,sig);
+  signal(SIGHUP,sig);
 //start the game loop:
-    world->WriteLog("Entering game loop.");
-    GameLoop();
-    world->WriteLog("Game loop finished, exiting.");
-    delete world;
-    return 0;
+  world->WriteLog("Entering game loop.");
+  GameLoop();
+  world->WriteLog("Game loop finished, exiting.");
+  delete world;
+  return 0;
 }
 
 static void CopyoverRecover(void)
 {
-    Player* person = NULL;
-    sockaddr_in* saddr = NULL;
-    FILE* recover = NULL;
-    short family = 0;
-    unsigned short port = 0;
-    unsigned long addr = 0;
-    char *name=new char[15];
-    char* host=new char[256];
-    int desc;
-    int cuptime, ruptime;
+  Player* person = NULL;
+  sockaddr_in* saddr = NULL;
+  FILE* recover = NULL;
+  short family = 0;
+  unsigned short port = 0;
+  unsigned long addr = 0;
+  char *name=new char[15];
+  char* host=new char[256];
+  int desc;
+  int cuptime, ruptime;
 
-    world->WriteLog("Starting copyover recovery");
-    recover=fopen(COPYOVER_FILE,"rb");
-    if (recover==NULL) {
-        world->WriteLog("There was an error opening the copyover recovery file, now exiting.", ERR);
-        exit(1);
+  world->WriteLog("Starting copyover recovery");
+  recover=fopen(COPYOVER_FILE,"rb");
+  if (recover==NULL)
+    {
+      world->WriteLog("There was an error opening the copyover recovery file, now exiting.", ERR);
+      exit(1);
     }
 
-    fscanf(recover, "%d %d\n", &cuptime, &ruptime);
-    world->SetRealUptime((time_t)ruptime);
-    world->SetCopyoverUptime((time_t)cuptime);
-    while (1) {
-        memset(name, 0, 15);
-        memset(host, 0, 256);
-        fscanf(recover,"%d %s %hd %hu %lu %s\n",
-               &desc,name,&family,&port,&addr, host);
-        if (desc==-1) {
-            break;
+  fscanf(recover, "%d %d\n", &cuptime, &ruptime);
+  world->SetRealUptime((time_t)ruptime);
+  world->SetCopyoverUptime((time_t)cuptime);
+  while (1)
+    {
+      memset(name, 0, 15);
+      memset(host, 0, 256);
+      fscanf(recover,"%d %s %hd %hu %lu %s\n",
+             &desc,name,&family,&port,&addr, host);
+      if (desc==-1)
+        {
+          break;
         }
-        Socket* sock=new Socket(desc);
-        saddr = sock->GetAddr();
-        saddr->sin_family=family;
-        saddr->sin_port=port;
-        saddr->sin_addr.s_addr=addr;
-        sock->SetHost(host);
-        sock->AllocatePlayer();
-        world->WriteLog("Loading "+std::string(name)+".");
-        person = sock->GetPlayer();
-        person->SetName(name);
-        person->Load();
-        sock->SetConnectionType(con_game);
-        world->GetServer()->AddSock(sock);
-        person->SetSocket(sock);
-        person->EnterGame(true);
-        sock->Write("Copyover complete.\n");
+      Socket* sock=new Socket(desc);
+      saddr = sock->GetAddr();
+      saddr->sin_family=family;
+      saddr->sin_port=port;
+      saddr->sin_addr.s_addr=addr;
+      sock->SetHost(host);
+      sock->AllocatePlayer();
+      world->WriteLog("Loading "+std::string(name)+".");
+      person = sock->GetPlayer();
+      person->SetName(name);
+      person->Load();
+      sock->SetConnectionType(con_game);
+      world->GetServer()->AddSock(sock);
+      person->SetSocket(sock);
+      person->EnterGame(true);
+      sock->Write("Copyover complete.\n");
     }
-    delete []name;
-    delete []host;
-    fclose(recover);
-    remove(COPYOVER_FILE);
-    world->WriteLog("Copyover completed.");
+  delete []name;
+  delete []host;
+  fclose(recover);
+  remove(COPYOVER_FILE);
+  world->WriteLog("Copyover completed.");
 }
 
 static void GameLoop()
 {
-    while (world->IsRunning()) {
+  while (world->IsRunning())
+    {
 //update our world:
-        world->Update();
+      world->Update();
     }
 //the game loop finished, shutdown world.
-    world->Shutdown();
-    world->Update();
+  world->Shutdown();
+  world->Update();
 }
 
 void sig(int sig)
 {
-    world->WriteLog("Caught signal, cleaning up.");
-    world->SetRunning(false);
+  world->WriteLog("Caught signal, cleaning up.");
+  world->SetRunning(false);
 }
