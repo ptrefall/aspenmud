@@ -12,6 +12,7 @@ void InitializeGenCommands()
   world->WriteLog("Initializing general commands.");
   world->commands.AddCommand(new CMDQuit());
   world->commands.AddCommand(new CMDSave());
+  world->commands.AddCommand(new CMDBackup());
   world->commands.AddCommand(new CMDWho());
   world->commands.AddCommand(new CMDToggle());
   world->commands.AddCommand(new CMDScore());
@@ -41,8 +42,43 @@ CMDSave::CMDSave()
 }
 BOOL CMDSave::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
-  mobile->Write("Saving\n");
-  mobile->Save();
+  if (!mobile->Save())
+    {
+      mobile->Message(MSG_NORMAL, "You just recently saved, please wait before trying again.");
+    }
+  else
+    {
+      mobile->Message(MSG_NORMAL, "saved.");
+    }
+  return true;
+}
+CMDBackup::CMDBackup()
+{
+  SetName("backup");
+}
+BOOL CMDBackup::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  if (!args.size())
+    {
+      mobile->Message(MSG_CRITICAL, "Please type backup confirm to confirm the backup process.\nPlease note: Backups are to prevent you from losing equipment or data. Backing up after you have lost equipment or data will make it impossible to recover your information, thus please use backup -BEFORE-.");
+      return true;
+    }
+  if (args[0] != "confirm")
+    {
+      mobile->Message(MSG_CRITICAL, "Please type backup confirm to confirm the backup process.\nPlease note: Backups are to prevent you from losing equipment or data. Backing up after you have lost equipment or data will make it impossible to recover your information, thus please use backup -BEFORE-.");
+      return true;
+    }
+
+  if (!mobile->Backup())
+    {
+      mobile->Message(MSG_ERROR, "You have used backup to recently, please wait before trying again.");
+      return false;
+    }
+  else
+    {
+      mobile->Message(MSG_INFO, "Your data has been backed up.");
+    }
+
   return true;
 }
 
