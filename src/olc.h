@@ -2,7 +2,6 @@
 *Olc mechenism used for registering
 *Certain objects with OLC.
 */
-
 #ifndef OLC_H
 #define OLC_H
 #include <string>

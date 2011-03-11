@@ -2,7 +2,6 @@
 *The main living class
 *Holds functions needed for both players and mobs.
 */
-
 #ifndef LIVING_H
 #define LIVING_H
 #include <tinyxml.h>

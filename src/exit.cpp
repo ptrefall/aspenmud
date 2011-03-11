@@ -3,27 +3,16 @@
 #include "exit.h"
 #include "living.h"
 
-Exit::Exit(VNUM from, VNUM to)
+Exit::Exit(VNUM to)
 {
   _to=to;
-  _from=from;
 }
 Exit::Exit(void)
 {
-  _from=EXIT_NOWHERE;
   _to=EXIT_NOWHERE;
 }
 Exit::~Exit(void)
 {
-}
-
-VNUM Exit::GetFrom(void) const
-{
-  return _from;
-}
-void Exit::SetFrom(VNUM from)
-{
-  _from=from;
 }
 
 VNUM Exit::GetTo(void) const
@@ -81,7 +70,6 @@ void Exit::Serialize(TiXmlElement* root)
   int tmp = (int)_direction;
   node->SetAttribute("direction", tmp);
   node->SetAttribute("to", _to);
-  node->SetAttribute("from", _from);
   root->LinkEndChild(root);
 }
 void Exit::Deserialize(TiXmlElement* node)
@@ -89,8 +77,6 @@ void Exit::Deserialize(TiXmlElement* node)
   int tmp = 0;
 
   node->Attribute("to", &_to);
-  node->Attribute("from", &_from);
-
   node->Attribute("direction", &tmp);
   _direction = (ExitDirection)tmp;
 }

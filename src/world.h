@@ -255,6 +255,7 @@ public:
   *Returns: true on success, false on failure.
   */
   BOOL DoCommand(Player* mobile, std::string args);
+  Entity* MatchKeyword(const std::string &name, Player* caller);
   /*
   *Finds an object from the input.
   *Param: [in] the name of the object.
