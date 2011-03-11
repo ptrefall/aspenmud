@@ -5,13 +5,13 @@
 
 Exit::Exit(VNUM from, VNUM to)
 {
-    _to=to;
-    _from=from;
+  _to=to;
+  _from=from;
 }
 Exit::Exit(void)
 {
-    _from=EXIT_NOWHERE;
-    _to=EXIT_NOWHERE;
+  _from=EXIT_NOWHERE;
+  _to=EXIT_NOWHERE;
 }
 Exit::~Exit(void)
 {
@@ -19,77 +19,78 @@ Exit::~Exit(void)
 
 VNUM Exit::GetFrom(void) const
 {
-    return _from;
+  return _from;
 }
 void Exit::SetFrom(VNUM from)
 {
-    _from=from;
+  _from=from;
 }
 
 VNUM Exit::GetTo(void) const
 {
-    return _to;
+  return _to;
 }
 void Exit::SetTo(VNUM to)
 {
-    _to=to;
+  _to=to;
 }
 
 ExitDirection Exit::GetDirection(void) const
 {
-    return _direction;
+  return _direction;
 }
 void Exit::SetDirection(ExitDirection dir)
 {
-    _direction = dir;
+  _direction = dir;
 }
 
 std::string Exit::GetName() const
 {
-    switch(_direction) {
+  switch(_direction)
+    {
     case north:
-        return "north";
+      return "north";
     case south:
-        return "south";
+      return "south";
     case east:
-        return "east";
+      return "east";
     case west:
-        return "west";
+      return "west";
     case northwest:
-        return "northwest";
+      return "northwest";
     case northeast:
-        return "northeast";
+      return "northeast";
     case southwest:
-        return "southwest";
+      return "southwest";
     case southeast:
-        return "southeast";
+      return "southeast";
     default:
-        return "unknown";
+      return "unknown";
     }
 }
 
 BOOL Exit::CanEnter(Living* mobile)
 {
-    return true;
+  return true;
 }
 
 void Exit::Serialize(TiXmlElement* root)
 {
-    TiXmlElement* node = new TiXmlElement("exit");
+  TiXmlElement* node = new TiXmlElement("exit");
 
-    int tmp = (int)_direction;
-    node->SetAttribute("direction", tmp);
-    node->SetAttribute("to", _to);
-    node->SetAttribute("from", _from);
-    root->LinkEndChild(root);
+  int tmp = (int)_direction;
+  node->SetAttribute("direction", tmp);
+  node->SetAttribute("to", _to);
+  node->SetAttribute("from", _from);
+  root->LinkEndChild(root);
 }
 void Exit::Deserialize(TiXmlElement* node)
 {
-    int tmp = 0;
+  int tmp = 0;
 
-    node->Attribute("to", &_to);
-    node->Attribute("from", &_from);
+  node->Attribute("to", &_to);
+  node->Attribute("from", &_from);
 
-    node->Attribute("direction", &tmp);
-    _direction = (ExitDirection)tmp;
+  node->Attribute("direction", &tmp);
+  _direction = (ExitDirection)tmp;
 }

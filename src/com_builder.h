@@ -28,21 +28,21 @@ void InitializeBuilderCommands(void);
 class CMDZlist:public Command
 {
 public:
-    CMDZlist();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDZlist();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 
 class CMDRlist:public Command
 {
 public:
-    CMDRlist();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDRlist();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 
 class CMDDig:public Command
 {
 public:
-    CMDDig();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDDig();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 #endif

@@ -22,6 +22,6 @@
 void InitializeModules(void)
 {
 #ifdef MODULE_SYSLOG
-    InitializeSyslog();
+  InitializeSyslog();
 #endif
 }

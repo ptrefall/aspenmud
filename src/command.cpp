@@ -25,11 +25,11 @@
 
 Command::Command()
 {
-    _name = "";
-    _subcmd=0;
-    _type = normal;
-    _access = RANK_PLAYER;
-    _position = any;
+  _name = "";
+  _subcmd=0;
+  _type = normal;
+  _access = RANK_PLAYER;
+  _position = any;
 }
 Command::~Command()
 {
@@ -37,156 +37,173 @@ Command::~Command()
 
 void Command::SetName(const std::string &name)
 {
-    _name = name;
+  _name = name;
 }
 std::string Command::GetName() const
 {
-    return _name;
+  return _name;
 }
 BOOL Command::AddAlias(const std::string &name)
 {
-    if (HasAlias(name)) {
-        return false;
+  if (HasAlias(name))
+    {
+      return false;
     }
 
-    _aliases.push_back(name);
-    return true;
+  _aliases.push_back(name);
+  return true;
 }
 BOOL Command::RemoveAlias(const std::string &name)
 {
-    std::list <std::string>::iterator it;
-    std::list <std::string>::iterator itEnd;
-    itEnd=_aliases.end();
+  std::list <std::string>::iterator it;
+  std::list <std::string>::iterator itEnd;
+  itEnd=_aliases.end();
 
-    for (it = _aliases.begin(); it != itEnd; ++it) {
-        if ((*it) == name) {
-            _aliases.remove((*it));
-            return true;
+  for (it = _aliases.begin(); it != itEnd; ++it)
+    {
+      if ((*it) == name)
+        {
+          _aliases.remove((*it));
+          return true;
         }
     }
 
-    return false;
+  return false;
 }
 BOOL Command::HasAlias(const std::string &name, BOOL partialMatch)
 {
-    std::list <std::string>::iterator it;
-    std::list <std::string>::iterator itEnd;
-    itEnd=_aliases.end();
+  std::list <std::string>::iterator it;
+  std::list <std::string>::iterator itEnd;
+  itEnd=_aliases.end();
 
-    for (it = _aliases.begin(); it != itEnd; ++it) {
-        if ((*it) == name) {
-            return true;
-        } else if ((partialMatch) && (name.length() < (*it).length()) && ((*it).substr(name.length()) == name)) {
-            return true;
+  for (it = _aliases.begin(); it != itEnd; ++it)
+    {
+      if ((*it) == name)
+        {
+          return true;
+        }
+      else if ((partialMatch) && (name.length() < (*it).length()) && ((*it).substr(name.length()) == name))
+        {
+          return true;
         }
     }
 
-    return false;
+  return false;
 }
 void Command::SetSubcmd(int subcmd)
 {
-    _subcmd = subcmd;
+  _subcmd = subcmd;
 }
 int Command::GetSubcmd() const
 {
-    return _subcmd;
+  return _subcmd;
 }
 void Command::SetType(COMMAND_TYPE type)
 {
-    _type = type;
+  _type = type;
 }
 COMMAND_TYPE Command::GetType() const
 {
-    return _type;
+  return _type;
 }
 void Command::SetAccess(FLAG access)
 {
-    _access = access;
+  _access = access;
 }
 FLAG Command::GetAccess() const
 {
-    return _access;
+  return _access;
 }
 void Command::SetPosition(POSITION position)
 {
-    _position = position;
+  _position = position;
 }
 POSITION Command::GetPosition() const
 {
-    return _position;
+  return _position;
 }
 BOOL Command::CanExecute(Player* mobile, int subcmd)
 {
-    return true;
+  return true;
 }
 
 
 Commandable::Commandable()
 {
-    _commands=new std::vector <Command*>();
+  _commands=new std::vector <Command*>();
 }
 Commandable::~Commandable()
 {
-    std::vector <Command*>::iterator comit;
-    std::vector <Command*>::iterator comitEnd;
+  std::vector <Command*>::iterator comit;
+  std::vector <Command*>::iterator comitEnd;
 
-    comitEnd = _commands->end();
-    for (comit = _commands->begin(); comit != comitEnd; ++comit) {
-        delete (*comit);
+  comitEnd = _commands->end();
+  for (comit = _commands->begin(); comit != comitEnd; ++comit)
+    {
+      delete (*comit);
     }
-    delete _commands;
+  delete _commands;
 }
 
 void Commandable::AddCommand(Command* com)
 {
-    if (CommandExists(com->GetName())) {
-        return;
+  if (CommandExists(com->GetName()))
+    {
+      return;
     }
 
-    _commands->push_back(com);
+  _commands->push_back(com);
 }
 BOOL Commandable::RemoveCommand(const std::string &name)
 {
-    if (!CommandExists(name)) {
-        return false;
+  if (!CommandExists(name))
+    {
+      return false;
     }
 
-    std::vector <Command*>::iterator it; //an iterator for iterating through the command list
-    std::vector <Command*>::iterator itEnd;
+  std::vector <Command*>::iterator it; //an iterator for iterating through the command list
+  std::vector <Command*>::iterator itEnd;
 
-    itEnd = _commands->end();
-    for (it = _commands->begin(); it != itEnd; ++it) {
-        if ((*it)->GetName() == name) {
-            _commands->erase(it);
-            return true;
+  itEnd = _commands->end();
+  for (it = _commands->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == name)
+        {
+          _commands->erase(it);
+          return true;
         }
     }
-    return false;
+  return false;
 }
 BOOL Commandable::CommandExists(const std::string &name)
 {
-    std::vector <Command*>::iterator it; //an iterator for iterating through the command list
-    std::vector <Command*>::iterator itEnd;
+  std::vector <Command*>::iterator it; //an iterator for iterating through the command list
+  std::vector <Command*>::iterator itEnd;
 
-    itEnd = _commands->end();
-    for (it = _commands->begin(); it != itEnd; ++it) {
-        if ((*it)->GetName() == name) {
-            return true;
+  itEnd = _commands->end();
+  for (it = _commands->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == name)
+        {
+          return true;
         }
     }
 
-    return false;
+  return false;
 }
 void Commandable::ListCommands(std::vector <std::string>* list, Player* mobile, COMMAND_TYPE filter)
 {
-    std::vector <Command*>::iterator it;
-    std::vector <Command*>::iterator itEnd;
+  std::vector <Command*>::iterator it;
+  std::vector <Command*>::iterator itEnd;
 
-    itEnd = _commands->end();
-    for (it = _commands->begin(); it != itEnd; ++it) {
-        if (mobile->HasAccess((*it)->GetAccess())) {
-            if (((*it)->GetType() == filter) || (filter == all)) {
-                list->push_back((*it)->GetName());
+  itEnd = _commands->end();
+  for (it = _commands->begin(); it != itEnd; ++it)
+    {
+      if (mobile->HasAccess((*it)->GetAccess()))
+        {
+          if (((*it)->GetType() == filter) || (filter == all))
+            {
+              list->push_back((*it)->GetName());
             }
         }
     }
@@ -194,15 +211,15 @@ void Commandable::ListCommands(std::vector <std::string>* list, Player* mobile, 
 
 std::vector <Command*> *Commandable::GetPtr()
 {
-    return _commands;
+  return _commands;
 }
 
 
 void InitializeCommands()
 {
-    world->WriteLog("Initializing commands.");
-    InitializeGenCommands();
-    InitializeMovementCommands();
-    InitializeWizCommands();
-    InitializeBuilderCommands();
+  world->WriteLog("Initializing commands.");
+  InitializeGenCommands();
+  InitializeMovementCommands();
+  InitializeWizCommands();
+  InitializeBuilderCommands();
 }

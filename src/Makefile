@@ -22,7 +22,7 @@ L_FLAGS	= -lcrypto -llua -ltinyxml
 
 #formatting specific flags
 FORMATTER = astyle
-FORMAT_FLAGS = --style=k/r
+FORMAT_FLAGS = --style=gnu
 
 #modules
 MODULES = scripts syslog help components

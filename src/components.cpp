@@ -29,6 +29,6 @@
 
 void CreateComponents(void)
 {
-    world->WriteLog("Initializing components.");
-    world->RegisterComponent("stats", STATS_CREATE, STATS_INIT);
+  world->WriteLog("Initializing components.");
+  world->RegisterComponent("stats", STATS_CREATE, STATS_INIT);
 }

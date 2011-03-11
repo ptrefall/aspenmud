@@ -29,25 +29,25 @@ void InitializeWizCommands();
 class CMDCopyover:public Command
 {
 public:
-    CMDCopyover();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDCopyover();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDMkgod:public Command
 {
 public:
-    CMDMkgod();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDMkgod();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDMkbuilder:public Command
 {
 public:
-    CMDMkbuilder();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDMkbuilder();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 class CMDShutdown:public Command
 {
 public:
-    CMDShutdown();
-    BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  CMDShutdown();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 #endif

@@ -26,7 +26,7 @@
 class Stats:public Component
 {
 public:
-    Stats(void);
+  Stats(void);
 };
 
 //prototypes

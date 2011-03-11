@@ -21,5 +21,5 @@
 
 BOOL Npc::IsNpc(void)
 {
-    return true;
+  return true;
 }
