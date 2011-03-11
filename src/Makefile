@@ -37,7 +37,7 @@ command.cpp com_gen.cpp com_wiz.cpp event.cpp menu.cpp\
 living.cpp channel.cpp modules.cpp component.cpp npc.cpp\
 editor.cpp exit.cpp room.cpp zone.cpp com_builder.cpp\
 com_movement.cpp ComponentFactory.cpp components.cpp olc.cpp socials.cpp\
-option.cpp match.cpp
+option.cpp
 
 ###
 ###YOU SHOULD NOT MODIFY ANYTHING PAST THIS POINT.
