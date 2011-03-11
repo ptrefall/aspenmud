@@ -1,21 +1,3 @@
-/*
-*com_builder.cpp
-*
-*   Copyright 2010 Tyler Littlefield.
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
 #include <list>
 #include <sstream>
 #include <string>
@@ -136,8 +118,8 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
   Room* room;
   Room* location;
   Zone* zone;
-  Exit* orig;
-  Exit* other;
+  Exit* orig; //from current room to another room.
+  Exit* other; //from other room to current.
   std::string dir=SwapExit(args[0]);
   location=(Room*)mobile->GetLocation();
 
@@ -155,12 +137,12 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
     }
   zone->AddRoom(room->GetOnum());
 
-  orig=new Exit(location->GetOnum(),room->GetOnum());
+  orig=new Exit(room->GetOnum());
   orig->SetDirection(GetDirectionByName(args[0]));
   location->AddExit(orig);
   if (dir!="")
     {
-      other=new Exit(room->GetOnum(),location->GetOnum());
+      other=new Exit(location->GetOnum());
       other->SetDirection(GetDirectionByName(dir));
       room->AddExit(other);
     }

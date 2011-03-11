@@ -2,7 +2,6 @@
 *player.h
 *Contains the main player object prototypes.
 */
-
 #ifndef PLAYER_H
 #define PLAYER_H
 #include <string>

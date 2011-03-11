@@ -13,16 +13,13 @@
 class Exit
 {
   VNUM _to; //the vnum that the exit points to.
-  VNUM _from; //where the exit is located.
   ExitDirection _direction;
 public:
-  Exit(VNUM from,VNUM to);
+  Exit(VNUM to);
   Exit(void);
   virtual ~Exit(void);
 
 //getters and setters:
-  virtual VNUM GetFrom(void) const;
-  virtual void SetFrom(VNUM from);
   virtual VNUM GetTo(void) const;
   virtual void SetTo(VNUM to);
   virtual ExitDirection GetDirection(void) const;

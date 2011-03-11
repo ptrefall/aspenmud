@@ -1,8 +1,7 @@
 /*
 *exception.h
-*This file is used so that we can use exceptions; for some reason g++ doesn't like the basic std::exception class.
+*A basic exception framework that other exceptions can be built off of.
 */
-
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 #include <string>
