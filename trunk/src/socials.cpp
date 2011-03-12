@@ -1,3 +1,4 @@
+#include <tinyxml.h>
 #include <string>
 #include <map>
 #include "socials.h"
@@ -5,6 +6,7 @@
 #include "living.h"
 #include "command.h"
 #include "utils.h"
+
 Socials* Socials::_ptr;
 Socials* Socials::GetPtr(void)
 {
@@ -23,8 +25,7 @@ void Socials::Initialize(void)
 }
 Socials::~Socials(void)
 {
-  std::map<std::string, SOCIAL_DATA*>::iterator it;
-  std::map<std::string, SOCIAL_DATA*>::iterator itEnd;
+  std::map<std::string, SOCIAL_DATA*>::iterator it, itEnd;
 
   if (_slist&&_slist->size())
     {
@@ -42,91 +43,87 @@ Socials::~Socials(void)
 
 void Socials::Save(void)
 {
-  std::map<std::string, SOCIAL_DATA*>::iterator it;
-  std::map<std::string, SOCIAL_DATA*>::iterator itEnd;
-  FILE* output = fopen(SOCIALS_FILE, "w");
+  TiXmlDocument doc;
+  TiXmlElement* socials = new TiXmlElement("socials");
+  TiXmlElement* social = NULL;
+  TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
+  doc.LinkEndChild(decl);
+
+  std::map<std::string, SOCIAL_DATA*>::iterator it, itEnd;
   SOCIAL_DATA* d = NULL;
 
-  if (!output)
-    {
-      world->WriteLog("Could not save to socials file.");
-      return;
-    }
-//print the number of socials.
-  fprintf(output, "%u\n", (UINT)_slist->size());
 //if there are socials, print them.
-  if (_slist&&_slist->size())
+  if (_slist->size())
     {
       itEnd = _slist->end();
       for (it = _slist->begin(); it != itEnd; ++it)
         {
           d = (*it).second;
-          fprintf(output, "%u %s %s %s %s %s %s\n", (UINT)d->id,
-                  d->name.c_str(), d->ynotarg.c_str(),
-                  d->rnotarg.c_str(), d->ttarg.c_str(),
-                  d->rtarg.c_str(), d->ytarg.c_str());
+          social = new TiXmlElement("social");
+          social->SetAttribute("id", (int)d->id);
+          social->SetAttribute("name", d->name.c_str());
+          social->SetAttribute("ynotarg", d->ynotarg.c_str());
+          social->SetAttribute("rnotarg", d->rnotarg.c_str());
+          social->SetAttribute("ttarg", d->ttarg.c_str());
+          social->SetAttribute("rtarg", d->rtarg.c_str());
+          social->SetAttribute("ytarg", d->ytarg.c_str());
+          socials->LinkEndChild(social);
         }
     }
-  fclose(output);
+  doc.LinkEndChild(socials);
+  doc.SaveFile(SOCIALS_FILE);
 }
 void Socials::Load(void)
 {
+  int id;
+  TiXmlDocument doc(SOCIALS_FILE);
+  TiXmlElement* socials = NULL;
+  TiXmlElement* social = NULL;
+  TiXmlNode* node = NULL;
+  SOCIAL_DATA* data = NULL;
+
   if (!FileExists(SOCIALS_FILE))
     {
-#ifdef NO_INIT_DEFAULTS
+#ifndef NO_INIT_DEFAULTS
       InitializeDefaultSocials();
 #else
       world->WriteLog("No socials file exists, and NO_INIT_DEFAULTS was enabled.", CRIT);
 #endif
       return;
     }
-  FILE* input = fopen(SOCIALS_FILE, "r");
-  UINT id = 0;
-  VNUM max_id = 0;
-  UINT count, i;
-  SOCIAL_DATA* data = NULL;
-  char* name= new char[64+1];
-  char* ynotarg = new char[64+1];
-  char* rnotarg = new char[64+1];
-  char* ttarg = new char[64+1];
-  char* rtarg = new char[64+1];
-  char* ytarg = new char[64+1];
-  fscanf(input, "%u\n", &count);
-  for (i = 0; i < count; ++i)
+  if (!doc.LoadFile())
     {
-      memset(name, 0, 64+1);
-      memset(ynotarg, 0, 64+1);
-      memset(rnotarg, 0, 64+1);
-      memset(ttarg, 0, 64+1);
-      memset(rtarg, 0, 64+1);
-      memset(ytarg, 0, 64+1);
-      fscanf(input, "%u %s %s %s %s %s %s\n", &id,
-             name, ynotarg, rnotarg,
-             ttarg, rtarg, ytarg);
-      if (id > (UINT)max_id)
-        {
-          max_id=id+1;
-        }
-
-      data = new SOCIAL_DATA();
-      data->name = name;
-      data->ynotarg = ynotarg;
-      data->rnotarg = rnotarg;
-      data->ttarg = ttarg;
-      data->rtarg = rtarg;
-      data->ytarg = ytarg;
-      data->id = id;
-      (*_slist)[name] = data;
-      data = NULL;
+      world->WriteLog("Could not load XML socials file.");
+      return;
     }
-  _socid = max_id;
-  delete []name;
-  delete []ynotarg;
-  delete []rnotarg;
-  delete []ttarg;
-  delete []rtarg;
-  delete []ytarg;
-  fclose(input);
+
+  node = doc.FirstChild("socials");
+  if (node)
+    {
+      socials = node->ToElement();
+
+      for (node = socials->FirstChild(); node; node = node->NextSibling())
+        {
+          social = node->ToElement();
+          data = new SOCIAL_DATA();
+          social->Attribute("id", &id);
+          data->id = id;
+          data->name = social->Attribute("name");
+          data->ynotarg = social->Attribute("ynotarg");
+          data->rnotarg = social->Attribute("rnotarg");
+          data->ttarg = social->Attribute("ttarg");
+          data->rtarg = social->Attribute("rtarg");
+          data->ytarg = social->Attribute("ytarg");
+
+          if (id > _socid)
+            {
+              _socid = id+1;
+            }
+
+          (*_slist)[data->name] = data;
+          data = NULL;
+        }
+    }
 }
 
 BOOL Socials::SocialExists(const std::string &name) const
