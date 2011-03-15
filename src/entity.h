@@ -60,6 +60,11 @@ public:
   */
   void SetLocation(Entity* location);
   /*
+  *Returns a pointer to a list of objects that the object contains.
+  *Return: A pointer to an std::list of pointers to objects.
+  */
+  std::list<Entity*>* GetContents();
+  /*
   *Returns the type of the entity.
   *Return: 1 for object, 2 for room.
   *Note: don't add more types, this is just used for assigning the entity's objhect to the correct vnum table.

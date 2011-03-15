@@ -102,6 +102,11 @@ void Entity::SetLocation(Entity* location)
   _location=location;
 }
 
+std::list<Entity*>* Entity::GetContents()
+{
+  return &_contents;
+}
+
 int Entity::GetType(void) const
 {
   return _type;

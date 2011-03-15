@@ -30,7 +30,7 @@ enum MATCH_RETURN {M_SUCCESS, //success
                    M_FAIL, //failed without any reason.
                    M_BADNUM //there were some, but not enough for the number provided. e.g: 5.sword when you only have 2.
                   };
-#define EXPLODE_MATCH_PAIR(pair, ret, obj)(ret = pair.first; obj = pair.second)
+#define EXPLODE_MATCH_PAIR(pair, ret, obj)ret = pair.first; obj = pair.second
 
 class World
 {
@@ -261,7 +261,7 @@ public:
   *Param: [in] the name of the object.
   *Return: A pointer to the object, NULL if it wasn't found.
   */
-  Entity* MatchObject(const std::string &name,Player* caller);
+  std::pair<MATCH_RETURN, Entity*> MatchObject(const std::string &name,Player* caller);
   /*
   *Matches an object in a list.
   *Param: [in] the name of the object to find.

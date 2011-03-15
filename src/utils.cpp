@@ -201,12 +201,11 @@ std::string StripWhitespace(const std::string &str)
     }
 }
 
-std::string Columnize(std::vector<std::string> *data, int cols, int width)
+std::string Columnize(std::vector<std::string> *data, int cols, std::vector<std::string>* headers, int width)
 {
   int cwidth = (width/cols);
   int count = (int)data->size();
-  std::vector<std::string>::iterator it;
-  std::vector<std::string>::iterator itEnd;
+  std::vector<std::string>::iterator it, itEnd;
   int i = 0;
   int j=0;
   std::stringstream st;
@@ -215,6 +214,24 @@ std::string Columnize(std::vector<std::string> *data, int cols, int width)
     {
       return "";
     }
+  if (headers && (int)headers->size() != cols)
+    {
+      return "";
+    }
+  if (headers)
+    {
+      itEnd = headers->end();
+      for (it = headers->begin(); it != headers->end(); ++it)
+        {
+          int res = cwidth - (*it).length();
+          st << (*it);
+          for (j=0; j < res; j++)
+            {
+              st << " ";
+            }
+        }
+    }
+  st << "\n" << Repete("-", width) << "\n";
 
   itEnd = data->end();
   for (it = data->begin(), i = 1; it != itEnd; ++it, ++i)

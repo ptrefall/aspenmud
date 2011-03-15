@@ -373,7 +373,7 @@ void World::Update(void) const
     }
 
 //sleep so that we don't kill our cpu
-  _server->Sleep(10);
+  _server->Sleep(PULSES_PER_SECOND);
 }
 
 BOOL World::RegisterComponent(const std::string &name,COMCREATECB cb, COMINITCB ib)
@@ -589,9 +589,13 @@ BOOL World::DoCommand(Player* mobile,std::string args)
   return false;
 }
 
-Entity* World::MatchObject(const std::string &name,Player* caller)
+Entity* World::MatchKeyword(const std::string &name, Player* caller)
 {
   if ((name=="me")||(name==caller->GetName()))
+    {
+      return (Entity*)caller;
+    }
+  if (name.length() < caller->GetName().length() && caller->GetName().substr(name.length()) == name)
     {
       return (Entity*)caller;
     }
@@ -601,6 +605,30 @@ Entity* World::MatchObject(const std::string &name,Player* caller)
     }
 
   return NULL;
+}
+
+std::pair<MATCH_RETURN, Entity*> World::MatchObject(const std::string &name,Player* caller)
+{
+  std::list<Entity*> *contents; //holds contents for the location and current caller.
+  std::list<Entity*>* val;
+  std::list<Entity*>::iterator it, itEnd;
+  std::pair<MATCH_RETURN, Entity*> ret;
+  Entity* obj = NULL;
+
+  obj = MatchKeyword(name, caller);
+  if (obj)
+    {
+      return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+    }
+
+  contents = new std::list<Entity*>();
+  val = caller->GetLocation()->GetContents();
+  contents->insert(contents->begin(), val->begin(), val->end());
+  val = caller->GetContents();
+  contents->insert(contents->begin(), val->begin(), val->end());
+  ret = MatchObjectInList(name, val);
+  delete contents;
+  return ret;
 }
 std::pair<MATCH_RETURN, Entity*> World::MatchObjectInList(const std::string &name, std::list<Entity*> *olist)
 {
