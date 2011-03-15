@@ -81,7 +81,7 @@ ExitDirection GetDirectionByName(const std::string &name);
 *[in] The max width of the columns.
 *Return: A string with the columnized data.
 */
-std::string Columnize(std::vector<std::string> *data, int cols, int width=80);
+std::string Columnize(std::vector<std::string> *data, int cols, std::vector<std::string>* headers = NULL, int width = 80);
 //time functions:
 class TimeInfo
 {

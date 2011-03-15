@@ -117,6 +117,7 @@ public:
       return;
 
     Parent->RemoveProperty(this);
+    Parent = NULL;
   }
 
   // Removes a Property from this Property (and all of its children)
@@ -192,8 +193,7 @@ public:
 
   void Serialize(TiXmlElement *root)
   {
-    std::vector<Property*>::iterator it;
-    std::vector<Property*>::iterator itEnd;
+    std::vector<Property*>::iterator it, itEnd;
 
     TiXmlElement *prop = new TiXmlElement("property");
     prop->SetAttribute("name", Name.c_str());

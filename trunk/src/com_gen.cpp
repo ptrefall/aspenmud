@@ -210,6 +210,12 @@ CMDCommands::CMDCommands()
 BOOL CMDCommands::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
   std::vector <std::string> commands;
+  std::vector<std::string> headers;
+  headers.push_back("command");
+  headers.push_back("command");
+  headers.push_back("command");
+  headers.push_back("command");
+
   COMMAND_TYPE type;
 
   if (!args.size())
@@ -243,7 +249,7 @@ BOOL CMDCommands::Execute(const std::string &verb, Player* mobile,std::vector<st
     }
 
   world->commands.ListCommands(&commands,mobile, type);
-  mobile->Message(MSG_LIST, Columnize(&commands, 4));
+  mobile->Message(MSG_LIST, Columnize(&commands, 4, &headers));
   return true;
 }
 
@@ -378,13 +384,17 @@ CMDLook::CMDLook()
 }
 BOOL CMDLook::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  Entity* obj = NULL;
+  MATCH_RETURN rtype;
+  std::pair<MATCH_RETURN, Entity*> p;
+
   if (!args.size())
     {
       mobile->Message(MSG_INFO,mobile->GetLocation()->DoLook(mobile));
-
       return true;
     }
-  Entity* obj=world->MatchObject(args[0],mobile);
+  p =world->MatchObject(args[0],mobile);
+  EXPLODE_MATCH_PAIR(p, rtype, obj);
   if (obj==NULL)
     {
       mobile->Message(MSG_ERROR,"You don't see that here.");
