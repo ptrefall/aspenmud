@@ -29,6 +29,10 @@ Variant Option::GetData(void) const
 {
   return _data;
 }
+void Option::SetData(Variant var)
+{
+  _data = var;
+}
 void Option::SetBool(BOOL val)
 {
   _data.SetInt((val==true?1:0));
@@ -46,45 +50,24 @@ std::string Option::GetName(void) const
 {
   return _name;
 }
+void Option::SetName(const std::string &name)
+{
+  _name = name;
+}
 std::string Option::GetHelp(void) const
 {
   return _help;
+}
+void Option::SetHelp(const std::string &help)
+{
+  _help = help;
 }
 int Option::GetRank(void) const
 {
   return _rank;
 }
+
 BOOL Option::CanToggle() const
 {
   return _toggle;
-}
-
-static std::map<std::string, Option> options;
-
-BOOL RegisterOption(const std::string &name, const std::string & help, int rank, Variant value, VARIABLE_TYPE type, BOOL toggle)
-{
-  if (options.count(name) == 0)
-    {
-      options[name] = Option(name, help, rank, value, type);
-      return true;
-    }
-
-  return false;
-}
-BOOL OptionExists(const std::string &name)
-{
-  return (options.count(name)==0?false:true);
-}
-Option* GetGlobalOption(const std::string &name)
-{
-  if (options.count(name) == 0)
-    {
-      return NULL;
-    }
-
-  return &(options[name]);
-}
-std::map<std::string, Option>* GetGlobalOptions()
-{
-  return &options;
 }

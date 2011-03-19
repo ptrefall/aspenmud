@@ -29,17 +29,15 @@ public:
     return _data.Get<T>();
   }
   Variant GetData(void) const;
+  void SetData(Variant var);
   void SetBool(BOOL val);
   void SetInt(int val);
   void SetString(const std::string &val);
   std::string GetName(void) const;
+  void SetName(const std::string &name);
   std::string GetHelp(void) const;
+  void SetHelp(const std::string &help);
   int GetRank(void) const;
   BOOL CanToggle() const;
 };
-
-BOOL RegisterOption(const std::string &name, const std::string & help, int rank, Variant value, VARIABLE_TYPE type, BOOL toggle = false);
-BOOL OptionExists(const std::string &name);
-Option* GetGlobalOption(const std::string &name);
-std::map<std::string, Option>* GetGlobalOptions();
 #endif

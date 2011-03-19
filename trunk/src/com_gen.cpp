@@ -123,9 +123,8 @@ CMDToggle::CMDToggle()
 }
 BOOL CMDToggle::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
-  std::map<std::string, Option> *options;
-  std::map<std::string, Option>::iterator it;
-  std::map<std::string, Option>::iterator itEnd;
+  std::map<std::string, Option*> *options;
+  std::map<std::string, Option*>::iterator it, itEnd;
   std::stringstream st;
 
 //if no args were given, print out a list of options:
@@ -135,22 +134,23 @@ BOOL CMDToggle::Execute(const std::string &verb, Player* mobile,std::vector<std:
       itEnd = options->end();
       for (it = options->begin(); it != itEnd; ++it)
         {
-          if ((*it).second.CanToggle())
+          if ((*it).second->CanToggle())
             {
-              st << (*it).second.GetName() << " ";
-              st << ((*it).second.GetData().GetInt()==0?"off: ":"on ");
-              st << (*it).second.GetHelp() << "\n";
+              st << (*it).second->GetName() << " ";
+              st << ((*it).second->GetData().GetInt()==0?"off: ":"on ");
+              st << (*it).second->GetHelp() << "\n";
             }
         }
-      options=GetGlobalOptions();
+
+      options = world->GetGlobalOptions();
       itEnd = options->end();
       for (it = options->begin(); it != itEnd; ++it)
         {
-          if ((*it).second.CanToggle())
+          if ((*it).second->CanToggle())
             {
-              st << (*it).second.GetName() << " ";
-              st << ((*it).second.GetData().GetInt()==0?"off: ":"on ");
-              st << (*it).second.GetHelp() << "\n";
+              st << (*it).second->GetName() << " ";
+              st << ((*it).second->GetData().GetInt()==0?"off: ":"on ");
+              st << (*it).second->GetHelp() << "\n";
             }
         }
       return true;
