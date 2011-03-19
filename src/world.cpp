@@ -607,18 +607,17 @@ Entity* World::MatchKeyword(const std::string &name, Player* caller)
   return NULL;
 }
 
-std::pair<MATCH_RETURN, Entity*> World::MatchObject(const std::string &name,Player* caller)
+Entity* World::MatchObject(const std::string &name,Player* caller)
 {
   std::list<Entity*> *contents; //holds contents for the location and current caller.
   std::list<Entity*>* val;
   std::list<Entity*>::iterator it, itEnd;
-  std::pair<MATCH_RETURN, Entity*> ret;
   Entity* obj = NULL;
 
   obj = MatchKeyword(name, caller);
   if (obj)
     {
-      return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+      return obj;
     }
 
   contents = new std::list<Entity*>();
@@ -626,11 +625,11 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObject(const std::string &name,Play
   contents->insert(contents->begin(), val->begin(), val->end());
   val = caller->GetContents();
   contents->insert(contents->begin(), val->begin(), val->end());
-  ret = MatchObjectInList(name, val);
+  obj = MatchObjectInList(name, val);
   delete contents;
-  return ret;
+  return obj;
 }
-std::pair<MATCH_RETURN, Entity*> World::MatchObjectInList(const std::string &name, std::list<Entity*> *olist)
+Entity* World::MatchObjectInList(const std::string &name, std::list<Entity*> *olist)
 {
   std::list<Entity*>::iterator it, itEnd;
   std::string sub; //used for holding the subpart of the number.
@@ -645,7 +644,7 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInList(const std::string &nam
 
   if (!olist->size())
     {
-      return std::pair<MATCH_RETURN, Entity*>(M_FAIL, NULL);
+      return NULL;
     }
 
 //we check to see if the string has a '.', if so, there's a number.
@@ -653,7 +652,7 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInList(const std::string &nam
 //check to see if it is 1) at the beginning, or 2) at the end.
   if ((marker == 0) || (marker == name.length()))
     {
-      return std::pair<MATCH_RETURN, Entity*>(M_FAIL, NULL);
+      return NULL;
     }
 
   if (marker != std::string::npos)   //we found something.
@@ -663,7 +662,7 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInList(const std::string &nam
       number = atoi(sub.c_str());
       if (number == 0)
         {
-          return std::pair<MATCH_RETURN, Entity*>(M_FAIL, NULL);
+          return NULL;
         }
 
       itEnd = olist->end();
@@ -710,11 +709,11 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInList(const std::string &nam
         }
       if (count != (number -1))
         {
-          return std::pair<MATCH_RETURN, Entity*>(M_BADNUM, NULL);
+          return NULL;
         }
       else
         {
-          return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+          return obj;
         }
     }
   else
@@ -728,12 +727,12 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInList(const std::string &nam
             {
               if (obj->GetName().substr(temp.length()) == temp)
                 {
-                  return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+                  return obj;
                 }
             }
           if (obj->GetName() == temp)   //full match
             {
-              return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+              return obj;
             }
 
 //now we check a list of aliases.
@@ -748,21 +747,21 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInList(const std::string &nam
                     {
                       if (alias.substr(temp.length()) == temp)
                         {
-                          return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+                          return obj;
                         }
                     }
                   if (alias == temp)   //full match
                     {
-                      return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+                      return obj;
                     }
                 }
             }
         }
     }
 
-  return std::pair<MATCH_RETURN, Entity*>(M_FAIL, NULL);
+  return NULL;
 }
-std::pair<MATCH_RETURN, Entity*> World::MatchObjectInVector(const std::string &name, std::vector<Entity*> *olist)
+Entity* World::MatchObjectInVector(const std::string &name, std::vector<Entity*> *olist)
 {
   std::vector<Entity*>::iterator it, itEnd;
   std::string sub; //used for holding the subpart of the number.
@@ -777,7 +776,7 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInVector(const std::string &n
 
   if (!olist->size())
     {
-      return std::pair<MATCH_RETURN, Entity*>(M_FAIL, NULL);
+      return NULL;
     }
 
 //we check to see if the string has a '.', if so, there's a number.
@@ -785,7 +784,7 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInVector(const std::string &n
 //check to see if it is 1) at the beginning, or 2) at the end.
   if ((marker == 0) || (marker == name.length()))
     {
-      return std::pair<MATCH_RETURN, Entity*>(M_FAIL, NULL);
+      return NULL;
     }
 
   if (marker != std::string::npos)   //we found something.
@@ -795,7 +794,7 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInVector(const std::string &n
       number = atoi(sub.c_str());
       if (number == 0)
         {
-          return std::pair<MATCH_RETURN, Entity*>(M_FAIL, NULL);
+          return NULL;
         }
 
       itEnd = olist->end();
@@ -842,11 +841,11 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInVector(const std::string &n
         }
       if (count != (number -1))
         {
-          return std::pair<MATCH_RETURN, Entity*>(M_BADNUM, NULL);
+          return NULL;
         }
       else
         {
-          return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+          return obj;
         }
     }
   else
@@ -860,12 +859,12 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInVector(const std::string &n
             {
               if (obj->GetName().substr(temp.length()) == temp)
                 {
-                  return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+                  return obj;
                 }
             }
           if (obj->GetName() == temp)   //full match
             {
-              return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+              return obj;
             }
 
 //now we check a list of aliases.
@@ -880,19 +879,19 @@ std::pair<MATCH_RETURN, Entity*> World::MatchObjectInVector(const std::string &n
                     {
                       if (alias.substr(temp.length()) == temp)
                         {
-                          return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+                          return obj;
                         }
                     }
                   if (alias == temp)   //full match
                     {
-                      return std::pair<MATCH_RETURN, Entity*>(M_SUCCESS, obj);
+                      return obj;
                     }
                 }
             }
         }
     }
 
-  return std::pair<MATCH_RETURN, Entity*>(M_FAIL, NULL);
+  return NULL;
 }
 
 BOOL World::AddZone(Zone* zone)
