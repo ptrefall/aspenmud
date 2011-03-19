@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <utility>
 
 /*
 *Match return codes.
@@ -261,21 +260,21 @@ public:
   *Param: [in] the name of the object.
   *Return: A pointer to the object, NULL if it wasn't found.
   */
-  std::pair<MATCH_RETURN, Entity*> MatchObject(const std::string &name,Player* caller);
+  Entity* MatchObject(const std::string &name,Player* caller);
   /*
   *Matches an object in a list.
   *Param: [in] the name of the object to find.
   *param: [in] a pointer to the list of objects to match against.
   *Return: An std::pair containing the return code and a pointer to the object.
   */
-  std::pair<MATCH_RETURN, Entity*> MatchObjectInList(const std::string &name, std::list<Entity*> *olist);
+  Entity* MatchObjectInList(const std::string &name, std::list<Entity*> *olist);
   /*
   *Matches an object in a vector.
   *Param: [in] the name of the object to find.
   *param: [in] a pointer to the vector of objects to match against.
   *Return: An std::pair containing the return code and a pointer to the object.
   */
-  std::pair<MATCH_RETURN, Entity*> MatchObjectInVector(const std::string &name, std::vector<Entity*> *olist);
+  Entity* MatchObjectInVector(const std::string &name, std::vector<Entity*> *olist);
   /*
   *Adds a zone to the list of zones.
   *Param: [in] a pointer to the zone to add.

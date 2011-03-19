@@ -385,16 +385,13 @@ CMDLook::CMDLook()
 BOOL CMDLook::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
   Entity* obj = NULL;
-  MATCH_RETURN rtype;
-  std::pair<MATCH_RETURN, Entity*> p;
 
   if (!args.size())
     {
       mobile->Message(MSG_INFO,mobile->GetLocation()->DoLook(mobile));
       return true;
     }
-  p =world->MatchObject(args[0],mobile);
-  EXPLODE_MATCH_PAIR(p, rtype, obj);
+  obj =world->MatchObject(args[0],mobile);
   if (obj==NULL)
     {
       mobile->Message(MSG_ERROR,"You don't see that here.");
