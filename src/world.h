@@ -22,15 +22,6 @@
 #include <vector>
 #include <map>
 
-/*
-*Match return codes.
-*/
-enum MATCH_RETURN {M_SUCCESS, //success
-                   M_FAIL, //failed without any reason.
-                   M_BADNUM //there were some, but not enough for the number provided. e.g: 5.sword when you only have 2.
-                  };
-#define EXPLODE_MATCH_PAIR(pair, ret, obj)ret = pair.first; obj = pair.second
-
 class World
 {
   Server* _server; //our main server object.
