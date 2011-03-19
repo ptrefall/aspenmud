@@ -15,6 +15,7 @@
 #include "event.h"
 #include "option.h"
 #include "exception.h"
+
 //exceptions:
 class FileLoadException:public Exception
 {
@@ -40,7 +41,7 @@ class Player:public Living
   time_t _lastLogin;
   time_t _lastSave;
   time_t _lastBackup;
-  std::map <std::string,Option> *_config;
+  std::map <std::string,Option*> *_config;
   std::map <MessageType,std::string> *_messages;
   Socket *_sock;
 public:
@@ -150,7 +151,7 @@ public:
   *Retrieves a pointer to the players configuration mapping.
   *Return: a pointer to a map of type <std::string,int>.
   */
-  std::map<std::string, Option>* GetOptions(void) const;
+  std::map<std::string, Option*>* GetOptions(void) const;
 
   /*
   *Checks to see if the player has the specified rank.

@@ -25,6 +25,7 @@ World::World()
   _log->Open(EVENT_FILE);
   _users=new std::list<Player*>();
   _channels=new std::map<int,Channel*>();
+  _options = new std::map<std::string, Option*>();
   _cfactory=new ComponentFactory();
   _properties=new std::map<std::string,void*>();
   _zones=new std::vector<Zone*>();
@@ -53,10 +54,9 @@ World::World()
 
 World::~World()
 {
-  std::map<int,Channel*>::iterator cit;
-  std::map<int,Channel*>::iterator citEnd;
-  std::vector<Zone*>::iterator zit;
-  std::vector<Zone*>::iterator zitEnd;
+  std::map<int,Channel*>::iterator cit, citEnd;
+  std::vector<Zone*>::iterator zit, zitEnd;
+  std::map<std::string, Option*>::iterator oit, oitEnd;
 
   delete [] _motd;
   delete [] _banner;
@@ -70,6 +70,14 @@ World::~World()
       delete (*cit).second;
     }
   delete _channels;
+
+  oitEnd = _options->end();
+  for (oit = _options->begin(); oit != oitEnd; ++oit)
+    {
+      delete (*oit).second;
+    }
+  delete _options;
+
   delete _cfactory;
   delete _properties;
 
@@ -79,6 +87,7 @@ World::~World()
       delete (*zit);
     }
   delete _zones;
+
   delete _rooms;
   delete _objects;
   delete _onumPool;
@@ -245,9 +254,9 @@ void World::GetChannelNames(std::list <std::string>* out)
 void World::AddChannel(Channel* chan,BOOL command)
 {
   (*_channels)[_chanid]=chan;
-  RegisterOption(chan->GetName(),
-                 "Controls whether or not you can hear and broadcast to "+chan->GetName()+".",
-                 chan->GetAccess(), (chan->GetName()=="newbie"?Variant((int)1):Variant((int)0)), VAR_INT, true);
+  RegisterOption(new Option(chan->GetName(),
+                            "Controls whether or not you can hear and broadcast to "+chan->GetName()+".",
+                            chan->GetAccess(), (chan->GetName()=="newbie"?Variant((int)1):Variant((int)0)), VAR_INT, true));
   if (command)
     {
       CMDChan* com = new CMDChan();
@@ -1067,4 +1076,32 @@ BOOL World::IsRunning() const
 void World::SetRunning(BOOL running)
 {
   _running = running;
+}
+
+BOOL World::RegisterOption(Option* option)
+{
+  if (!option)
+    {
+      return false;
+    }
+
+  if (OptionExists(option->GetName()))
+    {
+      return false;
+    }
+
+  (*_options)[option->GetName()] = option;
+  return true;
+}
+BOOL World::OptionExists(const std::string &name)
+{
+  return (_options->count(name)?true:false);
+}
+Option* World::GetGlobalOption(const std::string &name)
+{
+  return (OptionExists(name)? NULL:(*_options)[name]);
+}
+std::map<std::string, Option*>* World::GetGlobalOptions()
+{
+  return _options;
 }

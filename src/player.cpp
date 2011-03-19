@@ -28,7 +28,8 @@ Player::Player()
   _lastSave = 0;
   _lastBackup = 0;
 //config defaults:
-  _config=new std::map<std::string, Option>();
+  _config=new std::map<std::string, Option*>();
+
 //messages:
   _messages=new std::map<MessageType,std::string>();
   AddMessage(MSG_ERROR, C_RED);
@@ -50,6 +51,8 @@ Player::Player()
 }
 Player::~Player()
 {
+  std::map<std::string, Option*>::iterator oit, oitEnd;
+
   if (_password)
     {
       delete []_password;
@@ -60,15 +63,21 @@ Player::~Player()
       delete []_tempPassword;
       _tempPassword = NULL;
     }
-  if (_config)
-    {
-      delete _config;
-      _config=NULL;
-    }
   if (_messages)
     {
       delete _messages;
       _messages=NULL;
+    }
+
+  oitEnd = _config->end();
+  for (oit = _config->begin(); oit != oitEnd; ++oit)
+    {
+      delete (*oit).second;
+    }
+  if (_config)
+    {
+      delete _config;
+      _config=NULL;
     }
 }
 
@@ -98,20 +107,20 @@ void Player::Serialize(TiXmlDocument* doc)
 
 //options
   TiXmlElement* options = new TiXmlElement("options");
-  std::map<std::string, Option>::iterator it;
-  std::map<std::string, Option>::iterator itEnd = _config->end();
+  std::map<std::string, Option*>::iterator it, itEnd;
+  itEnd = _config->end();
   if (_config->size())
     {
 //we serialize if there is actually something to serialize.
       for (it = _config->begin(); it != itEnd; ++it)
         {
-          if ((!OptionExists((*it).first)) || (GetGlobalOption((*it).first)->GetData() == (*it).second.GetData()))
+          if ((!OptionExists((*it).first)) || (world->GetGlobalOption((*it).first)->GetData() == (*it).second->GetData()))
             {
               continue;
             }
           TiXmlElement* option = new TiXmlElement("option");
           option->SetAttribute("name", (*it).first.c_str());
-          (*it).second.GetData().Serialize(option);
+          (*it).second->GetData().Serialize(option);
           options->LinkEndChild(option);
         }
     }
@@ -134,6 +143,7 @@ void Player::Deserialize(TiXmlElement* root)
   TiXmlElement* options = NULL;
   TiXmlNode* node = NULL;
   Variant* var = NULL;
+  Option* opt = NULL;
   std::string name;
 
   if (!root)
@@ -172,11 +182,14 @@ void Player::Deserialize(TiXmlElement* root)
 //now we iterate through the options list, and pull in the options to deserialize.
   for (node = options->FirstChild(); node; node = node->NextSibling())
     {
+      opt = new Option();
       option = node->ToElement();
       name = option->Attribute("name");
       var = new Variant();
       var->Deserialize(option->FirstChild("variable")->ToElement());
-      SetOption(name, *var);
+      opt->SetName(name);
+      opt->SetData(*var);
+      (*_config)[name] = opt;
     }
 
   _title = root->Attribute("title");
@@ -396,18 +409,18 @@ void Player::SetOption(const std::string &option, Variant &val)
 {
   if (OptionExists(option))
     {
-      (*_config)[option].GetData().SetStr(val.GetStr());
+      (*_config)[option]->GetData().SetStr(val.GetStr());
     }
 }
 Option* Player::GetOption(const std::string &option) const
 {
   if (OptionExists(option))
     {
-      return &(*_config)[option];
+      return (*_config)[option];
     }
   else
     {
-      return GetGlobalOption(option);
+      return world->GetGlobalOption(option);
     }
 }
 
@@ -419,24 +432,23 @@ void Player::ToggleOption(const std::string &option)
 {
   if (OptionExists(option))
     {
-      if ((*_config)[option].GetData().Typeof() == VAR_INT)
+      if ((*_config)[option]->GetData().Typeof() == VAR_INT)
         {
-          if ((*_config)[option].GetData().GetInt())
+          if ((*_config)[option]->GetData().GetInt())
             {
-              (*_config)[option].GetData().SetInt(0);
+              (*_config)[option]->GetData().SetInt(0);
             }
           else
             {
-              (*_config)[option].GetData().SetInt(1);
+              (*_config)[option]->GetData().SetInt(1);
             }
         }
     }
 }
-std::map<std::string, Option>* Player::GetOptions(void) const
+std::map<std::string, Option*>* Player::GetOptions(void) const
 {
   return _config;
 }
-
 
 BOOL Player::HasAccess(FLAG access) const
 {

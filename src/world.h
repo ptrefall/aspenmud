@@ -30,6 +30,7 @@ class World
   std::list <Player*> *_users; //a list of the currently connected players.
   std::map <int,Channel*>* _channels;
   std::map <std::string,void*> *_properties;
+  std::map<std::string, Option*> *_options;
   std::vector<Zone*> *_zones;
   std::map<VNUM,Room*> *_rooms;
   std::map<VNUM,Entity*> *_objects;
@@ -310,6 +311,28 @@ public:
   *Param: [in] A boolian value that controls the game loop.
   */
   void SetRunning(BOOL running);
+  /*
+  *Registers an option
+  *param: [in] a pointer to the option to register.
+  *return: True on success, false on failure.
+  */
+  BOOL RegisterOption(Option* option);
+  /*
+  *Checks for the existance of an option by name.
+  *Param: the name of the option.
+  *Return: True on success, false on failure.
+  */
+  BOOL OptionExists(const std::string &name);
+  /*
+  *Checks for the option by name.
+  *Param: [in] the name of the option.
+  *Return: a pointer to the option if the option exists, NULL otherwise.
+  */
+  Option* GetGlobalOption(const std::string &name);
+  /*
+  *Returns a pointer to the mapping of objects.
+  *Return: a pointer to an std::map<std::string, Option*>.
+  */
+  std::map<std::string, Option*>* GetGlobalOptions();
 };
-
 #endif
