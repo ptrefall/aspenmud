@@ -20,16 +20,15 @@ void InitializeChannels()
 EVENT(SubscribeChannels)
 {
   std::list <std::string> *names=new std::list<std::string>();
-  std::list <std::string>::iterator it;
-  std::list<std::string>::iterator itEnd;
+  std::list <std::string>::iterator it, itEnd;
   Channel* chan=NULL;
   Player* mobile=(Player*)caller;
   world->GetChannelNames(names);
-  itEnd = names->end();
 
+  itEnd = names->end();
   for (it = names->begin(); it != itEnd; ++it)
     {
-      if (mobile->GetOption((*it))->GetData().GetInt() == 1)
+      if (mobile->GetOption((*it))->_data.GetInt() == 1)
         {
           chan=world->FindChannel((*it));
           if (chan)

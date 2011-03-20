@@ -40,4 +40,14 @@ public:
   int GetRank(void) const;
   BOOL CanToggle() const;
 };
+
+/*
+*One of the problems with Players is that they're holding an entire option setup, which they do not need.
+*/
+struct OptionNode
+{
+  Variant _data;
+  VARIABLE_TYPE _type; //the type that the value should hold.
+  Option* _option;
+};
 #endif
