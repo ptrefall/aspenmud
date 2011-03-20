@@ -123,36 +123,54 @@ CMDToggle::CMDToggle()
 }
 BOOL CMDToggle::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
-  std::map<std::string, Option*> *options;
-  std::map<std::string, Option*>::iterator it, itEnd;
-  std::stringstream st;
+  Option* gopt;
+  OptionNode* popt;
+  std::map<std::string, Option*> *goptions;
+  std::map<std::string, OptionNode*>* poptions;
+  std::map<std::string, Option*>::iterator git, gitEnd;
+  std::map<std::string, OptionNode*>::iterator pit, pitEnd;
+  std::vector<std::string> *cols = NULL;
+  std::vector<std::string>* headers = NULL;
 
 //if no args were given, print out a list of options:
   if (!args.size())
     {
-      options=mobile->GetOptions();
-      itEnd = options->end();
-      for (it = options->begin(); it != itEnd; ++it)
+      cols = new std::vector<std::string>();
+      headers = new std::vector<std::string>();
+      headers->push_back("option");
+      headers->push_back("value");
+      headers->push_back("description");
+
+      poptions=mobile->GetOptions();
+      pitEnd = poptions->end();
+      for (pit = poptions->begin(); pit != pitEnd; ++pit)
         {
-          if ((*it).second->CanToggle())
+          popt = (*pit).second;
+          if (popt->_option->CanToggle())
             {
-              st << (*it).second->GetName() << " ";
-              st << ((*it).second->GetData().GetInt()==0?"off: ":"on ");
-              st << (*it).second->GetHelp() << "\n";
+              cols->push_back(popt->_option->GetName());
+              cols->push_back(popt->_data.GetInt()==0?"off: ":"on ");
+              cols->push_back(popt->_option->GetHelp());
             }
         }
 
-      options = world->GetGlobalOptions();
-      itEnd = options->end();
-      for (it = options->begin(); it != itEnd; ++it)
+      goptions = world->GetGlobalOptions();
+      gitEnd = goptions->end();
+      for (git = goptions->begin(); git != gitEnd; ++git)
         {
-          if ((*it).second->CanToggle())
+          gopt = (*git).second;
+          if (gopt->CanToggle())
             {
-              st << (*it).second->GetName() << " ";
-              st << ((*it).second->GetData().GetInt()==0?"off: ":"on ");
-              st << (*it).second->GetHelp() << "\n";
+              cols->push_back(gopt->GetName());
+              cols->push_back(gopt->GetData().GetInt()==0?"off: ":"on ");
+              cols->push_back(gopt->GetHelp());
             }
         }
+
+      mobile->Message(MSG_LIST, Columnize(cols, 3, headers));
+
+      delete cols;
+      delete headers;
       return true;
     }
 

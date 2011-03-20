@@ -28,7 +28,7 @@ Player::Player()
   _lastSave = 0;
   _lastBackup = 0;
 //config defaults:
-  _config=new std::map<std::string, Option*>();
+  _config=new std::map<std::string, OptionNode*>();
 
 //messages:
   _messages=new std::map<MessageType,std::string>();
@@ -51,7 +51,7 @@ Player::Player()
 }
 Player::~Player()
 {
-  std::map<std::string, Option*>::iterator oit, oitEnd;
+  std::map<std::string, OptionNode*>::iterator oit, oitEnd;
 
   if (_password)
     {
@@ -107,20 +107,22 @@ void Player::Serialize(TiXmlDocument* doc)
 
 //options
   TiXmlElement* options = new TiXmlElement("options");
-  std::map<std::string, Option*>::iterator it, itEnd;
+  std::map<std::string, OptionNode*>::iterator it, itEnd;
+  OptionNode* onode = NULL;
   itEnd = _config->end();
   if (_config->size())
     {
 //we serialize if there is actually something to serialize.
       for (it = _config->begin(); it != itEnd; ++it)
         {
-          if ((!OptionExists((*it).first)) || (world->GetGlobalOption((*it).first)->GetData() == (*it).second->GetData()))
+          onode =  (*it).second;
+          if (onode->_data == world->GetGlobalOption((*it).first)->GetData())
             {
               continue;
             }
           TiXmlElement* option = new TiXmlElement("option");
           option->SetAttribute("name", (*it).first.c_str());
-          (*it).second->GetData().Serialize(option);
+          onode->_data.Serialize(option);
           options->LinkEndChild(option);
         }
     }
@@ -137,13 +139,14 @@ void Player::Serialize(TiXmlDocument* doc)
 void Player::Deserialize(TiXmlElement* root)
 {
   int tmp = 0;
+  OptionNode* onode = NULL;
+  Option* opt = NULL;
   TiXmlElement* password = NULL;
   TiXmlElement* tinfo = NULL;
   TiXmlElement* option = NULL;
   TiXmlElement* options = NULL;
   TiXmlNode* node = NULL;
-  Variant* var = NULL;
-  Option* opt = NULL;
+  Variant var;
   std::string name;
 
   if (!root)
@@ -182,14 +185,18 @@ void Player::Deserialize(TiXmlElement* root)
 //now we iterate through the options list, and pull in the options to deserialize.
   for (node = options->FirstChild(); node; node = node->NextSibling())
     {
-      opt = new Option();
+      onode = new OptionNode();
       option = node->ToElement();
       name = option->Attribute("name");
-      var = new Variant();
-      var->Deserialize(option->FirstChild("variable")->ToElement());
-      opt->SetName(name);
-      opt->SetData(*var);
-      (*_config)[name] = opt;
+      opt = world->GetGlobalOption(name);
+      if (opt)
+        {
+          onode = new OptionNode();
+          var.Deserialize(option->FirstChild("variable")->ToElement());
+          onode->_data = var;
+          onode->_option = opt;
+          (*_config)[name] = onode;
+        }
     }
 
   _title = root->Attribute("title");
@@ -407,12 +414,28 @@ void Player::SetPrompt(const std::string &prompt)
 
 void Player::SetOption(const std::string &option, Variant &val)
 {
+  Option* opt;
   if (OptionExists(option))
     {
-      (*_config)[option]->GetData().SetStr(val.GetStr());
+      if ((*_config)[option]->_option->GetData().Typeof() == val.Typeof())
+        {
+          (*_config)[option]->_option->GetData().SetStr(val.GetStr());
+        }
+    }
+//checks for the global existance of the option.
+  if (world->OptionExists(option))
+    {
+      opt = world->GetGlobalOption(option);
+      if (opt->GetData().Typeof() == val.Typeof())
+        {
+          OptionNode* node = new OptionNode();
+          node->_data = val;
+          node->_option = opt;
+          (*_config)[option] = node;
+        }
     }
 }
-Option* Player::GetOption(const std::string &option) const
+OptionNode* Player::GetOption(const std::string &option) const
 {
   if (OptionExists(option))
     {
@@ -420,7 +443,7 @@ Option* Player::GetOption(const std::string &option) const
     }
   else
     {
-      return world->GetGlobalOption(option);
+      return NULL;
     }
 }
 
@@ -432,20 +455,20 @@ void Player::ToggleOption(const std::string &option)
 {
   if (OptionExists(option))
     {
-      if ((*_config)[option]->GetData().Typeof() == VAR_INT)
+      if ((*_config)[option]->_data.Typeof() == VAR_INT)
         {
-          if ((*_config)[option]->GetData().GetInt())
+          if ((*_config)[option]->_data.GetInt())
             {
-              (*_config)[option]->GetData().SetInt(0);
+              (*_config)[option]->_data.SetInt(0);
             }
           else
             {
-              (*_config)[option]->GetData().SetInt(1);
+              (*_config)[option]->_data.SetInt(1);
             }
         }
     }
 }
-std::map<std::string, Option*>* Player::GetOptions(void) const
+std::map<std::string, OptionNode*>* Player::GetOptions(void) const
 {
   return _config;
 }

@@ -22,8 +22,10 @@ class FileLoadException:public Exception
 public:
   FileLoadException(const std::string &msg):Exception(msg) { }
 };
+
 //Message types:
 enum MessageType {MSG_NORMAL, MSG_ERROR,MSG_INFO,MSG_CRITICAL,MSG_CHANNEL,MSG_LIST};
+
 EVENT(HB_OnlineTime);
 EVENT(HB_AUTOSAVE);
 
@@ -41,7 +43,7 @@ class Player:public Living
   time_t _lastLogin;
   time_t _lastSave;
   time_t _lastBackup;
-  std::map <std::string,Option*> *_config;
+  std::map <std::string,OptionNode*> *_config;
   std::map <MessageType,std::string> *_messages;
   Socket *_sock;
 public:
@@ -135,9 +137,9 @@ public:
   *Param: [in] The option to retrieve the value of.
   *Return: The value of the option, or -1 if it doesn't exist.
   */
-  Option* GetOption(const std::string &option) const;
+  OptionNode* GetOption(const std::string &option) const;
   /*
-  *Checks to see if the specified option exists.
+  *Checks to see if the specified option exists on the player.
   *Param: [in] The name of the option.
   *Return: true if the option exists, false otherwise.
   */
@@ -151,7 +153,7 @@ public:
   *Retrieves a pointer to the players configuration mapping.
   *Return: a pointer to a map of type <std::string,int>.
   */
-  std::map<std::string, Option*>* GetOptions(void) const;
+  std::map<std::string, OptionNode*>* GetOptions(void) const;
 
   /*
   *Checks to see if the player has the specified rank.
