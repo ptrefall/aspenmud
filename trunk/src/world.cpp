@@ -1099,7 +1099,7 @@ BOOL World::OptionExists(const std::string &name)
 }
 Option* World::GetGlobalOption(const std::string &name)
 {
-  return (OptionExists(name)? NULL:(*_options)[name]);
+  return (OptionExists(name)? (*_options)[name]:NULL);
 }
 std::map<std::string, Option*>* World::GetGlobalOptions()
 {
