@@ -2,6 +2,8 @@
 #include <map>
 #include "option.h"
 #include "variant.h"
+#include "player.h"
+#include "world.h"
 
 Option::Option()
 {
@@ -70,4 +72,18 @@ int Option::GetRank(void) const
 BOOL Option::CanToggle() const
 {
   return _toggle;
+}
+
+Variant GetOptionValue(const std::string &name, const Player* mobile)
+{
+  if (mobile->OptionExists(name))
+    {
+      return mobile->GetOption(name)->_data;
+    }
+  if (world->OptionExists(name))
+    {
+      return world->GetGlobalOption(name)->GetData();
+    }
+
+  return Variant();
 }

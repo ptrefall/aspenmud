@@ -50,4 +50,13 @@ struct OptionNode
   VARIABLE_TYPE _type; //the type that the value should hold.
   Option* _option;
 };
+
+//option helper functions
+/*
+*Gets the value of the option either from the global option, or from the player's option. Checks the player first.
+*Param: [in] the name of the option.
+*Param: [in] a pointer to the player object.
+*Return: A variant holding the value.
+*/
+Variant GetOptionValue(const std::string &name, const Player* mobile);
 #endif

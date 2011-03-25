@@ -28,7 +28,7 @@ EVENT(SubscribeChannels)
   itEnd = names->end();
   for (it = names->begin(); it != itEnd; ++it)
     {
-      if (mobile->GetOption((*it))->_data.GetInt() == 1)
+      if (GetOptionValue((*it), mobile).GetInt() == 1)
         {
           chan=world->FindChannel((*it));
           if (chan)
