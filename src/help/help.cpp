@@ -10,6 +10,7 @@
 #include <ctime>
 #include <tinyxml.h>
 
+#ifdef MODULE_HELP
 HelpEntry::HelpEntry(const std::string &name, const std::string &data, FLAG access, HELP_ENTRY_TYPE type):_name(name), _data(data), _access(access), _type(type)
 {
   _lastModified = time(NULL);
@@ -148,4 +149,129 @@ void HelpTable::Save()
     }
 
   doc.SaveFile(HELP_FILE);
+}
+
+BOOL HelpTable::AddEntry(HelpEntry* entry)
+{
+  if (!entry)
+    {
+      return false;
+    }
+
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  itEnd = _entries->end();
+  for (it = _entries->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == entry->GetName())
+        {
+          return false;
+        }
+    }
+
+  _entries->push_back(entry);
+  return true;
+}
+BOOL HelpTable::RemoveEntry(const std::string &name)
+{
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  itEnd = _entries->end();
+  for (it = _entries->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == name)
+        {
+          _entries->erase(it);
+          delete (*it);
+          return true;
+        }
+    }
+
+  return false;
+}
+BOOL HelpTable::EntryExists(const std::string &name)
+{
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  itEnd = _entries->end();
+  for (it = _entries->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == name)
+        {
+          return true;
+        }
+    }
+
+  return false;
+}
+
+BOOL HelpTable::ShowEntry(const std::string &name, Player* mobile)
+{
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  itEnd = _entries->end();
+  for (it = _entries->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == name)
+        {
+          mobile->Message(MSG_INFO, (*it)->GetData());
+          return true;
+        }
+    }
+
+  return false;
+}
+
+CMDHelp::CMDHelp()
+{
+  SetName("help");
+  AddAlias("h");
+  SetType(normal);
+}
+BOOL CMDHelp::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  HelpTable* table = NULL;
+
+  if (!args.size())
+    {
+      mobile->Message(MSG_ERROR, "Syntax: help <topic>.\nYou can also use help <index> to get a listing of help categories.");
+      return false;
+    }
+
+  table = (HelpTable*)world->GetProperty("help");
+  if (args.size() == 1)
+    {
+      if (!table->ShowEntry(args[0], mobile))
+        {
+          mobile->Message(MSG_ERROR, "That topic does not exist.");
+          return false;
+        }
+    }
+  else
+    {
+      std::string arg;
+      arg = Explode(args);
+      if (!table->ShowEntry(arg, mobile))
+        {
+          mobile->Message(MSG_ERROR, "That topic does not exist.");
+          return false;
+        }
+    }
+
+  return true;
+}
+#endif
+
+void InitializeHelp()
+{
+#ifdef MODULE_HELP
+  world->WriteLog("Initializing help.");
+  HelpTable* table = new HelpTable();
+  if (!table)
+    {
+      world->WriteLog("Error creating help table.", CRIT);
+    }
+  world->AddProperty("help", (void*)table);
+  world->commands.AddCommand(new CMDHelp());
+#endif
 }

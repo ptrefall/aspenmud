@@ -5,5 +5,9 @@
 #ifdef MODULE_SYSLOG
 #include "syslog/syslog.h"
 #endif
+#ifdef MODULE_HELP
+#include "help/help.h"
+#endif
+
 void InitializeModules(void);
 #endif
