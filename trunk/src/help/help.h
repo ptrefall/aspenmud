@@ -5,11 +5,13 @@
 #include "../world.h"
 #include "../player.h"
 #include "../utils.h"
+#include "../command.h"
 #include <string>
 #include <vector>
 #include <cstdlib>
 #include <tinyxml.h>
 
+#ifdef MODULE_HELP
 enum HELP_ENTRY_TYPE {h_combat, h_movement, h_communication};
 
 //the basic help node.
@@ -87,5 +89,39 @@ public:
   *Iterates through all of the help entries stored and serializes them to one file.
   */
   void Save();
+  /*
+  *Adds the specified entry.
+  *Param: [in] the entry to add.
+  *Return: True if the entry could be added, false otherwise.
+  */
+  BOOL AddEntry(HelpEntry* entry);
+  /*
+  *Locates and removes the entry by name.
+  *Param: [in] the entry to find.
+  *Return: True if the entry was found and could be removed, false otherwise.
+  */
+  BOOL RemoveEntry(const std::string &name);
+  /*
+    *Checks for the existance of an entry by name.
+  *Return: True if the entry exists, false otherwise.
+  */
+  BOOL EntryExists(const std::string &name);
+  /*
+  *Tries to show the specified entry.
+  *Param: [in] the name of the entry to show.
+  *Param: [in] a pointer to the player to show the entry to.
+  *Return: false if the entry could not be shown because it does not exist or the user does not have the proper permissions to read, true otherwise.
+  */
+  BOOL ShowEntry(const std::string &name, Player* mobile);
 };
+
+class CMDHelp:public Command
+{
+public:
+  CMDHelp();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
+#endif
+
+void InitializeHelp();
 #endif
