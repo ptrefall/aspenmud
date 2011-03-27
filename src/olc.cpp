@@ -90,12 +90,12 @@ MENU(olc_menu_cb)
     }
   in_data* sdata = new in_data();
   sdata->args = (void*)arg;
-  sdata->handle = olc_input;
+  sdata->handle = new OlcInput();
   mob->GetSocket()->SetInput(sdata);
   mob->Message(MSG_INFO, olc->prompt);
 }
 
-INPUT(olc_input)
+void OlcInput::Input(void* arg, const std::string &input)
 {
   OLC_IN_DATA* data= (OLC_IN_DATA*)arg;
   switch(data->olc->type)
@@ -131,9 +131,8 @@ INPUT(olc_input)
       break;
     }
     }
-  sock->ClearInput();
+  _sock->ClearInput();
   data->menu->menu->ShowMenu();
   delete data;
-  data = NULL;
 }
 #endif

@@ -40,6 +40,10 @@ public:
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 MENU(olc_menu_cb);
-INPUT(olc_input);
+class OlcInput:public InputHandle
+{
+public:
+  void Input(void* arg, const std::string &input);
+};
 #endif
 #endif

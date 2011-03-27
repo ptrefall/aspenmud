@@ -13,17 +13,37 @@
 #include "world.h"
 #include "telnet.h"
 
+InputHandle::InputHandle()
+{
+  _sock = NULL;
+}
+InputHandle::~InputHandle()
+{
+}
+void InputHandle::Attach(Socket* sock)
+{
+  _sock = sock;
+}
+void InputHandle::Active()
+{
+}
+void InputHandle::Input(void* arg, const std::string &input)
+{
+}
+
 Socket::Socket(const int desc)
 {
   _control = desc;
   _mobile=NULL;
   _Close=0;
   _addr=new sockaddr_in();
+  _input = new std::stack<in_data*>();
   _lastInput = time(NULL);
   _inSequence = false;
 }
 Socket::~Socket()
 {
+  in_data* data = NULL;
   if (_control != -1)
     {
       close(_control);
@@ -38,6 +58,17 @@ Socket::~Socket()
       delete _addr;
       _addr=NULL;
     }
+  while (!_input->empty())
+    {
+      data = _input->top();
+      _input->pop();
+      if (data->handle)
+        {
+          delete data->handle;
+        }
+      delete data;
+    }
+  delete _input;
 }
 
 int Socket::GetControl() const
@@ -202,7 +233,7 @@ void Socket::SetConnectionType(const ConType &s)
   _con=s;
 }
 
-std::string Socket::GetHost(void) const
+std::string Socket::GetHost() const
 {
   return _host;
 }
@@ -211,7 +242,7 @@ void Socket::SetHost(const std::string &host)
   _host = host;
 }
 
-void Socket::AllocatePlayer(void)
+void Socket::AllocatePlayer()
 {
   if (!_mobile)
     {
@@ -239,62 +270,72 @@ void Socket::Kill()
     }
 }
 
-BOOL Socket::ShouldClose(void)
+BOOL Socket::ShouldClose()
 {
   return _Close;
 }
 
-BOOL Socket::HasHandle(void) const
+BOOL Socket::HasHandle() const
 {
-  if (_input.size())
-    {
-      return true;
-    }
-  return false;
+  return (_input->empty()==true?false:true);
 }
-BOOL Socket::HandleInput(void)
+BOOL Socket::HandleInput()
 {
   if (HasHandle())
     {
-      (_input.front()->handle)(this,_input.front()->args,PopInput());
+      in_data* data = _input->top();
+      data->handle->Input(_input->top()->args, PopCommand());
       ClrInBuffer();
       return true;
     }
+
   return false;
 }
-void Socket::ClearInput(void)
+void Socket::ClearInput()
 {
-  if (_input.size())
+  if (HasHandle())
     {
-      in_data* in = _input.front();
-      _input.pop_front();
+      in_data* in = _input->top();
+      _input->pop();
+      if (in->handle)
+        {
+          delete in->handle;
+        }
       delete in;
+      if (HasHandle())
+        {
+          in = _input->top();
+          in->handle->Active();
+        }
     }
 }
 BOOL Socket::SetInput(in_data* data)
 {
-  _input.push_front(data);
+  if (data->handle)
+    {
+      data->handle->Attach(this);
+    }
+  _input->push(data);
   ClrInBuffer();
   Flush();
   return true;
 }
 
-void Socket::UpdateLastInput()
+void Socket::UpdateLastCommand()
 {
   _lastInput = time(NULL);
 }
-time_t Socket::GetLastInput(void)
+time_t Socket::GetLastCommand()
 {
   return _lastInput;
 }
-
-BOOL Socket::InputPending() const
+BOOL Socket::CommandPending() const
 {
   return (_cqueue.size()==0?false:true);
 }
-std::string Socket::PopInput()
+std::string Socket::PopCommand()
 {
-  if (_cqueue.size() == 0)
+  if (!CommandPending())
     {
       return "";
     }
@@ -303,7 +344,7 @@ std::string Socket::PopInput()
 
   return ret;
 }
-void Socket::AddInput(const std::string &input)
+void Socket::AddCommand(const std::string &input)
 {
   _cqueue.push(input);
 }

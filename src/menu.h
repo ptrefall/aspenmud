@@ -19,7 +19,7 @@ class Menu;
 
 //menu data structure
 //used for holding information about each individual item.
-struct menu_data
+struct MENU_DATA
 {
   std::string name;
   int subitem;
@@ -28,7 +28,6 @@ struct menu_data
   void* args;
   Menu* menu;
 };
-typedef struct menu_data MENU_DATA;
 
 class Menu
 {
@@ -62,6 +61,9 @@ public:
   BOOL Unattach(void);
   BOOL ShowMenu(void);
 };
-
-INPUT(menu_handler);
+class MenuInput:public InputHandle
+{
+public:
+  void Input(void* arg, const std::string &input);
+};
 #endif
