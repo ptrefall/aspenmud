@@ -260,6 +260,38 @@ BOOL CMDHelp::Execute(const std::string &verb, Player* mobile,std::vector<std::s
 
   return true;
 }
+
+CMDAddTopic::CMDAddTopic()
+{
+  SetName("addtopic");
+  AddAlias("addt");
+  SetAccess(RANK_ADMIN);
+}
+BOOL CMDAddTopic::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  HelpEntry* entry;
+  std::string arg = Explode(args);
+  HelpTable* table = (HelpTable*)world->GetProperty("table");
+  if (table->EntryExists(arg))
+    {
+      mobile->Message(MSG_ERROR, "That topic already exists.");
+      return false;
+    }
+
+  entry = new HelpEntry();
+  entry->SetName(arg);
+  entry->SetData("A newly created help file, with no contents. Perhaps you should tell "+mobile->GetName()+" to give this help file some content.");
+  if (!table->AddEntry(entry))
+    {
+      mobile->Message(MSG_ERROR, "Could not add the entry to the help table.");
+      delete entry;
+      return false;
+    }
+
+  table->AddEntry(entry);
+  mobile->Message(MSG_INFO, "Entry added successfully. You will need to write contents in the entry, by using the hedit command.");
+  return true;
+}
 #endif
 
 void InitializeHelp()
@@ -273,5 +305,6 @@ void InitializeHelp()
     }
   world->AddProperty("help", (void*)table);
   world->commands.AddCommand(new CMDHelp());
+  world->commands.AddCommand(new CMDAddTopic());
 #endif
 }

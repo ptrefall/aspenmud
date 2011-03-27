@@ -121,6 +121,13 @@ public:
   CMDHelp();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+
+class CMDAddTopic:public Command
+{
+public:
+  CMDAddTopic();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
 #endif
 
 void InitializeHelp();
