@@ -171,6 +171,7 @@ void Socials::InitializeDefaultSocials(void)
   AddSocial("chuckle", "You %v %a.", "%N %vs %a.", "You %v %a at %T.", "%N %vs %a at %T.", "%N %vs %a at you.");
   AddSocial("cower", "You %v in a corner.", "%N %vs in a corner.", "You %v in fear from %T.", "%N %vs in fear from %T.", "%N %vs in fear from you.");
   AddSocial("cry", "You %v.", "%N %vs.", "You %v on %T's shoulder.", "%N %vs on %T's shoulder.", "%N %vs on your shoulder.");
+  AddSocial("wink", "you %v suggestively", "%N %vs suggestively", "You %v suggestively at %T.", "%N %vs suggestively at %T.", "%N %vs suggestively at you.");
   Save();
 #endif
 }
