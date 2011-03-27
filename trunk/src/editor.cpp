@@ -8,7 +8,7 @@
 #include "event.h"
 #include "eventargs.h"
 
-INPUT(editor_ed)
+void EditorInput::Input(void* arg, const std::string &input)
 {
   if (input=="")
     {
@@ -21,7 +21,7 @@ INPUT(editor_ed)
 
   std::vector <std::string> tokens;
 
-  mobile=sock->GetPlayer();
+  mobile=_sock->GetPlayer();
   ed=(Editor*)arg;
   Tokenize(input,tokens);
 
@@ -349,7 +349,7 @@ BOOL Editor::EnterEditor(Player* mobile)
 {
   _mobile=mobile;
   _handler=new in_data();
-  _handler->handle=editor_ed;
+  _handler->handle=new EditorInput();
   _handler->args = (void*)this;
   _mobile->GetSocket()->SetInput(_handler);
   _mobile->Message(MSG_INFO,"Entering editor. use \'h\' for help.");

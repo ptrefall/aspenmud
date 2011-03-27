@@ -41,5 +41,9 @@ public:
   std::vector<std::string>* GetLines();
 };
 
-INPUT(editor_ed);
+class EditorInput:public InputHandle
+{
+public:
+  void Input(void* arg, const std::string &input);
+};
 #endif

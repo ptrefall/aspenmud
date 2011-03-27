@@ -95,7 +95,7 @@ BOOL Server::PollSockets()
     {
       sock = *iSocket;
 //check for idlers:
-      res = time(NULL)-sock->GetLastInput();
+      res = time(NULL)-sock->GetLastCommand();
       switch(sock->GetConnectionType())
         {
         case con_game:
@@ -113,7 +113,6 @@ BOOL Server::PollSockets()
               sock->Write("You must log in within 30 seconds.\n");
               sock->Kill();
             }
-          break;
         }
     }
 
@@ -148,7 +147,7 @@ BOOL Server::PollSockets()
               continue;
             }
 //update their last input since we received data
-          sock->UpdateLastInput();
+          sock->UpdateLastCommand();
         }
     }
 //now we poll every socket for pending commands and handle them.
@@ -158,7 +157,7 @@ BOOL Server::PollSockets()
       sock = *iSocket;
       mob=sock->GetPlayer();
 
-      if (!sock->InputPending())   //no input pending to parse.
+      if (!sock->CommandPending())   //no input pending to parse.
         {
           continue;
         }
@@ -175,15 +174,12 @@ BOOL Server::PollSockets()
               break;
             }
 //No handle was found, pass on to command parsing
-          input=sock->PopInput();
+          input=sock->PopCommand();
           if (input=="")
             {
               break;
             }
-          if (!world->DoCommand(mob, input))
-            {
-              sock->Write("That is not a valid command.\n");
-            }
+          world->DoCommand(mob, input);
           break;
         }
 //login username prompt
@@ -193,7 +189,7 @@ BOOL Server::PollSockets()
           sock->AllocatePlayer();
 //we didn't have a mobile object before, now we need to set the mob pointer after allocation.
           mob = sock->GetPlayer();
-          input = sock->PopInput();
+          input = sock->PopCommand();
 //new player:
           if (input=="new")
             {
@@ -224,7 +220,7 @@ BOOL Server::PollSockets()
 //login password prompt
         case con_password:
         {
-          input = sock->PopInput();
+          input = sock->PopCommand();
 //sets the temp password to that specified by the user so that we can compare with the password that was loaded from the file.
           mob->SetTempPassword(input);
           if (!mob->ComparePassword())
@@ -245,7 +241,7 @@ BOOL Server::PollSockets()
 //login new username
         case con_newname:
         {
-          input = sock->PopInput();
+          input = sock->PopCommand();
           if (!IsValidUserName(input))
             {
               sock->Write("That is not a valid username. Usernames must contain 4-12 characters.\nWhat name would you like?\n");
@@ -267,7 +263,7 @@ BOOL Server::PollSockets()
         //login new password
         case con_newpass:
         {
-          input = sock->PopInput();
+          input = sock->PopCommand();
           if (!IsValidPassword(input))
             {
               sock->Write("That password isn't valid, please try again.\n");
@@ -282,7 +278,7 @@ BOOL Server::PollSockets()
 //login verify password
         case con_verpass:
         {
-          input = sock->PopInput();
+          input = sock->PopCommand();
           if (!IsValidPassword(input))
             {
               sock->Write("That password isn't valid, please try again.\n");

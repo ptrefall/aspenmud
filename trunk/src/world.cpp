@@ -158,17 +158,17 @@ void World::Copyover(Player* mobile)
   mobile->Write("Copyover failed!\n");
 }
 
-Server* World::GetServer(void) const
+Server* World::GetServer() const
 {
   return _server;
 }
 
-Log* World::GetLog(void) const
+Log* World::GetLog() const
 {
   return _log;
 }
 
-std::list <Player*> *World::GetPlayers(void) const
+std::list <Player*> *World::GetPlayers() const
 {
   return _users;
 }
@@ -296,7 +296,7 @@ Channel* World::FindChannel(const std::string &name)
   return NULL;
 }
 
-BOOL World::InitializeFiles(void)
+BOOL World::InitializeFiles()
 {
   struct stat *fs; //holds file stats
 //load our banner:
@@ -353,17 +353,17 @@ BOOL World::InitializeFiles(void)
   return true;
 }
 
-const char* World::GetBanner(void) const
+const char* World::GetBanner() const
 {
   return _banner;
 }
 
-const char* World::GetMotd(void) const
+const char* World::GetMotd() const
 {
   return _motd;
 }
 
-void World::Update(void) const
+void World::Update() const
 {
   std::list <Player*>::iterator pit;
   std::list<Player*>::iterator pitEnd;
@@ -465,7 +465,7 @@ BOOL World::ObjectExists(VNUM num)
   return (_objects->count(num)==0?false:true);
 }
 
-time_t World::GetRealUptime(void) const
+time_t World::GetRealUptime() const
 {
   return _ruptime;
 }
@@ -474,7 +474,7 @@ void World::SetRealUptime(time_t tm)
   _ruptime=tm;
 }
 
-time_t World::GetCopyoverUptime(void) const
+time_t World::GetCopyoverUptime() const
 {
   return _cuptime;
 }
@@ -1019,7 +1019,7 @@ BOOL World::CreateRoom(Room* room)
   return false;
 }
 
-void World::InitializeNums(void)
+void World::InitializeNums()
 {
   WriteLog("Initializing vnums for pool.");
   int max=0;

@@ -127,7 +127,7 @@ BOOL Menu::Attach(void)
     }
 
   _data = new in_data();
-  _data->handle=menu_handler;
+  _data->handle= new MenuInput();
   _data->args=(void*)this;
 
   _sock->SetInput(_data);
@@ -185,8 +185,7 @@ BOOL Menu::ShowMenu(void)
   return true;
 }
 
-
-INPUT(menu_handler)
+void MenuInput::Input(void* arg, const std::string &input)
 {
   Menu* m=(Menu*)arg;
   std::string::iterator it;
