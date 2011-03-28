@@ -31,9 +31,13 @@ int SCR_GetPrompt(lua_State* l);
 int SCR_SetPrompt(lua_State* l);
 
 int SCR_Save(lua_State* l);
+int SCR_Backup(lua_State* l);
 int SCR_Write(lua_State* l);
 int SCR_Message(lua_State* l);
 int SCR_SetOption(lua_State* l);
 int SCR_GetOption(lua_State* l);
+int SCR_OptionExists(lua_State* l);
+int SCR_ToggleOption(lua_State* l);
+int SCR_HasAccess(lua_State* l);
 #endif
 #endif
