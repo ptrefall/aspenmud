@@ -8,6 +8,7 @@
 #include "../command.h"
 #include "../event.h"
 #include "../eventargs.h"
+#include "../variant.h"
 #include "scr_world.h"
 #include "scr_player.h"
 
@@ -131,4 +132,51 @@ void SCR_Error(lua_State* l, const char* msg)
   lua_error(l);
 }
 
+Variant IndexToVariant(lua_State* l, int index)
+{
+  int type = 0;
+
+  if (lua_isnoneornil(l, index))
+    {
+      SCR_Error(l, "Specified index is either out of range or nil.");
+      return Variant();
+    }
+
+  type = lua_type(l, index);
+  switch(type)
+    {
+    default:
+      SCR_Error(l, "Can not convert the type at the specified index.");
+      return Variant();
+    case LUA_TNUMBER:
+      return Variant(lua_tonumber(l, index));
+    case LUA_TBOOLEAN:
+      return lua_toboolean(l, index);
+    case LUA_TSTRING:
+      return Variant(lua_tostring(l, index));
+    }
+}
+BOOL VariantToStack(lua_State* l, Variant& var)
+{
+  VARIABLE_TYPE type = var.Typeof();
+
+  switch(type)
+    {
+    case VAR_INT:
+      lua_pushinteger(l, var.GetInt());
+      return true;
+    case VAR_DOUBLE:
+      lua_pushnumber(l, var.GetDouble());
+      return true;
+    case VAR_BYTE:
+      lua_pushinteger(l, (int)var.GetByte());
+      return true;
+    case VAR_STR:
+      lua_pushstring(l, var.GetStr().c_str());
+      return true;
+    default:
+      SCR_Error(l, "Invalid variable type handled when pushing a variant to the stack.");
+      return false;
+    }
+}
 #endif

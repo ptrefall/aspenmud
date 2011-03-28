@@ -211,6 +211,5 @@ void MenuInput::Input(void* arg, const std::string &input)
       return;
     }
   option = m->GetDataByIndex(result);
-  m->Unattach();
   (option->callback)(m->GetMobile(), m, option->args, option->subitem);
 }

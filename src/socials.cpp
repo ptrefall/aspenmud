@@ -172,6 +172,8 @@ void Socials::InitializeDefaultSocials(void)
   AddSocial("cower", "You %v in a corner.", "%N %vs in a corner.", "You %v in fear from %T.", "%N %vs in fear from %T.", "%N %vs in fear from you.");
   AddSocial("cry", "You %v.", "%N %vs.", "You %v on %T's shoulder.", "%N %vs on %T's shoulder.", "%N %vs on your shoulder.");
   AddSocial("wink", "you %v suggestively", "%N %vs suggestively", "You %v suggestively at %T.", "%N %vs suggestively at %T.", "%N %vs suggestively at you.");
+  AddSocial("addict", "You stand and proclaim, \"I am %N, and I am a mud addict.\"", "%N stands and proclaims, \"I am %N, and I am a mud addict.\"", "You stand and proclaim to %T, \"I am %N, and I am a mud addict.\"", "%N stands and proclaims to %T, \"I am %N, and I am a mud addict.\"", "%N proclaims to you, \"I am %N, and I am a mud addict.\"");
+  AddSocial("aargh", "You shout, %v!", "%N shouts, %v!", "You shout, %v at %T.", "%N shouts, %v at %T.", "%N shouts, %v at you.");
   Save();
 #endif
 }

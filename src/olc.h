@@ -29,7 +29,7 @@ struct OLC_IN_DATA
   Entity* obj;
   OLC_DATA* olc;
   Player*mobile;
-  MENU_DATA* menu;
+  MENU_DATA* menudata;
 };
 
 BOOL InitializeOlc(void);

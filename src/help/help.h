@@ -12,6 +12,11 @@
 #include <tinyxml.h>
 
 #ifdef MODULE_HELP
+//we need OLC for this:
+#ifndef OLC
+#error OLC must be enabled for help to compile, or help must be disabled.
+#endif
+
 enum HELP_ENTRY_TYPE {h_combat, h_movement, h_communication};
 
 //the basic help node.

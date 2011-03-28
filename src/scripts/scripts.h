@@ -2,7 +2,6 @@
 *The main scripts header.
 *Initializes other script components.
 */
-
 #ifndef SCRIPTS_H
 #define SCRIPTS_H
 #include "../mud.h"
@@ -11,6 +10,7 @@
 #include "../player.h"
 #include "../server.h"
 #include "../socket.h"
+#include "../variant.h"
 
 #ifdef MODULE_SCRIPTING
 extern "C"
@@ -57,7 +57,9 @@ public:
   CMDExecute();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
-void SCR_Error(lua_State* l, const char* msg);
-#endif
 
+void SCR_Error(lua_State* l, const char* msg);
+Variant IndexToVariant(lua_State*l, int index);
+BOOL VariantToStack(lua_State* l, Variant &var);
+#endif
 #endif
