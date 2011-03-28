@@ -80,7 +80,7 @@ MENU(olc_menu_cb)
 
   arg->obj = obj;
   arg->mobile = mob;
-  arg->menu = option;
+  arg->menudata = option;
   arg->olc = olc;
   if (arg->olc->type == EDITOR)
     {
@@ -132,7 +132,7 @@ void OlcInput::Input(void* arg, const std::string &input)
     }
     }
   _sock->ClearInput();
-  data->menu->menu->ShowMenu();
+  data->menudata->menu->ShowMenu();
   delete data;
 }
 #endif

@@ -15,8 +15,6 @@ void name(Player* mob, Menu* menu, void*args, int subitem)
 //our menu callback.
 typedef void (*MENUCB)(Player*, Menu*, void*, int);
 
-class Menu;
-
 //menu data structure
 //used for holding information about each individual item.
 struct MENU_DATA
@@ -24,7 +22,6 @@ struct MENU_DATA
   std::string name;
   int subitem;
   MENUCB callback;
-  BOOL retAfter; //should we return back to the menu after calling the callback?
   void* args;
   Menu* menu;
 };

@@ -12,6 +12,8 @@
 #include "editor.h"
 
 #ifdef OLC
+EVENT(entity_description_editor_load);
+EVENT(entity_description_editor_save);
 OLC_INPUT(olc_entity_name);
 OLC_INPUT(olc_entity_description);
 #endif

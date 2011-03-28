@@ -14,9 +14,6 @@
 #include "variant.h"
 #include "command.h"
 #include "property.hpp"
-//events
-EVENT(entity_description_editor_load);
-EVENT(entity_description_editor_save);
 
 class Entity
 {

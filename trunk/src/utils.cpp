@@ -256,15 +256,15 @@ std::string Columnize(std::vector<std::string> *data, int cols, std::vector<std:
 
 FLAG BitSet(FLAG flag,int pos)
 {
-  return flag|=(1<<(pos-1));
+  return flag|=(1<<pos);
 }
 FLAG BitClear(FLAG flag,int pos)
 {
-  return flag&=~(1<<(pos-1));
+  return flag&=~(1<<pos);
 }
 BOOL BitIsSet(FLAG flag,int pos)
 {
-  return flag&(1<<(pos-1));
+  return flag&(1<<pos);
 }
 
 template <typename T>

@@ -4,6 +4,7 @@
 #include "scripts.h"
 #include "../player.h"
 #include "../world.h"
+#include "../variant.h"
 
 #ifdef MODULE_SCRIPTING
 static const struct luaL_reg player_table [] =
@@ -30,11 +31,11 @@ static const struct luaL_reg player_table [] =
   {"Save", SCR_Save},
   {"Write", SCR_Write},
   {"Message", SCR_Message},
-//{"SetOption", SCR_SetOption},
-//{"GetOption", SCR_GetOption},
+  {"SetOption", SCR_SetOption},
+  {"GetOption", SCR_GetOption},
 //{"OptionExists", SCR_OptionExists},
 //{"ToggleOption", SCR_ToggleOption},
-//{"HasAccess", SCR_HasAccess}
+  //{"HasAccess", SCR_HasAccess}
   {NULL, NULL}
 };
 
@@ -117,12 +118,19 @@ int SCR_SetPassword(lua_State *l)
     }
 
   UserData* udata = (UserData*)lua_touserdata(l, -2);
+  if (!udata)
+    {
+      SCR_Erorr("Argument 1 to \'SetPassword\' must be a player object.");
+      return 0;
+    }
   if (!IsPlayer(l, udata))
     {
+      SCR_Error(l, "Argument 1 to \'SetPassword\' must be a player object.");
       return 0;
     }
 
   ((Player*)udata->ptr)->SetPassword(password);
+
   return 0;
 }
 #endif
@@ -475,6 +483,85 @@ int SCR_Message(lua_State* l)
     }
 
   ((Player*)udata->ptr)->Message(type, message);
+  return 0;
+}
+
+int SCR_SetOption(lua_State* l)
+{
+  Variant var;
+  const char* str = NULL;
+  UserData* udata = NULL;
+
+  if (lua_gettop(l) != 3)
+    {
+      SCR_Error(l, "Invalid number of arguments to \'SetOption\'.");
+      return 0;
+    }
+
+  var = IndexToVariant(l, -1);
+  if (var.Typeof() == VAR_EMPTY)
+    {
+      SCR_Error(l, "Argument 3 to \'SetOption\' must be a float, integer, or string.");
+      return 0;
+    }
+
+  str = lua_tostring(l, -2);
+  if (!str)
+    {
+      SCR_Error(l, "Argument 2 to \'SetOption\' must be the option name.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -3);
+  if (!udata)
+    {
+      SCR_Error(l, "Argument 1 to \'SetOption\' must be a player object.");
+      return 0;
+    }
+  if (!IsPlayer(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to \'SetOption\' must be a player object.");
+      return 0;
+    }
+
+  ((Player*)udata->ptr)->SetOption(str, var);
+  return 0;
+}
+int SCR_GetOption(lua_State* l)
+{
+  UserData* udata = NULL;
+  const char* str = NULL;
+
+  if (lua_gettop(l) != 2)
+    {
+      SCR_Error(l, "Invalud number of arguments to \'GetOption\'.");
+      return 0;
+    }
+
+  str = lua_tostring(l, -1);
+  if (!str)
+    {
+      SCR_Error(l, "Argument 2 to \'GetOption\' must be the option to retrieve.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -2);
+  if (!udata)
+    {
+      SCR_Error(l, "Argument 1 to \'GetOption\' must be an object.");
+      return 0;
+    }
+  if (!IsPlayer(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to \'GetOption\' must be a player object.");
+      return 0;
+    }
+
+  if (VariantToStack(l, ((Player*)udata->ptr)->GetOption(str)->_data))
+    {
+      return 1;
+    }
+
   return 0;
 }
 #endif
