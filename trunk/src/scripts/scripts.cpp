@@ -2,6 +2,9 @@
 #include <sstream>
 #include <sys/time.h>
 #include "scripts.h"
+#include "scr_world.h"
+#include "scr_player.h"
+#include "scr_entity.h"
 #include "../mud.h"
 #include "../conf.h"
 #include "../world.h"
@@ -9,8 +12,6 @@
 #include "../event.h"
 #include "../eventargs.h"
 #include "../variant.h"
-#include "scr_world.h"
-#include "scr_player.h"
 
 #ifdef MODULE_SCRIPTING
 Script::Script()
@@ -64,7 +65,6 @@ BOOL InitializeScript(void)
 {
 #ifdef MODULE_SCRIPTING
   world->WriteLog("Initializing scripting.");
-  world->events.AddCallback("ScriptLoaded", EVENT_INIT_PLAYER_SCRIPT);
   world->commands.AddCommand(new CMDExecute());
   if (!InitWorldScript())
     {
@@ -74,6 +74,11 @@ BOOL InitializeScript(void)
   if (!InitPlayerScript())
     {
       world->WriteLog("Initialization of player script system failed.", ERR);
+      return false;
+    }
+  if (!InitEntityScript())
+    {
+      world->WriteLog("Initialization of entity script failed.", ERR);
       return false;
     }
 #endif
@@ -178,5 +183,22 @@ BOOL VariantToStack(lua_State* l, Variant& var)
       SCR_Error(l, "Invalid variable type handled when pushing a variant to the stack.");
       return false;
     }
+}
+
+BOOL IsPlayer(lua_State* l, UserData* udata)
+{
+  if (!udata)
+    {
+      SCR_Error(l, "Udata passed to IsPlayer was NULL.");
+      return false;
+    }
+
+  if ((udata->type != type_player) || (udata->ptr == NULL))
+    {
+      SCR_Error(l, "Invalid type.");
+      return false;
+    }
+
+  return true;
 }
 #endif

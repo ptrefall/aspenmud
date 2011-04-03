@@ -31,12 +31,11 @@ void InputHandle::Input(void* arg, const std::string &input)
 {
 }
 
-Socket::Socket(const int desc)
+Socket::Socket(const int desc):
+  BaseSocket(desc)
 {
-  _control = desc;
   _mobile=NULL;
   _Close=0;
-  _addr=new sockaddr_in();
   _input = new std::stack<in_data*>();
   _lastInput = time(NULL);
   _inSequence = false;
@@ -44,20 +43,12 @@ Socket::Socket(const int desc)
 Socket::~Socket()
 {
   in_data* data = NULL;
-  if (_control != -1)
-    {
-      close(_control);
-    }
   if (_mobile)
     {
       delete _mobile;
       _mobile=NULL;
     }
-  if (_addr)
-    {
-      delete _addr;
-      _addr=NULL;
-    }
+
   while (!_input->empty())
     {
       data = _input->top();
@@ -69,11 +60,6 @@ Socket::~Socket()
       delete data;
     }
   delete _input;
-}
-
-int Socket::GetControl() const
-{
-  return _control;
 }
 
 bool Socket::Read()
@@ -165,11 +151,6 @@ bool Socket::Read()
   return true;
 }
 
-void Socket::Write(const std::string &txt)
-{
-  _outBuffer += txt;
-}
-
 bool Socket::Flush()
 {
   int b=0, w=0;
@@ -199,7 +180,6 @@ bool Socket::Flush()
     }
   return true;
 }
-
 std::string Socket::GetInBuffer()
 {
 //we need to clean up extra junk at the end
@@ -208,20 +188,6 @@ std::string Socket::GetInBuffer()
       return "";
     }
   return _inBuffer.substr(0,_inBuffer.find_first_of("\n\r"));
-}
-
-void Socket::ClrInBuffer()
-{
-  _inBuffer.erase();
-}
-
-sockaddr_in* Socket::GetAddr() const
-{
-  return _addr;
-}
-void Socket::SetAddr(sockaddr_in* addr)
-{
-  memcpy(_addr,addr,sizeof(sockaddr_in));
 }
 
 ConType Socket::GetConnectionType() const

@@ -1,5 +1,5 @@
 /*
-*A class for handling sockets
+*A class for handling client sockets
 *Also handles telnet negotiation.
 */
 #ifndef SOCKET_H
@@ -13,6 +13,7 @@
 #include "mud.h"
 #include "conf.h"
 #include "player.h"
+#include "baseSocket.h"
 
 /*
 *This is the connection type that each player has, it is used to hold the state of their current connection.
@@ -43,14 +44,10 @@ struct in_data
   void* args;
 };
 
-class Socket
+class Socket:public BaseSocket
 {
-  int                  _control;
   std::stack <in_data*> *_input;
   std::queue<std::string> _cqueue;
-  sockaddr_in          *_addr;
-  std::string          _inBuffer;
-  std::string          _outBuffer;
   std::string _host;
   ConType _con;
   Player *_mobile;
@@ -64,22 +61,12 @@ public:
   *Param: [in] the FD to assign to the socket.
   */
   Socket  (const int desc );
-  ~Socket ( void );
-  /*
-  *Returns the "control" fd.
-  *Return: the fd associated with the socket.
-  */
-  int                  GetControl     ( void ) const;
+  ~Socket ();
   /*
   *Reads the pending data and places it in the sockets input buffer.
   *Return: True on success, false on failure.
   */
-  bool                 Read           ( void );
-  /*
-  *Appends the text to the output buffer.
-  *Param: [in] the data to append to the output buffer.
-  */
-  void                 Write          (const std::string &txt );
+  bool                 Read           ();
   /*
   *Flushes the sockets output buffer to the client.
   *Return: true on success, false on failure.
@@ -90,20 +77,7 @@ public:
   *Return: The input buffer of the socket.
   */
   std::string          GetInBuffer    ( void );
-  /*
-  *Clears the input buffer.
-  */
-  void                 ClrInBuffer    ( void );
-  /*
-  *Returns the address of the socket.
-  *Return: The socket's addr struct.
-  */
-  sockaddr_in* GetAddr() const;
-  /*
-  *coppies the address to the socket's address buffer.
-  *Param: [in] a pointer to a sockaddr_in structure.
-  */
-  void SetAddr(sockaddr_in* addr);
+
   /*
   *Returns the connection type
   *Return: the type of connection that is associated with this socket.

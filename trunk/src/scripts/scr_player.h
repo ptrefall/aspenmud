@@ -3,8 +3,13 @@
 #include "../mud.h"
 #include "../conf.h"
 #include "../player.h"
+#include "../entity.h"
+#include "../world.h"
+#include "../variant.h"
 #include "../event.h"
 #include "scripts.h"
+#include <string>
+#include <cstring>
 
 #ifdef MODULE_SCRIPTING
 EVENT(EVENT_INIT_PLAYER_SCRIPT);
@@ -18,7 +23,6 @@ int SCR_SetOnlineTime(lua_State* l);
 int SCR_SetFirstLogin(lua_State* l);
 int SCR_SetLastLogin(lua_State* l);
 #endif
-
 int SCR_GetTitle(lua_State* l);
 int SCR_SetTitle(lua_State*l);
 int SCR_GetLevel(lua_State* l);
@@ -29,7 +33,6 @@ int SCR_GetFirstLogin(lua_State* l);
 int SCR_GetLastLogin(lua_State* l);
 int SCR_GetPrompt(lua_State* l);
 int SCR_SetPrompt(lua_State* l);
-
 int SCR_Save(lua_State* l);
 int SCR_Backup(lua_State* l);
 int SCR_Write(lua_State* l);

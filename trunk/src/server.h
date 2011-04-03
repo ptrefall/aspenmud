@@ -3,8 +3,8 @@
 *Handles incoming connections, and passes info to the parser.
 */
 
-#ifndef HEADER_SERVER
-#define HEADER_SERVER
+#ifndef SERVER_H
+#define SERVER_H
 #include "mud.h"
 #include "conf.h"
 #include "socket.h"

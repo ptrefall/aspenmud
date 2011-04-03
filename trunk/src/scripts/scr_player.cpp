@@ -72,23 +72,6 @@ BOOL InitPlayerScript(void)
   return true;
 }
 
-static bool IsPlayer(lua_State* l, UserData* udata)
-{
-  if (!udata)
-    {
-      SCR_Error(l, "Udata passed to IsPlayer was NULL.");
-      return false;
-    }
-
-  if ((udata->type != type_player) || (udata->ptr == NULL))
-    {
-      SCR_Error(l, "Invalid type.");
-      return false;
-    }
-
-  return true;
-}
-
 #ifndef SCRIPT_SECURE
 int SCR_GetPassword(lua_State* l)
 {
