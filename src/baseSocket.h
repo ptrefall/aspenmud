@@ -1,0 +1,64 @@
+#ifndef BASE_SOCKET_H
+#define BASE_SOCKET_H
+#include "mud.h"
+#include "conf.h"
+#include <string>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+
+class BaseSocket
+{
+protected:
+  int _control;
+  sockaddr_in          *_addr;
+  std::string          _inBuffer;
+  std::string          _outBuffer;
+public:
+  /*
+  *Constructer
+  *Param: [in] the FD to assign to the socket.
+  */
+  BaseSocket  (const int desc );
+  ~BaseSocket();
+  /*
+  *Returns the "control" fd.
+  *Return: the fd associated with the socket.
+  */
+  virtual int                  GetControl     ( void ) const;
+  /*
+  *Reads the pending data and places it in the sockets input buffer.
+  *Return: True on success, false on failure.
+  */
+  virtual bool                 Read           ();
+  /*
+  *Appends the text to the output buffer.
+  *Param: [in] the data to append to the output buffer.
+  */
+  virtual void                 Write          (const std::string &txt );
+  /*
+  *Flushes the sockets output buffer to the client.
+  *Return: true on success, false on failure.
+  */
+  virtual bool                 Flush          ( void );
+  /*
+  *Returns the input buffer.
+  *Return: The input buffer of the socket.
+  */
+  virtual std::string          GetInBuffer    ( void );
+  /*
+  *Clears the input buffer.
+  */
+  virtual void                 ClrInBuffer    ( void );
+  /*
+  *Returns the address of the socket.
+  *Return: The socket's addr struct.
+  */
+  virtual sockaddr_in* GetAddr() const;
+  /*
+  *coppies the address to the socket's address buffer.
+  *Param: [in] a pointer to a sockaddr_in structure.
+  */
+  virtual void SetAddr(sockaddr_in* addr);
+};
+#endif

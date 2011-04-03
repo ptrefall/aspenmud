@@ -17,5 +17,6 @@ int SCR_GetPlayers(lua_State* l);
 int SCR_GetBanner(lua_State* l);
 int SCR_GetMotd(lua_State* l);
 int SCR_WriteLog(lua_State* l);
+int SCR_AddChannel(lua_State* l);
 #endif
 #endif

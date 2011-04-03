@@ -10,12 +10,11 @@
 static const struct luaL_reg world_table [] =
 {
   {"Shutdown", SCR_Shutdown},
-//{"GetServer", SCR_GetServer},
   {"GetPlayers", SCR_GetPlayers},
   {"FindPlayer", SCR_FindPlayer},
 //{"AddCommand", SCR_AddCommand},
 //{"RemoveCommand", SCR_RemoveCommand},
-//{"AddChannel", SCR_AddChannel},
+  {"AddChannel", SCR_AddChannel},
 //{"FindChannel", SCR_FindChannel},
 //{"RegisterComponent", SCR_RegisterComponent},
 //{"CreateComponent", SCR_CreateComponent},
@@ -111,4 +110,10 @@ int SCR_WriteLog(lua_State* l)
   world->WriteLog(lua_tostring(l, -1), SCRIPT);
   return 0;
 }
+
+int SCR_AddChannel(lua_State* l)
+{
+  return 0;
+}
+
 #endif
