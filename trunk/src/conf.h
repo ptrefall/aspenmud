@@ -90,6 +90,7 @@ enum ExitDirection {nowhere, north, south, east, west, northeast, northwest, sou
 #define MODULE_SCRIPTING
 #define MODULE_SYSLOG
 #define MODULE_HELP
+#define MODULE_INTERMUD
 #define OLC
 //if this is defined, the program will try to secure it's process environment when
 //starting up. Leaving it defined can't hurt, but comment it out if this is giving you some sort of problem.
