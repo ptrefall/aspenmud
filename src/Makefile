@@ -25,7 +25,7 @@ FORMATTER = astyle
 FORMAT_FLAGS = --style=gnu
 
 #modules
-MODULES = scripts syslog help components
+MODULES = scripts syslog help components intermud
 
 #dependencies
 DEPS = tinyxml lua
