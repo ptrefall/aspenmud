@@ -12,6 +12,11 @@
 #include <cstring>
 #include <cstdlib>
 
+BaseSocket::BaseSocket()
+{
+  _control = -1;
+  _addr = NULL;
+}
 BaseSocket::BaseSocket(const int desc)
 {
   _control = desc;
@@ -22,6 +27,7 @@ BaseSocket::~BaseSocket()
   if (_control != -1)
     {
       close(_control);
+      _control = -1;
     }
   if (_addr)
     {
@@ -107,6 +113,10 @@ void BaseSocket::ClrInBuffer()
 {
   _inBuffer.erase();
 }
+BOOL BaseSocket::InputPending() const
+{
+  return (_inBuffer.length()>0?true:false);
+}
 
 sockaddr_in* BaseSocket::GetAddr() const
 {
@@ -115,4 +125,48 @@ sockaddr_in* BaseSocket::GetAddr() const
 void BaseSocket::SetAddr(sockaddr_in* addr)
 {
   memcpy(_addr,addr,sizeof(sockaddr_in));
+}
+
+BOOL BaseSocket::Close()
+{
+  if (_control != -1)
+    {
+      close(_control);
+      _control = -1;
+      return true;
+    }
+
+  return false;
+}
+BOOL BaseSocket::Connect(const char* address, unsigned short port)
+{
+  if (_control != -1)
+    {
+      return false;
+    }
+  if (!_addr)
+    {
+      _addr = new sockaddr_in();
+    }
+
+  memset(_addr, 0, sizeof(sockaddr_in));
+  if (!inet_aton(address, &(_addr->sin_addr)))
+    {
+      return false;
+    }
+  _addr->sin_family = AF_INET;
+  _addr->sin_port = htons(port);
+
+  _control = socket(AF_INET, SOCK_STREAM, 0);
+  if (_control == -1)
+    {
+      return false;
+    }
+
+  if (connect(_control, (sockaddr*)_addr, sizeof(sockaddr_in)) == -1)
+    {
+      return false;
+    }
+
+  return true;
 }

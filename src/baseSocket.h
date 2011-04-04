@@ -15,6 +15,7 @@ protected:
   std::string          _inBuffer;
   std::string          _outBuffer;
 public:
+  BaseSocket();
   /*
   *Constructer
   *Param: [in] the FD to assign to the socket.
@@ -50,6 +51,7 @@ public:
   *Clears the input buffer.
   */
   virtual void                 ClrInBuffer    ( void );
+  virtual BOOL InputPending() const;
   /*
   *Returns the address of the socket.
   *Return: The socket's addr struct.
@@ -60,5 +62,17 @@ public:
   *Param: [in] a pointer to a sockaddr_in structure.
   */
   virtual void SetAddr(sockaddr_in* addr);
+  /*
+  *Closes the socket, if one is actually open.
+  *Return: True if the socket could be closed, false otherwise.
+  */
+  BOOL Close();
+  /*
+  *Creates a socket and connects it to the specified address.
+  *Param: [in] the address to connect to.
+  *Param: [in] the port to connect to.
+  *Return: True if the socket could be created and connected, false otherwise.
+  */
+  BOOL Connect(const char* address, unsigned short port);
 };
 #endif
