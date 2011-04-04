@@ -79,6 +79,12 @@ void BaseSocket::Write(const std::string &txt)
 {
   _outBuffer += txt;
 }
+size_t BaseSocket::Write(const void* buffer, size_t count)
+{
+  Flush();
+  return write(_control, buffer, count);
+}
+
 bool BaseSocket::Flush()
 {
   int b=0, w=0;
