@@ -36,7 +36,14 @@ public:
   *Appends the text to the output buffer.
   *Param: [in] the data to append to the output buffer.
   */
-  virtual void                 Write          (const std::string &txt );
+  virtual void                 Write(const std::string &txt );
+  /*
+  *Flushes the current buffer and writes len bytes, stored in buffer.
+  *Param: [in] a pointer to the buffer to write.
+  [in] the number of bytes to write.
+  [Return: The number of bytes written.
+  */
+  virtual size_t Write(const void* buffer, size_t count);
   /*
   *Flushes the sockets output buffer to the client.
   *Return: true on success, false on failure.
