@@ -26,9 +26,6 @@ public:
 //Message types:
 enum MessageType {MSG_NORMAL, MSG_ERROR,MSG_INFO,MSG_CRITICAL,MSG_CHANNEL,MSG_LIST};
 
-EVENT(HB_OnlineTime);
-EVENT(HB_AUTOSAVE);
-
 class Player:public Living
 {
   unsigned char *_password;
@@ -167,6 +164,10 @@ public:
   *[in] the color.
   */
   void AddMessage(MessageType type, const std::string &color);
+
+//events
+  static EVENT(OnlineTime);
+  static EVENT(AutoSave);
 };
 
 #endif

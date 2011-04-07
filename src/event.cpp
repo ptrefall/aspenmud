@@ -185,7 +185,7 @@ BOOL EventManager::CallEvent(const std::string &name, EventArgs* args, void* cal
   (_events[name])->Invoke(args,caller);
   return true;
 }
-BOOL EventManager::AddCallback(const std::string &name, EVENTCB cb)
+BOOL EventManager::AddCallback(const std::string &name, EVENTFUNC cb)
 {
   if (!IsEventRegistered(name))
     {
