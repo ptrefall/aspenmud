@@ -1,41 +1,78 @@
 #include <sys/time.h>
 #include <string>
-#include <list>
+#include <boost/function.hpp>
+#include <vector>
 #include "event.h"
 #include "exception.h"
 
+Event::Event()
+{
+  _id = 0;
+  _callbacks = new std::vector<EventContainer*>();
+}
 Event::~Event()
 {
+  std::vector<EventContainer*>::iterator it, itEnd;
+
+  itEnd = _callbacks->end();
+  for (it = _callbacks->begin(); it != itEnd; ++it)
+    {
+      delete (*it);
+    }
+  delete _callbacks;
+  _callbacks = NULL;
 }
 
-BOOL Event::Add(const EVENTCB cb)
+UINT Event::Add(const EVENTFUNC cb)
 {
-  _callbacks.push_back(cb);
-  return true;
+  EventContainer* c = new EventContainer();
+  if (!c)
+    {
+      return 0;
+    }
+
+  _id++;
+  c->id = _id;
+  c->cb = cb;
+  _callbacks->push_back(c);
+  return c->id;
 }
-BOOL Event::Remove(const EVENTCB cb)
+BOOL Event::Remove(UINT id)
 {
-  _callbacks.remove(cb);
-  return true;
+  std::vector<EventContainer*>::iterator it, itEnd;
+
+  itEnd = _callbacks->end();
+  for (it = _callbacks->begin(); it != itEnd; ++it)
+    {
+      if (id == (*it)->id)
+        {
+          _callbacks->erase(it);
+          return true;
+        }
+    }
+
+  return false;
 }
 
-BOOL Event::operator +=(const EVENTCB cb)
+BOOL Event::operator +=(const EVENTFUNC cb)
 {
   Add(cb);
   return true;
 }
-BOOL Event::operator -=(const EVENTCB cb)
+BOOL Event::operator -=(UINT id)
 {
-  Remove(cb);
+  Remove(id);
   return true;
 }
 
 void Event::Invoke(EventArgs *args,void*caller)
 {
-  std::list <EVENTCB>::iterator it;
-  for (it=_callbacks.begin(); it!=_callbacks.end(); it++)
+  std::vector <EventContainer*>::iterator it, itEnd;
+
+  itEnd = _callbacks->end();
+  for (it = _callbacks->begin(); it != itEnd; ++it)
     {
-      (*it)(args,caller);
+      (*it)->cb(args,caller);
     }
 }
 
@@ -60,21 +97,24 @@ void DelayedEvent::SetDelay(int sec,int msec)
 void DelayedEvent::Invoke(EventArgs *args,void* caller)
 {
   timeval curtime;
-  std::list <EVENTCB>::iterator it;
+  std::vector <EventContainer*>::iterator it, itEnd;
   int secs; //seconds between last time and now
   int msecs; //microseconds between last time and now
   int felapse; //the full elapsed time that _fireTime requires.
   int celapse; //the time elapsed between now and last call
+
   gettimeofday(&curtime,NULL);
   secs=(int)(curtime.tv_sec-_lastTime.tv_sec)*1000;
   msecs=(int)(curtime.tv_usec-_lastTime.tv_usec)/1000;
   felapse=((_fireTime.tv_sec*1000)+(_fireTime.tv_usec/1000));
   celapse=msecs+secs;
+
   if (celapse>=felapse)   //the time between current time and last time elapsed is greater or equal to fire time
     {
-      for (it=_callbacks.begin(); it!=_callbacks.end(); it++)
+      itEnd = _callbacks->end();
+      for (it = _callbacks->begin(); it != itEnd; ++it)
         {
-          (*it)(args,caller);
+          (*it)->cb(args,caller);
         }
 //update the last time the event was fired:
       gettimeofday(&_lastTime,NULL);

@@ -1,9 +1,10 @@
 #ifndef EVENT_H
 #define EVENT_H
 #include <sys/time.h>
-#include <list>
+#include <vector>
 #include <map>
 #include <string>
+#include <boost/function.hpp>
 #include "mud.h"
 #include "conf.h"
 
@@ -22,6 +23,17 @@ public:
 *Our main event callback
 */
 typedef void (*EVENTCB)(EventArgs*,void*);
+typedef boost::function<void (EventArgs*, void*)> EVENTFUNC;
+
+/*
+*This holds our event function object, as well as an ID associated with each event.
+*/
+struct EventContainer
+{
+  EVENTFUNC cb;
+  UINT id;
+};
+
 /*
 *Event function declarations
 */
@@ -35,16 +47,18 @@ void name(EventArgs* args,void* caller)
 class Event
 {
 protected:
-  std::list <EVENTCB> _callbacks;
+  std::vector<EventContainer*> *_callbacks;
+  UINT _id;
 public:
+  Event();
   virtual ~Event();
   /*
   *Add and remove a callback from the event list.
   */
-  virtual BOOL operator +=(const EVENTCB cb);
-  virtual BOOL operator -=(const EVENTCB cb);
-  virtual BOOL Add(const EVENTCB cb);
-  virtual BOOL Remove(const EVENTCB cb);
+  virtual BOOL operator +=(const EVENTFUNC cb);
+  virtual BOOL operator -=(UINT id);
+  virtual UINT Add(const EVENTFUNC cb);
+  virtual BOOL Remove(UINT id);
   /*
   *Trigger all events in the callback list, passing args.
   *Params: [in] EventArgs specific to this event.
