@@ -168,6 +168,8 @@ public:
   *Return: a pointer to the data, NULL if index was invalid.
   */
   OLC_DATA* GetOlcByIndex(int index);
+  static EVENT(load_description);
+  static EVENT(save_description);
 #endif
 
 };

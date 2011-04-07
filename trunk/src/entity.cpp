@@ -2,6 +2,7 @@
 #include <list>
 #include <map>
 #include <tinyxml.h>
+#include <boost/bind.hpp>
 #include "entity.h"
 #include "world.h"
 #include "room.h"
@@ -12,8 +13,6 @@
 #include "editor.h"
 
 #ifdef OLC
-EVENT(entity_description_editor_load);
-EVENT(entity_description_editor_save);
 OLC_INPUT(olc_entity_name);
 OLC_INPUT(olc_entity_description);
 #endif
@@ -469,12 +468,12 @@ OLC_INPUT(olc_entity_description)
 {
   Editor* edit = new Editor();
   edit->SetArg(ed);
-  edit->events.AddCallback("load", entity_description_editor_load);
-  edit->events.AddCallback("save", entity_description_editor_save);
+  edit->events.AddCallback("load", boost::bind(&Entity::load_description, _1, _2));
+  edit->events.AddCallback("save", boost::bind(&Entity::save_description, _1, _2));
   edit->EnterEditor(mob);
 }
 
-EVENT(entity_description_editor_load)
+CEVENT(Entity, load_description)
 {
   OneArg* arg = (OneArg*)args;
   Editor* ed = (Editor*)arg->_arg;
@@ -490,7 +489,7 @@ EVENT(entity_description_editor_load)
       ed->Add((*it));
     }
 }
-EVENT(entity_description_editor_save)
+CEVENT(Entity, save_description)
 {
   OneArg* arg = (OneArg*)args;
   Editor* ed = (Editor*)arg->_arg;

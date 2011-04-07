@@ -39,6 +39,9 @@ struct EventContainer
 */
 #define EVENT(name)\
 void name(EventArgs* args,void* caller)
+#define CEVENT(c, name)\
+void c::name(EventArgs* args,void* caller)
+
 
 /*
 *Main event class.
@@ -142,7 +145,7 @@ public:
   *Param: [in] the name of the event.
   *[in] the callback.
   */
-  BOOL AddCallback(const std::string &name, EVENTCB callback);
+  BOOL AddCallback(const std::string &name, EVENTFUNC callback);
 };
 
 #endif

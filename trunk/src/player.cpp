@@ -5,6 +5,7 @@
 #include <sstream>
 #include <list>
 #include <cstring>
+#include <boost/bind.hpp>
 #include "player.h"
 #include "event.h"
 #include "utils.h"
@@ -46,8 +47,8 @@ Player::Player()
   events.RegisterEvent("EnterGame", new Event());
   events.RegisterEvent("LeaveGame", new Event());
 
-  events.AddCallback("HeartBeat", HB_OnlineTime);
-  events.AddCallback("HeartBeat", HB_AUTOSAVE);
+  events.AddCallback("HeartBeat", boost::bind(&Player::OnlineTime, _1, _2));
+  events.AddCallback("HeartBeat", boost::bind(&Player::AutoSave, _1, _2));
 }
 Player::~Player()
 {
@@ -482,13 +483,13 @@ void Player::AddMessage(MessageType type, const std::string &color)
   (*_messages)[type]=color;
 }
 
-EVENT(HB_OnlineTime)
+CEVENT(Player, OnlineTime)
 {
   Player* person=(Player*)caller;
   person->SetOnlineTime(person->GetOnlineTime()+LIVING_PULSE);
 }
 
-EVENT(HB_AUTOSAVE)
+CEVENT(Player, AutoSave)
 {
   Player* person = (Player*)caller;
   int saves=0;
