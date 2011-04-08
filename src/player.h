@@ -166,8 +166,8 @@ public:
   void AddMessage(MessageType type, const std::string &color);
 
 //events
-  static EVENT(OnlineTime);
-  static EVENT(AutoSave);
+  EVENT(OnlineTime);
+  EVENT(AutoSave);
 };
 
 #endif

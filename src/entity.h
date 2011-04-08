@@ -150,7 +150,7 @@ public:
   *[in] The type of OLC input function.
   *[in] The callback to use when this option is called.
   */
-  void AddOlc(const std::string &name, const std::string &prompt, OLC_INPUT_TYPE type, FP_INPUT callback);
+  void AddOlc(const std::string &name, const std::string &prompt, OLC_INPUT_TYPE type, OLCFUNC callback);
   /*
   *Used for removing an olc by name.
   *Param: [in] the name of the olc node to remove.
@@ -168,6 +168,10 @@ public:
   *Return: a pointer to the data, NULL if index was invalid.
   */
   OLC_DATA* GetOlcByIndex(int index);
+
+//callbacks
+  OLC_INPUT(OlcName);
+  OLC_INPUT(OlcDescription);
   static EVENT(load_description);
   static EVENT(save_description);
 #endif

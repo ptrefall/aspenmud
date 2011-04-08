@@ -47,8 +47,8 @@ Player::Player()
   events.RegisterEvent("EnterGame", new Event());
   events.RegisterEvent("LeaveGame", new Event());
 
-  events.AddCallback("HeartBeat", boost::bind(&Player::OnlineTime, _1, _2));
-  events.AddCallback("HeartBeat", boost::bind(&Player::AutoSave, _1, _2));
+  events.AddCallback("HeartBeat", boost::bind(&Player::OnlineTime, this, _1, _2));
+  events.AddCallback("HeartBeat", boost::bind(&Player::AutoSave, this, _1, _2));
 }
 Player::~Player()
 {
@@ -485,28 +485,26 @@ void Player::AddMessage(MessageType type, const std::string &color)
 
 CEVENT(Player, OnlineTime)
 {
-  Player* person=(Player*)caller;
-  person->SetOnlineTime(person->GetOnlineTime()+LIVING_PULSE);
+  SetOnlineTime(GetOnlineTime()+LIVING_PULSE);
 }
 
 CEVENT(Player, AutoSave)
 {
-  Player* person = (Player*)caller;
   int saves=0;
 
-  if (!person->variables.FindProperty("autosaves"))
+  if (!variables.FindProperty("autosaves"))
     {
-      person->variables.AddProperty("autosaves", Variant(saves));
+      variables.AddProperty("autosaves", Variant(saves));
       return;
     }
 
-  saves = person->variables.GetPropertyRef("autosaves").GetInt();
+  saves = variables.GetPropertyRef("autosaves").GetInt();
   saves++;
   if (saves >= 150)
     {
       saves = 0;
-      person->Save();
-      person->Message(MSG_INFO, "Autosaving.");
+      Save();
+      Message(MSG_INFO, "Autosaving.");
     }
-  person->variables.GetPropertyRef("autosaves").SetInt(saves);
+  variables.GetPropertyRef("autosaves").SetInt(saves);
 }

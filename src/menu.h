@@ -58,6 +58,7 @@ public:
   BOOL Unattach(void);
   BOOL ShowMenu(void);
 };
+
 class MenuInput:public InputHandle
 {
 public:

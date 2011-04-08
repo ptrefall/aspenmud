@@ -5,6 +5,7 @@
 #ifndef OLC_H
 #define OLC_H
 #include <string>
+#include <boost/function.hpp>
 #include "mud.h"
 #include "conf.h"
 #include "command.h"
@@ -12,16 +13,12 @@
 #include "editor.h"
 
 #ifdef OLC
-//input defines
-#define OLC_INPUT(name)\
-void name(Entity* ed, Player* mob, const Variant* input)
-
 struct OLC_DATA
 {
   std::string name; //the name of the option.
   std::string prompt;
   OLC_INPUT_TYPE type;
-  FP_INPUT callback;
+  OLCFUNC callback;
 };
 
 struct OLC_IN_DATA
@@ -39,7 +36,9 @@ public:
   CMDOedit();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+
 MENU(olc_menu_cb);
+
 class OlcInput:public InputHandle
 {
 public:
