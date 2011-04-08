@@ -399,7 +399,7 @@ std::vector<std::string>* Entity::GetAliases()
 }
 
 #ifdef OLC
-void Entity::AddOlc(const std::string &name, const std::string &prompt, OLC_INPUT_TYPE type, FP_INPUT callback)
+void Entity::AddOlc(const std::string &name, const std::string &prompt, OLC_INPUT_TYPE type, OLCFUNC callback)
 {
   struct OLC_DATA* data = NULL;
   if ((name == "") || (callback == NULL))
