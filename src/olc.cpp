@@ -41,7 +41,7 @@ BOOL CMDOedit::Execute(const std::string &verb, Player* mobile,std::vector<std::
     }
 
   std::vector <struct OLC_DATA*> entries;
-  std::vector <struct OLC_DATA*>::iterator it;
+  std::vector <struct OLC_DATA*>::iterator it, itEnd;
   Menu* m = NULL;
   int count;
 
@@ -53,7 +53,8 @@ BOOL CMDOedit::Execute(const std::string &verb, Player* mobile,std::vector<std::
     }
 
   m = new Menu(mobile);
-  for (it = entries.begin(), count = 1; it != entries.end(); it++, count++)
+  itEnd = entries.end();
+  for (it = entries.begin(), count = 1; it != itEnd; ++it, count++)
     {
       m->AddItem((*it)->name, olc_menu_cb, (void*)obj, count);
     }
@@ -70,13 +71,13 @@ BOOL CMDOedit::Execute(const std::string &verb, Player* mobile,std::vector<std::
 */
 MENU(olc_menu_cb)
 {
-  Entity* obj = (Entity*)args;
-  MENU_DATA* option = NULL;
-  OLC_DATA* olc = NULL;
+  Entity* obj = (Entity*)args; //the object we are editing.
+  MENU_DATA* option = NULL; //the option chosen in the menu.
+  OLC_DATA* olc = NULL; //the olc entry found on the object being edited.
 
-  option = menu->GetDataByIndex(subitem);
-  olc = obj->GetOlcByIndex(subitem);
-  OLC_IN_DATA*arg = new OLC_IN_DATA();
+  option = menu->GetDataByIndex(subitem); //gets the pointer to the menu option, given the number (subitem) that the user chose.
+  olc = obj->GetOlcByIndex(subitem); //gets the olc item associated with the object.
+  OLC_IN_DATA*arg = new OLC_IN_DATA(); //the input data that gets passed around while the user is editing.
 
   arg->obj = obj;
   arg->mobile = mob;
@@ -135,4 +136,6 @@ void OlcInput::Input(void* arg, const std::string &input)
   data->menudata->menu->ShowMenu();
   delete data;
 }
+
+
 #endif

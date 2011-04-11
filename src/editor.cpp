@@ -219,7 +219,7 @@ void Editor::List(BOOL num)
     }
 }
 
-void Editor::Add(const std::string &line)
+void Editor::Add(const std::string &line, BOOL quiet)
 {
   std::stringstream st;
   std::vector <std::string>::iterator it;
@@ -228,15 +228,21 @@ void Editor::Add(const std::string &line)
   if (_cursor==-1)
     {
       _lines.push_back(line);
-      st << "Line " << _lines.size() << " added.";
-      _mobile->Message(MSG_INFO,st.str());
+      if (!quiet)
+        {
+          st << "Line " << _lines.size() << " added.";
+          _mobile->Message(MSG_INFO,st.str());
+        }
     }
   else
     {
 //the cursor is pointing to the insertion point; jump the iterator there and insert.
       for (it=_lines.begin(),i=0; i!=_cursor; i++,it++);
       _lines.insert(it,line);
-      _mobile->Message(MSG_INFO,"Line inserted.");
+      if (!quiet)
+        {
+          _mobile->Message(MSG_INFO,"Line inserted.");
+        }
       _cursor++;
     }
 }

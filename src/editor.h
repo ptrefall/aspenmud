@@ -29,7 +29,7 @@ public:
   virtual void Abort(void);
   virtual void Quit(void);
   virtual void List(BOOL lnum);
-  virtual void Add(const std::string &line);
+  virtual void Add(const std::string &line, BOOL quiet = false);
   virtual void Insert(int index);
   virtual void Delete(void);
   virtual void Delete(int index);

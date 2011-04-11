@@ -172,8 +172,8 @@ public:
 //callbacks
   OLC_INPUT(OlcName);
   OLC_INPUT(OlcDescription);
-  static EVENT(load_description);
-  static EVENT(save_description);
+  EVENT(LoadDescription);
+  EVENT(SaveDescription);
 #endif
 
 };
