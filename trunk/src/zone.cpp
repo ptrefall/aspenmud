@@ -1,7 +1,7 @@
 #include <string>
 #include <list>
 #include <tinyxml.h>
-#include <cstdio>
+#include <boost/bind.hpp>
 #include <sys/stat.h>
 #include "zone.h"
 #include "world.h"
@@ -30,7 +30,7 @@ Zone::~Zone()
     }
 }
 
-std::string Zone::GetName(void) const
+std::string Zone::GetName() const
 {
   return _name;
 }
@@ -39,7 +39,7 @@ void Zone::SetName(const std::string &name)
   _name=name;
 }
 
-int Zone::GetMaxRooms(void) const
+int Zone::GetMaxRooms() const
 {
   return _maxRooms;
 }
@@ -138,13 +138,13 @@ void Zone::Deserialize(TiXmlElement* zone)
 }
 
 
-BOOL InitializeZones(void)
+BOOL InitializeZones()
 {
   struct stat FInfo;
   world->WriteLog("Initializing areas.");
   if ((stat(AREA_FILE,&FInfo))!=-1)
     {
-      LoadZones();
+      Zone::LoadZones();
     }
   else
     {
@@ -187,13 +187,16 @@ BOOL InitializeZones(void)
 #endif
 
   zone_saves = 0;
-  world->events.AddCallback("WorldPulse", AUTOSAVE_ZONES);
-  world->events.AddCallback("Shutdown", SHUTDOWN_ZONES);
-  world->events.AddCallback("Copyover", SHUTDOWN_ZONES);
+  world->events.AddCallback("WorldPulse",
+                            boost::bind(&Zone::Autosave, _1, _2));
+  world->events.AddCallback("Shutdown",
+                            boost::bind(&Zone::Shutdown, _1, _2));
+  world->events.AddCallback("Copyover",
+                            boost::bind(&Zone::Shutdown, _1, _2));
   return true;
 }
 
-BOOL SaveZones(void)
+BOOL Zone::SaveZones()
 {
   std::vector<Zone*> *zones=new std::vector<Zone*>();
   world->GetZones(zones);
@@ -218,7 +221,7 @@ BOOL SaveZones(void)
   doc.SaveFile(AREA_FILE);
   return true;
 }
-BOOL LoadZones(void)
+BOOL Zone::LoadZones()
 {
   TiXmlDocument doc(AREA_FILE);
   if (!doc.LoadFile())
@@ -249,16 +252,16 @@ BOOL LoadZones(void)
   return true;
 }
 
-EVENT(AUTOSAVE_ZONES)
+CEVENT(Zone, Autosave)
 {
   zone_saves++;
   if (zone_saves >= 150)
     {
-      SaveZones();
+      Zone::SaveZones();
       zone_saves = 0;
     }
 }
-EVENT(SHUTDOWN_ZONES)
+CEVENT(Zone, Shutdown)
 {
-  SaveZones();
+  Zone::SaveZones();
 }

@@ -170,7 +170,6 @@ public:
   OLC_DATA* GetOlcByIndex(int index);
 
 //callbacks
-  OLC_INPUT(OlcName);
   OLC_INPUT(OlcDescription);
   EVENT(LoadDescription);
   EVENT(SaveDescription);

@@ -22,7 +22,7 @@ public:
   *Retrieves the set name of the zone.
   *\return The name of the zone, or "" if a name hasn't been set.
   */
-  std::string GetName(void) const;
+  std::string GetName() const;
   /**
   *Sets the name of the zone object.
   *\param name The name of the zone.
@@ -34,7 +34,7 @@ public:
   *\return The number of max rooms.
   *\note The number of max rooms returned may or may not be higher than the actual amount of rooms in the zone.
   */
-  int GetMaxRooms(void) const;
+  int GetMaxRooms() const;
   /**
   *Sets the number of max rooms that the zone can hold.
   *\param max [in] The number of rooms this zone should be able to hold.
@@ -55,12 +55,12 @@ public:
 
   virtual void Serialize(TiXmlElement* root);
   virtual void Deserialize(TiXmlElement* zone);
+
+  static BOOL SaveZones();
+  static BOOL LoadZones();
+  static EVENT(Autosave);
+  static EVENT(Shutdown);
 };
 
-BOOL InitializeZones(void);
-BOOL SaveZones(void);
-BOOL LoadZones();
-
-EVENT(AUTOSAVE_ZONES);
-EVENT(SHUTDOWN_ZONES);
+BOOL InitializeZones();
 #endif

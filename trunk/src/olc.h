@@ -74,6 +74,6 @@ public:
 *[in] a function object holding the getter.
 *[in] A function object holding the setter.
 */
-void OlcString(Entity* ed, Player* mob, const Variant* input, boost::function<std::string ()>, boost::function<void (std::string)>);
+void OlcString(Entity* ed, Player* mob, const Variant* input, boost::function<std::string ()> get, boost::function<void (const std::string&)> set);
 #endif
 #endif
