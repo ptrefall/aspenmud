@@ -146,6 +146,6 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
       other->SetDirection(GetDirectionByName(dir));
       room->AddExit(other);
     }
-  SaveZones();
+  Zone::SaveZones();
   return true;
 }

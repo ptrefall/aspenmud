@@ -3,6 +3,7 @@
 #include <map>
 #include <tinyxml.h>
 #include <boost/bind.hpp>
+#include <boost/bind/protect.hpp>
 #include "entity.h"
 #include "world.h"
 #include "room.h"
@@ -24,7 +25,10 @@ Entity::Entity(void)
   _aliases = new std::vector<std::string>();
 #ifdef OLC
   _olcs = new std::vector<struct OLC_DATA*>();
-  AddOlc("name", "Please enter the name of the object", STRING, boost::bind(&Entity::OlcName, this, _1, _2, _3));
+  AddOlc("name", "Please enter the name of the object", STRING,
+         boost::bind(OlcString, _1, _2, _3,
+                     boost::protect(boost::bind(&Entity::GetName, this)),
+                     boost::protect(boost::bind(&Entity::SetName, this, _1))));
   AddOlc("description", "Editing object description", EDITOR, boost::bind(&Entity::OlcDescription, this, _1, _2, _3));
 #endif
 
@@ -445,18 +449,6 @@ OLC_DATA* Entity::GetOlcByIndex(int index)
     }
 
   return (_olcs->at(index));
-}
-
-COLC_INPUT(Entity, OlcName)
-{
-  if (input->Typeof() != VAR_STR)
-    {
-      mob->Message(MSG_ERROR, "Invalid input.");
-      return;
-    }
-
-//we have a string, lets set that to the name.
-  ed->SetName(input->GetStr());
 }
 
 COLC_INPUT(Entity, OlcDescription)

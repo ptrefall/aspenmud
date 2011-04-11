@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <boost/function.hpp>
 #include "olc.h"
 #include "mud.h"
 #include "conf.h"
@@ -137,5 +138,14 @@ void OlcInput::Input(void* arg, const std::string &input)
   delete data;
 }
 
+void OlcString(Entity* ed, Player* mob, const Variant* input, boost::function<std::string ()> get, boost::function<void (const std::string&)> set)
+{
+  if (input->Typeof() != VAR_STR)
+    {
+      mob->Message(MSG_ERROR, "Invalid input.");
+      return;
+    }
 
+  set(input->GetStr());
+}
 #endif
