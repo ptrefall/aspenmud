@@ -12,11 +12,6 @@
 #include "olc.h"
 #include "editor.h"
 
-#ifdef OLC
-OLC_INPUT(olc_entity_name);
-OLC_INPUT(olc_entity_description);
-#endif
-
 Entity::Entity(void)
 {
   _name="A blank object";
@@ -29,8 +24,8 @@ Entity::Entity(void)
   _aliases = new std::vector<std::string>();
 #ifdef OLC
   _olcs = new std::vector<struct OLC_DATA*>();
-  AddOlc("name", "Please enter the name of the object", STRING, olc_entity_name);
-  AddOlc("description", "Editing object description", EDITOR, olc_entity_description);
+  AddOlc("name", "Please enter the name of the object", STRING, boost::bind(&Entity::OlcName, this, _1, _2, _3));
+  AddOlc("description", "Editing object description", EDITOR, boost::bind(&Entity::OlcDescription, this, _1, _2, _3));
 #endif
 
   events.RegisterEvent("PostLook", new Event());
@@ -452,7 +447,7 @@ OLC_DATA* Entity::GetOlcByIndex(int index)
   return (_olcs->at(index));
 }
 
-OLC_INPUT(olc_entity_name)
+COLC_INPUT(Entity, OlcName)
 {
   if (input->Typeof() != VAR_STR)
     {
@@ -464,36 +459,34 @@ OLC_INPUT(olc_entity_name)
   ed->SetName(input->GetStr());
 }
 
-OLC_INPUT(olc_entity_description)
+COLC_INPUT(Entity, OlcDescription)
 {
   Editor* edit = new Editor();
   edit->SetArg(ed);
-  edit->events.AddCallback("load", boost::bind(&Entity::load_description, _1, _2));
-  edit->events.AddCallback("save", boost::bind(&Entity::save_description, _1, _2));
+  edit->events.AddCallback("load", boost::bind(&Entity::LoadDescription, this, _1, _2));
+  edit->events.AddCallback("save", boost::bind(&Entity::SaveDescription, this, _1, _2));
   edit->EnterEditor(mob);
 }
 
-CEVENT(Entity, load_description)
+CEVENT(Entity, LoadDescription)
 {
   OneArg* arg = (OneArg*)args;
   Editor* ed = (Editor*)arg->_arg;
-  Entity* obj = (Entity*)ed->GetArg();
   std::vector<std::string> lines;
-  std::vector<std::string>::iterator it;
-  std::vector<std::string>::iterator itEnd;
-  Tokenize(obj->GetDescription(), lines, "\n");
+  std::vector<std::string>::iterator it, itEnd;
+
+  Tokenize(GetDescription(), lines, "\n");
 
   itEnd = lines.end();
   for (it = lines.begin(); it != itEnd; ++it)
     {
-      ed->Add((*it));
+      ed->Add((*it), false);
     }
 }
-CEVENT(Entity, save_description)
+CEVENT(Entity, SaveDescription)
 {
   OneArg* arg = (OneArg*)args;
   Editor* ed = (Editor*)arg->_arg;
-  Entity* obj = (Entity*)ed->GetArg();
   std::string desc;
   std::vector<std::string>::iterator it;
   std::vector<std::string>::iterator itEnd;
@@ -504,6 +497,6 @@ CEVENT(Entity, save_description)
     {
       desc += "\n" + (*it);
     }
-  obj->SetDescription(desc);
+  SetDescription(desc);
 }
 #endif
