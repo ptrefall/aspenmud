@@ -10,9 +10,9 @@ From the command line:
 
 ==dependencies==
 Aspen used to ship with Lua as it's dependency. We have removed this, however, which means that you will need to have the following libraries installed in order to compile Aspen:
-  *liblua5.1 or higher
-  boost 1.41 or higher
-  *libssl
+  * liblua5.1 or higher
+  * boost 1.41 or higher
+  * libssl
 
 ===potential problems===
 Currently there are a few potential problems. If you get compile errors due to lua.h not being found and you have it installed or link errors against liblua5.1, you will need to replace liblua5.1 in your Makefile, or edit scripts/scripts.h and include the proper path to lua.h as well as the other headers.
