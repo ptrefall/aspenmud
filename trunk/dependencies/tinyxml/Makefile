@@ -10,7 +10,6 @@ S_FILES = tinystr.cpp tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp
 O_FILES := $(patsubst %.cpp,%.o, $(filter %.cpp, $(S_FILES)))
 all: $(O_FILES)
 	@rm -f $(OUTPUT)
-	@echo `date '+%H:%M:%S:'` Building library
 	@$(AR) cq $(OUTPUT) $(O_FILES)
 	@$(RANLIB) $(OUTPUT)
 	@cp tinyxml.h ../../includes
