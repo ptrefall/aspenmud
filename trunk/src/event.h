@@ -38,7 +38,7 @@ struct EventContainer
 *Event function declarations
 */
 #define EVENT(name)\
-void name(EventArgs* args,void* caller)
+void name(EventArgs* args, void* caller)
 #define CEVENT(c, name)\
 void c::name(EventArgs* args,void* caller)
 

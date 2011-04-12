@@ -75,5 +75,20 @@ public:
 *[in] A function object holding the setter.
 */
 void OlcString(Entity* ed, Player* mob, const Variant* input, boost::function<std::string ()> get, boost::function<void (const std::string&)> set);
+
+/*
+*This is the event that is used to save a specified string to an object.
+*We can load the string when the editor is created, but when the editor saves we need a callback to set it on the object.
+*/
+void SaveString(EventArgs* args, void* caller, boost::function<void (const std::string&)> set);
+/*
+*Accepts a string, passes it to an editor and sets it when the editor saves.
+*Params: [in] the object to edit.
+*[in] the player doing the editing.
+*[in] the variant being passed with the data.
+*[in] a function object holding the getter.
+*[in] A function object holding the setter.
+*/
+void OlcEditor(Entity* ed, Player* mob, const Variant* input, boost::function<std::string ()> get, boost::function<void (const std::string&)> set);
 #endif
 #endif
