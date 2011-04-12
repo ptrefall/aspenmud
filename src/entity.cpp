@@ -29,7 +29,10 @@ Entity::Entity(void)
          boost::bind(OlcString, _1, _2, _3,
                      boost::protect(boost::bind(&Entity::GetName, this)),
                      boost::protect(boost::bind(&Entity::SetName, this, _1))));
-  AddOlc("description", "Editing object description", EDITOR, boost::bind(&Entity::OlcDescription, this, _1, _2, _3));
+  AddOlc("description", "Editing object description", EDITOR,
+         boost::bind(OlcEditor, _1, _2, _3,
+                     boost::protect(boost::bind(&Entity::GetDescription, this)),
+                     boost::protect(boost::bind(&Entity::SetDescription, this, _1))));
 #endif
 
   events.RegisterEvent("PostLook", new Event());
@@ -449,46 +452,5 @@ OLC_DATA* Entity::GetOlcByIndex(int index)
     }
 
   return (_olcs->at(index));
-}
-
-COLC_INPUT(Entity, OlcDescription)
-{
-  Editor* edit = new Editor();
-  edit->SetArg(ed);
-  edit->events.AddCallback("load", boost::bind(&Entity::LoadDescription, this, _1, _2));
-  edit->events.AddCallback("save", boost::bind(&Entity::SaveDescription, this, _1, _2));
-  edit->EnterEditor(mob);
-}
-
-CEVENT(Entity, LoadDescription)
-{
-  OneArg* arg = (OneArg*)args;
-  Editor* ed = (Editor*)arg->_arg;
-  std::vector<std::string> lines;
-  std::vector<std::string>::iterator it, itEnd;
-
-  Tokenize(GetDescription(), lines, "\n");
-
-  itEnd = lines.end();
-  for (it = lines.begin(); it != itEnd; ++it)
-    {
-      ed->Add((*it), false);
-    }
-}
-CEVENT(Entity, SaveDescription)
-{
-  OneArg* arg = (OneArg*)args;
-  Editor* ed = (Editor*)arg->_arg;
-  std::string desc;
-  std::vector<std::string>::iterator it;
-  std::vector<std::string>::iterator itEnd;
-
-  std::vector<std::string>* lines = ed->GetLines();
-  itEnd = lines->end();
-  for (it = lines->begin(); it != itEnd; ++it)
-    {
-      desc += "\n" + (*it);
-    }
-  SetDescription(desc);
 }
 #endif

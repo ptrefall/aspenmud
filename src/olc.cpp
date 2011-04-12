@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include "olc.h"
 #include "mud.h"
 #include "conf.h"
@@ -147,5 +148,40 @@ void OlcString(Entity* ed, Player* mob, const Variant* input, boost::function<st
     }
 
   set(input->GetStr());
+}
+
+void SaveString(EventArgs* args, void* caller, boost::function<void (const std::string&)> set)
+{
+  OneArg* arg = (OneArg*)args;
+  Editor* ed = (Editor*)arg->_arg;
+  std::string str;
+  std::vector<std::string>::iterator it, itEnd;
+
+  std::vector<std::string>* lines = ed->GetLines();
+  itEnd = lines->end();
+  for (it = lines->begin(); it != itEnd; ++it)
+    {
+      str += "\n" + (*it);
+    }
+
+  set(str);
+}
+void OlcEditor(Entity* ed, Player* mob, const Variant* input, boost::function<std::string ()> get, boost::function<void (const std::string&)> set)
+{
+  Editor* edit = new Editor();
+  edit->SetArg(ed);
+  std::vector<std::string> lines;
+  std::vector<std::string>::iterator it, itEnd;
+
+  edit->events.AddCallback("save", boost::bind(SaveString, _1, _2, set));
+
+  Tokenize(get(), lines, "\n");
+  itEnd = lines.end();
+  for (it = lines.begin(); it != itEnd; ++it)
+    {
+      edit->Add((*it), true);
+    }
+
+  edit->EnterEditor(mob);
 }
 #endif
