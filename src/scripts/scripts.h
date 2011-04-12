@@ -15,10 +15,10 @@
 #ifdef MODULE_SCRIPTING
 extern "C"
 {
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-#include <luaconf.h>
+#include <lua5.1/lua.h>
+#include <lua5.1/lauxlib.h>
+#include <lua5.1/lualib.h>
+#include <lua5.1/luaconf.h>
 }
 
 //Basic userdata class
