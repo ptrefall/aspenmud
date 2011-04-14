@@ -65,8 +65,23 @@ int SCR_GetCopyoverUptime(lua_State* l)
 }
 int SCR_FindPlayer(lua_State* l)
 {
+  Player* p = NULL;
+  const char* search = NULL;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "'FindPlayer' takes 1 argument.");
+      return 0;
+    }
+  search = lua_tostring(l, -1);
+  if (!search)
+    {
+      SCR_Error(l, "Argument 1 to 'FindPlayher' must be the name of the player to find.");
+      return 0;
+    }
+
   UserData* data = (UserData*)lua_newuserdata(l, sizeof(UserData));
-  data->ptr = (void*)world->FindPlayer(lua_tostring(l, -2));
+  data->ptr = (void*)world->FindPlayer(search);
   data->type = type_player;
   return 1;
 }

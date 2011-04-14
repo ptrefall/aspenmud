@@ -26,11 +26,11 @@ extern "C"
 enum UDATA_TYPE {
   type_none, type_server, type_world, type_object, type_player, type_npc
 };
-typedef struct
+struct UserData
 {
   UDATA_TYPE type;
   void* ptr;
-} UserData;
+};
 
 class Script
 {
@@ -88,5 +88,23 @@ BOOL VariantToStack(lua_State* l, Variant &var);
 *Return: True if the object is a player, false otherwise.
 */
 BOOL IsPlayer(lua_State* l, UserData* udata);
+/*
+*Checks to see if the provided object is living.
+*Param: [in] the active lua state.
+*Param: [in] the UserData struct.
+*/
+BOOL IsLiving(lua_State* l, UserData* udata);
+/*
+*Checks to see if the specified object is of type Entity
+*This is slightly dificult because everything in game that is actually in game is an entity, but we need multiple checks since
+*lua requires us to have a separation.
+*Param: [in] the currently active lua state.
+*Param: [in] The object to check.
+*/
+BOOL IsObject(lua_State* l, UserData* udata);
+/*
+*Used as a drop-in replacement for print.
+*/
+int SCR_Print(lua_State* l);
 #endif
 #endif

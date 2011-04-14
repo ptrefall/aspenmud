@@ -11,24 +11,25 @@ ECHO = echo
 #PROF = -pg
 CC	= g++
 #debugging code (should always be used except for special cases).
-CFLAGS	= -ggdb -ansi -pedantic -Wall -Werror -fno-nonansi-builtins -fno-rtti
+CFLAGS	= -ggdb -pedantic -Wall -Werror -O1
 #makes the compile use our libraries.
 CFLAGS += -L../libs
 #makes the compiler use our includes.
-CFLAGS += -I../includes
+#tinyxml is a third-party library, so we just compile it as a module.
+CFLAGS += -Itinyxml
 
 #required libraries
-L_FLAGS	= -lcrypto -llua5.1 -ltinyxml
+L_FLAGS	= -lcrypto -llua5.1
 
 #formatting specific flags
 FORMATTER = astyle
 FORMAT_FLAGS = --style=gnu
 
 #modules
-MODULES = scripts syslog help components intermud
+MODULES = tinyxml scripts syslog help components intermud
 
 #dependencies
-DEPS = tinyxml
+DEPS =
 
 #source files to compile:
 S_FILES= world.cpp variant.cpp entity.cpp player.cpp socket.cpp\

@@ -14,6 +14,28 @@
 #include "../variant.h"
 
 #ifdef MODULE_SCRIPTING
+static int traceback (lua_State *L)
+{
+  if (!lua_isstring(L, 1))  /* 'message' not a string? */
+    return 1;  /* keep it intact */
+  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+  if (!lua_istable(L, -1))
+    {
+      lua_pop(L, 1);
+      return 1;
+    }
+  lua_getfield(L, -1, "traceback");
+  if (!lua_isfunction(L, -1))
+    {
+      lua_pop(L, 2);
+      return 1;
+    }
+  lua_pushvalue(L, 1);  /* pass error message */
+  lua_pushinteger(L, 2);  /* skip this function and traceback */
+  lua_call(L, 2, 1);  /* call debug.traceback */
+  return 1;
+}
+
 Script::Script()
 {
   state = lua_open();
@@ -38,14 +60,24 @@ Entity* Script::GetObj(void) const
 }
 const char* Script::Execute(const std::string &code)
 {
-  if (luaL_dostring(state, code.c_str()) == 0)
+//we load our code to be executed.
+  int status = luaL_loadbuffer(state, code.c_str(), code.length(), "execution");
+  if (!status)
     {
-      return lua_tostring(state, -1);
+//we push our traceback function on to the stack.
+      int base = lua_gettop(state);
+      lua_pushcfunction(state, traceback);
+      lua_insert(state, base);
+//we call the code.
+      status = lua_pcall(state, 0, 0, base);
+      lua_remove(state, base);
+//if it failed, we garbage collect.
+      if (status)
+        {
+          lua_gc(state, LUA_GCCOLLECT, 0);
+        }
     }
-  else
-    {
-      return NULL;
-    }
+  return NULL;
 }
 lua_State* Script::GetState() const
 {
@@ -97,7 +129,7 @@ BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std
 {
   timeval prev, now; //used for timing the whole thing.
   const char* ret = NULL;
-  std::stringstream st;
+  std::stringstream st; //used for printing results.
   std::vector<std::string>::iterator it, itEnd;
   std::string input;
   int elapsed = 0;
@@ -110,14 +142,28 @@ BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std
       return false;
     }
 
+  lua_State* state = scr->GetState();
   gettimeofday(&prev, NULL);
+//we set the fd first
+  lua_pushnumber(state, mobile->GetSocket()->GetControl());
+  lua_setglobal(state, "__fd__");
+//now we assign a "me" keyword to the player.
+  UserData* data = (UserData*)lua_newuserdata(state, sizeof(UserData));
+  data->ptr = (void*)mobile;
+  data->type = type_player;
+  lua_setglobal(state, "me");
+//we push our print replacement to the global table:
+  lua_pushcfunction(state, SCR_Print);
+  lua_setfield(state, LUA_GLOBALSINDEX, "print");
 
+//expand our arguments into a full string.
   itEnd = args.end();
   for (it = args.begin(); it != itEnd; ++it)
     {
       input += (*it);
     }
 
+//execute the code.
   ret = scr->Execute(input);
   st << "Result: " << (ret == NULL?"no return":ret) << "\n";
   delete scr;
@@ -200,5 +246,57 @@ BOOL IsPlayer(lua_State* l, UserData* udata)
     }
 
   return true;
+}
+BOOL IsLiving(lua_State* l, UserData* udata)
+{
+  if ((udata->type != type_player) || (udata->type != type_npc) || (udata->ptr == NULL))
+    {
+      SCR_Error(l, "Invalid type.");
+      return false;
+    }
+
+  return true;
+}
+BOOL IsObject(lua_State* l, UserData* udata)
+{
+  if ((udata->type != type_player) || (udata->type != type_npc) || (udata->type != type_object) || (udata->ptr == NULL))
+    {
+      SCR_Error(l, "Invalid type.");
+      return false;
+    }
+
+  return true;
+}
+int SCR_Print(lua_State* l)
+{
+  std::string data;
+  int nargs = lua_gettop(l);
+  int i = 0;
+  int fd = 0;
+  const char* result = NULL;
+
+  lua_getglobal(l, "tostring");
+  for (i = 1; i <= nargs; i++)
+    {
+      lua_pushvalue(l, -1);
+      lua_pushvalue(l, i);
+      lua_call(l, 1, 1);
+      result = lua_tostring(l, -1);
+      if (result == NULL)
+        {
+          SCR_Error(l, "Error in print function--NULL was returned from tostring.");
+          return 0;
+        }
+
+      if (i > 1)
+        data += "    ";
+      data += result;
+      lua_pop(l, 1);
+    }
+  data += "\n";
+  lua_getglobal(l, "__fd__");
+  fd = lua_tonumber(l, -1);
+  write(fd, data.c_str(), data.length());
+  return 0;
 }
 #endif

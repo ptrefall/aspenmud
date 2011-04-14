@@ -14,5 +14,6 @@
 #ifdef MODULE_SCRIPTING
 EVENT(EVENT_INIT_ENTITY_SCRIPT);
 BOOL InitEntityScript(void);
+int SCR_GetName(lua_State* l);
 #endif
 #endif
