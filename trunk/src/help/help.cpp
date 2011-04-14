@@ -292,6 +292,18 @@ BOOL CMDAddTopic::Execute(const std::string &verb, Player* mobile,std::vector<st
   mobile->Message(MSG_INFO, "Entry added successfully. You will need to write contents in the entry, by using the hedit command.");
   return true;
 }
+
+CMDHedit::CMDHedit()
+{
+  SetName("hedit");
+  AddAlias("hed");
+  SetAccess(RANK_ADMIN);
+}
+BOOL CMDHedit::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  return true;
+}
+
 #endif
 
 void InitializeHelp()

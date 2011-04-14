@@ -75,7 +75,7 @@ BOOL InitPlayerScript(void)
 #ifndef SCRIPT_SECURE
 int SCR_GetPassword(lua_State* l)
 {
-  std::string password = NULL;
+  std::string password ;
   UserData* udata = NULL;
 
   if (lua_gettop(l) != 1)
