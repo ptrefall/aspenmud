@@ -16,20 +16,20 @@ CFLAGS	= -ggdb -pedantic -Wall -Werror -O1
 CFLAGS += -L../libs
 #makes the compiler use our includes.
 #tinyxml is a third-party library, so we just compile it as a module.
-CFLAGS += -Itinyxml
+CFLAGS += -I../includes
 
 #required libraries
-L_FLAGS	= -lcrypto -llua5.1
+L_FLAGS	= -lcrypto -llua5.1 -ltinyxml
 
 #formatting specific flags
 FORMATTER = astyle
 FORMAT_FLAGS = --style=gnu
 
 #modules
-MODULES = tinyxml scripts syslog help components intermud
+MODULES = scripts syslog help components intermud
 
 #dependencies
-DEPS =
+DEPS = tinyxml
 
 #source files to compile:
 S_FILES= world.cpp variant.cpp entity.cpp player.cpp socket.cpp\
