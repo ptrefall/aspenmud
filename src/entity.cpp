@@ -190,6 +190,8 @@ void Entity::Serialize(TiXmlElement* root)
 }
 void Entity::Deserialize(TiXmlElement* root)
 {
+  World* world = World::GetPtr();
+
   TiXmlElement* components = NULL;
   TiXmlElement* component = NULL;
   TiXmlElement* alias = NULL;
@@ -398,6 +400,15 @@ BOOL Entity::AliasExists(const std::string & name)
 std::vector<std::string>* Entity::GetAliases()
 {
   return _aliases;
+}
+
+BOOL Entity::IsNpc()
+{
+  return false;
+}
+BOOL Entity::IsPlayer()
+{
+  return false;
 }
 
 #ifdef OLC

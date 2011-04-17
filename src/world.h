@@ -24,6 +24,7 @@
 
 class World
 {
+  static World* _ptr;
   Server* _server; //our main server object.
   Log *_log;
   ComponentFactory* _cfactory;
@@ -46,12 +47,11 @@ class World
   char* _motd;
   char* _banner;
 public:
+  static World* GetPtr();
 //these are objects we need to store on each entity.
   EventManager events;
   Commandable commands;
 
-//Events
-//methods:
   World();
   ~World();
   /*
@@ -67,10 +67,6 @@ public:
   *Returns: a pointer to the main server object.
   */
   Server* GetServer(void) const;
-  /*
-  *Returns: a pointer to the log object.
-  */
-  Log* GetLog(void) const;
   /*
   *Returns: a pointer to a list of pointers to player objects.
   */
@@ -300,6 +296,7 @@ public:
   BOOL  CreateRoom(Room* room);
   void InitializeNums(void);
   void WriteLog(const std::string &data,LOG_LEVEL l=INFORM);
+  Log* GetLog() const;
   /*
   *Checks to see if the game engine is still running.
   *Return: True if the game loop should continue, false otherwise.

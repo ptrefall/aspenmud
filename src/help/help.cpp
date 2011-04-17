@@ -101,6 +101,7 @@ HelpTable::~HelpTable()
 
 void HelpTable::Load()
 {
+  World* world = World::GetPtr();
   TiXmlDocument doc(HELP_FILE);
   TiXmlElement* root = NULL;
   TiXmlElement* element = NULL;
@@ -230,6 +231,7 @@ CMDHelp::CMDHelp()
 }
 BOOL CMDHelp::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
   HelpTable* table = NULL;
 
   if (!args.size())
@@ -269,6 +271,8 @@ CMDAddTopic::CMDAddTopic()
 }
 BOOL CMDAddTopic::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   HelpEntry* entry;
   std::string arg = Explode(args);
   HelpTable* table = (HelpTable*)world->GetProperty("table");
@@ -303,12 +307,13 @@ BOOL CMDHedit::Execute(const std::string &verb, Player* mobile,std::vector<std::
 {
   return true;
 }
-
 #endif
 
 void InitializeHelp()
 {
 #ifdef MODULE_HELP
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing help.");
   HelpTable* table = new HelpTable();
   if (!table)

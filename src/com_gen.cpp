@@ -9,6 +9,8 @@
 
 void InitializeGenCommands()
 {
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing general commands.");
   world->commands.AddCommand(new CMDQuit());
   world->commands.AddCommand(new CMDSave());
@@ -90,6 +92,8 @@ CMDWho::CMDWho()
 }
 BOOL CMDWho::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   std::list <Player*>::iterator it;
   std::list <Player*>::iterator itEnd;
   std::stringstream st;
@@ -123,6 +127,7 @@ CMDToggle::CMDToggle()
 }
 BOOL CMDToggle::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
   Option* gopt;
   OptionNode* popt;
   std::map<std::string, Option*> *goptions;
@@ -207,6 +212,8 @@ CMDChan::CMDChan()
 }
 BOOL CMDChan::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   Channel* chan=(Channel*)world->FindChannel(subcmd);
   std::string message=Explode(args);
 
@@ -227,6 +234,8 @@ CMDCommands::CMDCommands()
 }
 BOOL CMDCommands::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   std::vector <std::string> commands;
   std::vector<std::string> headers;
   headers.push_back("command");
@@ -279,6 +288,8 @@ CMDHist::CMDHist()
 }
 BOOL CMDHist::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   Channel* chan=NULL;
   std::list <HistoryNode*> *history;
   std::list <HistoryNode*>::iterator it;
@@ -321,6 +332,8 @@ CMDUptime::CMDUptime()
 }
 BOOL CMDUptime::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   TimeInfo ruptime(time(NULL)-world->GetRealUptime());
   TimeInfo cuptime(time(NULL)-world->GetCopyoverUptime());
 
@@ -345,6 +358,7 @@ CMDWhois::CMDWhois()
 }
 BOOL CMDWhois::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
   Player* targ=NULL;
   BOOL load=false;
   TimeInfo tm;
@@ -402,6 +416,7 @@ CMDLook::CMDLook()
 }
 BOOL CMDLook::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
   Entity* obj = NULL;
 
   if (!args.size())

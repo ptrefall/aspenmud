@@ -14,30 +14,11 @@
 #include "../variant.h"
 
 #ifdef MODULE_SCRIPTING
-static int traceback (lua_State *L)
-{
-  if (!lua_isstring(L, 1))  /* 'message' not a string? */
-    return 1;  /* keep it intact */
-  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
-  if (!lua_istable(L, -1))
-    {
-      lua_pop(L, 1);
-      return 1;
-    }
-  lua_getfield(L, -1, "traceback");
-  if (!lua_isfunction(L, -1))
-    {
-      lua_pop(L, 2);
-      return 1;
-    }
-  lua_pushvalue(L, 1);  /* pass error message */
-  lua_pushinteger(L, 2);  /* skip this function and traceback */
-  lua_call(L, 2, 1);  /* call debug.traceback */
-  return 1;
-}
 
 Script::Script()
 {
+  World* world = World::GetPtr();
+
   state = lua_open();
   luaL_openlibs(state);
   OneArg arg(state);
@@ -46,38 +27,44 @@ Script::Script()
 }
 Script::~Script()
 {
+  World* world = World::GetPtr();
+
   OneArg arg(state);
   world->events.CallEvent("ScriptUnloaded", &arg, NULL);
   lua_close(state);
 }
 void Script::SetObj(Entity* obj)
 {
+
   _obj = obj;
 }
 Entity* Script::GetObj(void) const
 {
   return _obj;
 }
-const char* Script::Execute(const std::string &code)
+
+void Script::Execute(const std::string &code)
 {
+  int index = 0;
+
 //we load our code to be executed.
   int status = luaL_loadbuffer(state, code.c_str(), code.length(), "execution");
   if (!status)
     {
 //we push our traceback function on to the stack.
-      int base = lua_gettop(state);
-      lua_pushcfunction(state, traceback);
-      lua_insert(state, base);
+      lua_getglobal(state, "debug");
+      lua_getfield(state, -1, "traceback");
+      lua_remove(state, -2);
+      index = lua_gettop(state);
 //we call the code.
-      status = lua_pcall(state, 0, 0, base);
-      lua_remove(state, base);
+      status = lua_pcall(state, 0, 0, index);
+      lua_remove(state, index);
 //if it failed, we garbage collect.
       if (status)
         {
           lua_gc(state, LUA_GCCOLLECT, 0);
         }
     }
-  return NULL;
 }
 lua_State* Script::GetState() const
 {
@@ -95,6 +82,8 @@ EVENT(EVENT_INIT_SCRIPT)
 
 BOOL InitializeScript(void)
 {
+  World* world = World::GetPtr();
+
 #ifdef MODULE_SCRIPTING
   world->WriteLog("Initializing scripting.");
   world->commands.AddCommand(new CMDExecute());
@@ -128,7 +117,6 @@ CMDExecute::CMDExecute()
 BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
   timeval prev, now; //used for timing the whole thing.
-  const char* ret = NULL;
   std::stringstream st; //used for printing results.
   std::vector<std::string>::iterator it, itEnd;
   std::string input;
@@ -164,15 +152,14 @@ BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std
     }
 
 //execute the code.
-  ret = scr->Execute(input);
-  st << "Result: " << (ret == NULL?"no return":ret) << "\n";
+  scr->Execute(input);
+//  st << "Result: " << (ret == NULL?"no return":ret) << "\n";
   delete scr;
 
   gettimeofday(&now, NULL);
   elapsed = (now.tv_sec - prev.tv_sec) * 1000;
   elapsed += (now.tv_usec - prev.tv_usec) / 1000;
   st << "[execution took " << elapsed << " ms].";
-
   mobile->Message(MSG_INFO, st.str());
   return true;
 }

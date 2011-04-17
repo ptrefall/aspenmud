@@ -199,6 +199,8 @@ std::vector <Command*> *Commandable::GetPtr()
 
 void InitializeCommands()
 {
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing commands.");
   InitializeGenCommands();
   InitializeMovementCommands();

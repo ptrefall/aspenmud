@@ -31,20 +31,22 @@ static void GameLoop();
 //our signal callback
 void sig(int sig);
 
-World* world;
 
 int main(int argc, char** argv)
 {
+  World* world;
   BOOL copyover=false; //are we rebooting for copyover?
   int listener=0; //the socket to listen on when recovering from copyover
+
 #ifdef SECURE_INITIALIZATION
   if (getuid() == 0)
     {
       printf("You should not be running as root.\nAspen will now exit.\n");
-      return 1;
+      return EXIT_FAILURE;
     }
 #endif
-  world=new World();
+
+  world = World::GetPtr();
   world->WriteLog("Initializing "+MUD_NAME+".");
 //initialize the server class:
   int port;
@@ -56,8 +58,8 @@ int main(int argc, char** argv)
       port = atoi(argv[1]);
       if ((port < 1024)||(port>65535))
         {
-          world->WriteLog("Invalid port specified, program will now exit.");
-          return 1;
+          world->WriteLog("Invalid port specified, program will now exit.", ERR);
+          return EXIT_FAILURE;
         }
       break;
     }
@@ -73,33 +75,46 @@ int main(int argc, char** argv)
       port=DEFAULT_PORT;
       break;
     }
+
   if (!world->InitializeFiles())
     {
-      return 1;
+      world->WriteLog("Could not load mud text files.", ERR);
+      return EXIT_FAILURE;
     }
+
 //game initialization calls
   InitializeCommands();
   InitializeChannels();
 #ifdef MODULE_SCRIPTING
   if (!InitializeScript())
     {
-      return 1;
+      world->WriteLog("Could not initialize scripting.", ERR);
+      return EXIT_FAILURE;
     }
 #endif
+
 #ifdef OLC
-  InitializeOlc();
+  if(!InitializeOlc())
+    {
+      world->WriteLog("Could not initialize OLC.", ERR);
+      return EXIT_FAILURE;
+    }
 #endif
+
   InitializeModules();
   if (!InitializeZones())
     {
-      return 1;
+      world->WriteLog("could not initialize zones.", ERR);
+      return EXIT_FAILURE;
     }
+
   world->InitializeNums();
   InitializeSocials();
   CreateComponents();
   world->SetRealUptime(time(NULL));
   world->SetCopyoverUptime(time(NULL));
   srand(time(NULL));
+
 //make the server listen:
   world->WriteLog("Attempting to establish listening point.");
   if (copyover)
@@ -113,15 +128,17 @@ int main(int argc, char** argv)
     {
       if (!world->GetServer()->Listen(port))
         {
-          return 1;
+          return EXIT_FAILURE;
         }
     }
+
 //initialize signal callbacks
   world->WriteLog("Initializing signal callbacks.");
   signal(SIGTERM,sig);
   signal(SIGINT,sig);
   signal(SIGQUIT,sig);
   signal(SIGHUP,sig);
+
 //start the game loop:
   world->WriteLog("Entering game loop.");
   GameLoop();
@@ -132,6 +149,8 @@ int main(int argc, char** argv)
 
 static void CopyoverRecover(void)
 {
+  World* world = World::GetPtr();
+
   Player* person = NULL;
   sockaddr_in* saddr = NULL;
   FILE* recover = NULL;
@@ -148,12 +167,14 @@ static void CopyoverRecover(void)
   if (recover==NULL)
     {
       world->WriteLog("There was an error opening the copyover recovery file, now exiting.", ERR);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 
   fscanf(recover, "%d %d\n", &cuptime, &ruptime);
+
   world->SetRealUptime((time_t)ruptime);
   world->SetCopyoverUptime((time_t)cuptime);
+
   while (1)
     {
       memset(name, 0, 15);
@@ -181,6 +202,7 @@ static void CopyoverRecover(void)
       person->EnterGame(true);
       sock->Write("Copyover complete.\n");
     }
+
   delete []name;
   delete []host;
   fclose(recover);
@@ -190,6 +212,7 @@ static void CopyoverRecover(void)
 
 static void GameLoop()
 {
+  World* world = World::GetPtr();
   while (world->IsRunning())
     {
 //update our world:
@@ -202,6 +225,7 @@ static void GameLoop()
 
 void sig(int sig)
 {
+  World* world = World::GetPtr();
   world->WriteLog("Caught signal, cleaning up.");
   world->SetRunning(false);
 }

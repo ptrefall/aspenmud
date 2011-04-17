@@ -7,6 +7,8 @@
 
 void InitializeMovementCommands(void)
 {
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing movement commands.");
   world->commands.AddCommand(new CMDNorth());
   world->commands.AddCommand(new CMDSouth());
@@ -22,6 +24,8 @@ void InitializeMovementCommands(void)
 
 BOOL DoMove(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   ExitDirection direction = (ExitDirection)subcmd;
   Room* room;
   Room* dest;

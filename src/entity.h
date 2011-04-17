@@ -141,6 +141,8 @@ public:
   *Return: a pointer to a vector of strings.
   */
   std::vector<std::string>* GetAliases();
+  virtual BOOL IsNpc();
+  virtual BOOL IsPlayer(void);
 #ifdef OLC
 //olc-based functions.
   /*

@@ -22,7 +22,6 @@ class Player;
 class Component;
 class Variant;
 
-extern World* world;
 //olc forward declarations
 struct OLC_DATA;
 enum OLC_INPUT_TYPE {NUM, STRING, BOOLEAN, EDITOR};

@@ -42,7 +42,7 @@ public:
   ~Script();
   void SetObj(Entity* obj);
   Entity* GetObj(void) const;
-  const char* Execute(const std::string &code);
+  void Execute(const std::string &code);
   lua_State* GetState() const;
 };
 

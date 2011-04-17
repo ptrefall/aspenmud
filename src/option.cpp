@@ -76,6 +76,8 @@ BOOL Option::CanToggle() const
 
 Variant GetOptionValue(const std::string &name, const Player* mobile)
 {
+  World* world = World::GetPtr();
+
   if (mobile->OptionExists(name))
     {
       return mobile->GetOption(name)->_data;

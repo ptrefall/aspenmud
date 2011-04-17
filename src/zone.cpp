@@ -16,6 +16,8 @@ Zone::Zone()
 }
 Zone::~Zone()
 {
+  World* world = World::GetPtr();
+
 //we need to clean up our rooms.
   std::list<VNUM>::iterator it;
   std::list<VNUM>::iterator itEnd;
@@ -50,6 +52,8 @@ void Zone::SetMaxRooms(int max)
 
 BOOL Zone::AddRoom(VNUM num)
 {
+  World* world = World::GetPtr();
+
   std::list<VNUM>::iterator it;
 
   for (it=_rnums.begin(); it!=_rnums.end(); it++)
@@ -65,6 +69,7 @@ BOOL Zone::AddRoom(VNUM num)
 }
 BOOL Zone::RemoveRoom(VNUM num)
 {
+  World* world = World::GetPtr();
   std::list<VNUM>::iterator it;
 
   for (it=_rnums.begin(); it!=_rnums.end(); it++)
@@ -89,6 +94,8 @@ void Zone::GetRooms(std::list<VNUM>* rooms)
 
 void Zone::Serialize(TiXmlElement* root)
 {
+  World* world = World::GetPtr();
+
   std::list<VNUM>::iterator it;
   std::list<VNUM>::iterator itEnd = _rnums.end();
   Room* room = NULL;
@@ -115,6 +122,8 @@ void Zone::Serialize(TiXmlElement* root)
 }
 void Zone::Deserialize(TiXmlElement* zone)
 {
+  World* world = World::GetPtr();
+
   Room* room=NULL;
   TiXmlElement* rooms = NULL;
   TiXmlElement* iterator = NULL;
@@ -140,6 +149,8 @@ void Zone::Deserialize(TiXmlElement* zone)
 
 BOOL InitializeZones()
 {
+  World* world = World::GetPtr();
+
   struct stat FInfo;
   world->WriteLog("Initializing areas.");
   if ((stat(AREA_FILE,&FInfo))!=-1)
@@ -198,6 +209,8 @@ BOOL InitializeZones()
 
 BOOL Zone::SaveZones()
 {
+  World* world = World::GetPtr();
+
   std::vector<Zone*> *zones=new std::vector<Zone*>();
   world->GetZones(zones);
   std::vector<Zone*>::iterator it;
@@ -223,6 +236,7 @@ BOOL Zone::SaveZones()
 }
 BOOL Zone::LoadZones()
 {
+  World* world = World::GetPtr();
   TiXmlDocument doc(AREA_FILE);
   if (!doc.LoadFile())
     {

@@ -16,6 +16,8 @@
 #ifdef OLC
 BOOL InitializeOlc(void)
 {
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing OLC.");
   world->commands.AddCommand(new CMDOedit());
   return true;
@@ -29,6 +31,8 @@ CMDOedit::CMDOedit()
 }
 BOOL CMDOedit::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   if (!args.size())
     {
       mobile->Message(MSG_ERROR, "You must provide the name of an object to edit.");
@@ -100,6 +104,8 @@ MENU(olc_menu_cb)
 
 void OlcInput::Input(void* arg, const std::string &input)
 {
+  World* world = World::GetPtr();
+
   OLC_IN_DATA* data= (OLC_IN_DATA*)arg;
   switch(data->olc->type)
     {
