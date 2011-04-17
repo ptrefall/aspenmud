@@ -1,1 +1,0 @@
-S_FILES += tinyxml/tinyxmlparser.cpp tinyxml/tinyxmlerror.cpp tinyxml/tinyxml.cpp tinyxml/tinystr.cpp
