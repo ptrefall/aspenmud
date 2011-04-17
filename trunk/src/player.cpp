@@ -89,6 +89,8 @@ BOOL Player::IsPlayer(void)
 
 void Player::Serialize(TiXmlDocument* doc)
 {
+  World* world = World::GetPtr();
+
   TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
   doc->LinkEndChild(decl);
   TiXmlElement* root = new TiXmlElement("player");
@@ -139,6 +141,7 @@ void Player::Serialize(TiXmlDocument* doc)
 }
 void Player::Deserialize(TiXmlElement* root)
 {
+  World* world = World::GetPtr();
   int tmp = 0;
   OptionNode* onode = NULL;
   Option* opt = NULL;
@@ -299,6 +302,8 @@ void Player::Load(void)
 
 void Player::EnterGame(BOOL quiet)
 {
+  World* world = World::GetPtr();
+
   Living::EnterGame();
 //add the player to the users list:
   world->AddPlayer(this);
@@ -326,6 +331,8 @@ void Player::EnterGame(BOOL quiet)
 }
 void Player::LeaveGame()
 {
+  World* world = World::GetPtr();
+
   Save();
   Living::LeaveGame();
 //take the player from the users list:
@@ -415,6 +422,8 @@ void Player::SetPrompt(const std::string &prompt)
 
 void Player::SetOption(const std::string &option, Variant &val)
 {
+  World* world = World::GetPtr();
+
   Option* opt;
   if (OptionExists(option))
     {

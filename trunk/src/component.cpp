@@ -56,6 +56,7 @@ Entity* Component::GetObject(void) const
 
 void Component::Attach(Entity* obj)
 {
+  World* world = World::GetPtr();
   std::vector<std::string>::iterator it;
   std::vector<std::string>::iterator itEnd;
 

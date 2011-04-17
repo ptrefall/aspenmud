@@ -8,6 +8,8 @@
 
 void InitializeWizCommands()
 {
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing wizard commands.");
   world->commands.AddCommand(new CMDCopyover());
   world->commands.AddCommand(new CMDMkgod());
@@ -22,6 +24,8 @@ CMDCopyover::CMDCopyover()
 }
 BOOL CMDCopyover::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   world->Copyover(mobile);
   return true;
 }
@@ -33,12 +37,16 @@ CMDMkgod::CMDMkgod()
 }
 BOOL CMDMkgod::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+  Player* target = NULL;
+
   if (!args.size())
     {
       mobile->Message(MSG_ERROR,"You must specify the person that you would like to make a god.\n");
       return false;
     }
-  Player*target=world->FindPlayer(args[0]);
+
+  target=world->FindPlayer(args[0]);
 
   if (target==mobile)
     {
@@ -68,14 +76,16 @@ CMDMkbuilder::CMDMkbuilder()
 }
 BOOL CMDMkbuilder::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+  Player* target = NULL;
+
   if (!args.size())
     {
       mobile->Message(MSG_ERROR,"You must specify the person that you would like to make a builder.\n");
-
       return false;
     }
 
-  Player*target=world->FindPlayer(args[0]);
+  target=world->FindPlayer(args[0]);
   if (target==NULL)
     {
       mobile->Message(MSG_ERROR,"That person couldn't be found.");
@@ -99,7 +109,7 @@ CMDShutdown::CMDShutdown()
 }
 BOOL CMDShutdown::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
   world->Shutdown();
-
   return true;
 }

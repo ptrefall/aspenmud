@@ -75,6 +75,8 @@ void Socials::Save(void)
 }
 void Socials::Load(void)
 {
+  World* world = World::GetPtr();
+
   int id;
   TiXmlDocument doc(SOCIALS_FILE);
   TiXmlElement* socials = NULL;
@@ -182,9 +184,9 @@ void Socials::AddCommands(void)
 {
   std::map <std::string, SOCIAL_DATA*>::iterator it;
   std::map <std::string, SOCIAL_DATA*>::iterator itEnd;
+  World* world = World::GetPtr();
 
   world->WriteLog("Adding social commands.");
-
   itEnd = _slist->end();
   for (it = _slist->begin(); it != itEnd; ++it)
     {
@@ -198,6 +200,7 @@ void Socials::AddCommands(void)
 
 EVENT(socials_shutdown)
 {
+  World* world = World::GetPtr();
   world->WriteLog("Cleaning up socials.");
   Socials* soc = Socials::GetPtr();
   soc->Save();
@@ -220,6 +223,7 @@ BOOL CMDSocials::Execute(const std::string &verb, Player* mobile,std::vector<std
 
 BOOL InitializeSocials(void)
 {
+  World* world = World::GetPtr();
   world->WriteLog("Initializing socials.");
   Socials* soc = Socials::GetPtr();
   soc->Load();

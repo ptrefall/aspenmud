@@ -17,6 +17,16 @@
 #include "zone.h"
 #include "option.h"
 
+World* World::_ptr;
+World* World::GetPtr()
+{
+  if (!World::_ptr)
+    {
+      World::_ptr = new World();
+    }
+  return World::_ptr;
+}
+
 World::World()
 {
   _running = true;
@@ -131,8 +141,8 @@ void World::Copyover(Player* mobile)
   std::list <Player*>::iterator it, itEnd;
   char buff[16];
 
-  itEnd=GetPlayers()->end();
-  for (it = GetPlayers()->begin(); it != itEnd; ++it)
+  itEnd=_users->end();
+  for (it = _users->begin(); it != itEnd; ++it)
     {
       person = (*it);
       if (person->GetSocket()->GetConnectionType()!=con_game)
@@ -148,12 +158,12 @@ void World::Copyover(Player* mobile)
               addr->sin_family,addr->sin_port,(long int)addr->sin_addr.s_addr, person->GetSocket()->GetHost().c_str());
       person->Write("Copyover initiated by "+mobile->GetName()+".\n");
     }
-  world->Update();
+  Update();
   fprintf(copyover,"-1\n");
   fclose(copyover);
   events.CallEvent("Copyover", NULL, (void*)this);
   memset(buff,0,16);
-  snprintf(buff,16,"%d",world->GetServer()->GetListener());
+  snprintf(buff,16,"%d",_server->GetListener());
   execl(BIN_FILE,BIN_FILE,"-c",buff,(char*)NULL);
   mobile->Write("Copyover failed!\n");
 }

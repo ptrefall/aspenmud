@@ -39,11 +39,13 @@ Server::~Server()
 
 BOOL Server::Listen(const int port)
 {
+  World* world = World::GetPtr();
+
   int reuse = 1;
   // try to create a communications endpoint
   if ((control = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     {
-      world->WriteLog("could not create socket.");
+      world->WriteLog("could not create socket.", ERR);
       return false;
     }
   // set options for this control socket
@@ -90,6 +92,7 @@ BOOL Server::PollSockets()
   Socket *sock = NULL;
   Player* mob = NULL;
   std::string input;
+  World* world = World::GetPtr();
 
   for (iSocket = socketList.begin(); iSocket != iSocketEnd; ++iSocket)
     {
@@ -394,6 +397,7 @@ void Server::Accept()
   sockaddr_in          addr;
   DWORD len = sizeof(addr);
   int desc, argp = 1;
+  World* world = World::GetPtr();
 
 //clear the address buffer:
   memset(&addr,0,len);

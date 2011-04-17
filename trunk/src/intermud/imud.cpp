@@ -20,6 +20,7 @@ Intermud::~Intermud()
 
 void Intermud::Log(const std::string &message, LOG_LEVEL level)
 {
+  World* world = World::GetPtr();
   world->WriteLog("[INTERMUD]"+message, level);
 }
 

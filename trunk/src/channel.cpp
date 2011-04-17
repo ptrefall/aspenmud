@@ -10,6 +10,8 @@
 
 void InitializeChannels()
 {
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing channels");
   world->events.AddCallback("PlayerConnect", SubscribeChannels);
   world->events.AddCallback("PlayerDisconnect", UnsubscribeChannels);
@@ -19,6 +21,8 @@ void InitializeChannels()
 
 EVENT(SubscribeChannels)
 {
+  World* world = World::GetPtr();
+
   std::list <std::string> *names=new std::list<std::string>();
   std::list <std::string>::iterator it, itEnd;
   Channel* chan=NULL;
@@ -41,6 +45,8 @@ EVENT(SubscribeChannels)
 }
 EVENT(UnsubscribeChannels)
 {
+  World* world = World::GetPtr();
+
   std::list <std::string>* names=new std::list <std::string>();
   std::list <std::string>::iterator it;
   std::list<std::string>::iterator itEnd;

@@ -18,6 +18,7 @@ COMCREATE(STATS_CREATE)
 }
 COMINIT(STATS_INIT)
 {
+  World* world = World::GetPtr();
   world->events.GetEvent("PlayerCreated")->Add(STATS_ADD);
   world->events.GetEvent("PlayerConnect")->Add(STATS_ADD);
 }
@@ -36,6 +37,8 @@ EVENT(STATS_ATTACHED)
 
 EVENT(STATS_ADD) //called for new player and player logins.
 {
+  World* world = World::GetPtr();
+
   Player* mob=(Player*)caller;
   mob->AddComponent(world->CreateComponent("stats"));
 }

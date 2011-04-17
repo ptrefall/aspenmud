@@ -28,6 +28,7 @@ EVENT(EVENT_INIT_ENTITY_SCRIPT)
 }
 BOOL InitEntityScript()
 {
+  World* world = World::GetPtr();
   world->events.AddCallback("ScriptLoaded", EVENT_INIT_ENTITY_SCRIPT);
   return true;
 }

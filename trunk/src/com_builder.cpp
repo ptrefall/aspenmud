@@ -10,6 +10,8 @@
 
 void InitializeBuilderCommands()
 {
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing builder commands.");
   world->commands.AddCommand(new CMDZlist());
   world->commands.AddCommand(new CMDRlist());
@@ -24,6 +26,8 @@ CMDZlist::CMDZlist()
 }
 BOOL CMDZlist::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   std::stringstream st;
   std::vector<Zone*> *zones=new std::vector<Zone*>();
   std::vector<Zone*>::iterator it;
@@ -58,6 +62,8 @@ CMDRlist::CMDRlist()
 }
 BOOL CMDRlist::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   if (!args.size())
     {
       mobile->Message(MSG_ERROR,"You need to provide the name of a zone to list rooms for.");
@@ -104,6 +110,8 @@ CMDDig::CMDDig()
 }
 BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  World* world = World::GetPtr();
+
   if (!args.size())
     {
       mobile->Message(MSG_ERROR,"Syntax: dig <direction>\nCreates another room in the direction you specified.");

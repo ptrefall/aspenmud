@@ -4,6 +4,8 @@
 void InitializeSyslog(void)
 {
 #ifdef MODULE_SYSLOG
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing syslog.");
   world->events.GetEvent("PlayerConnect")->Add(SYSLOG_PlayerConnect);
   world->events.GetEvent("PlayerDisconnect")->Add(SYSLOG_PlayerDisconnect);
@@ -15,6 +17,8 @@ void InitializeSyslog(void)
 #ifdef MODULE_SYSLOG
 EVENT(SYSLOG_PlayerConnect)
 {
+  World* world = World::GetPtr();
+
   Player* mobile=(Player*)caller;
   sockaddr_in* addr=mobile->GetSocket()->GetAddr();
   std::stringstream st;
@@ -27,6 +31,8 @@ EVENT(SYSLOG_PlayerConnect)
 
 EVENT(SYSLOG_PlayerDisconnect)
 {
+  World* world = World::GetPtr();
+
   Player* mobile=(Player*)caller;
   world->FindChannel("syslog")->Broadcast(mobile,"Disconnected",false);
   world->WriteLog(mobile->GetName()+" disconnected.");

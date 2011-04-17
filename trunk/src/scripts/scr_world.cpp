@@ -43,29 +43,33 @@ EVENT(EVENT_INIT_WORLD_SCRIPT)
 
 BOOL InitWorldScript(void)
 {
+  World* world = World::GetPtr();
   world->events.AddCallback("ScriptLoaded", EVENT_INIT_PLAYER_SCRIPT);
   return true;
 }
 
 int SCR_Shutdown(lua_State* l)
 {
+  World* world = World::GetPtr();
   world->Shutdown();
   lua_pushboolean(l, true);
   return 1;
 }
 int SCR_GetRealUptime(lua_State* l)
 {
+  World* world = World::GetPtr();
   lua_pushnumber(l, world->GetRealUptime());
   return 1;
 }
 int SCR_GetCopyoverUptime(lua_State* l)
 {
+  World* world = World::GetPtr();
   lua_pushnumber(l, world->GetCopyoverUptime());
   return 1;
 }
 int SCR_FindPlayer(lua_State* l)
 {
-  Player* p = NULL;
+  World* world = World::GetPtr();
   const char* search = NULL;
 
   if (lua_gettop(l) != 1)
@@ -87,6 +91,8 @@ int SCR_FindPlayer(lua_State* l)
 }
 int SCR_GetPlayers(lua_State* l)
 {
+  World* world = World::GetPtr();
+
 //our list of players
   std::list <Player*> *players = world->GetPlayers();
 //iterators for the list.
@@ -110,18 +116,24 @@ int SCR_GetPlayers(lua_State* l)
 }
 int SCR_GetBanner(lua_State* l)
 {
+  World* world = World::GetPtr();
+
   const char*banner = world->GetBanner();
   lua_pushlstring(l, banner, strlen(banner));
   return 1;
 }
 int SCR_GetMotd(lua_State* l)
 {
+  World* world = World::GetPtr();
+
   const char* motd = world->GetMotd();
   lua_pushlstring(l, motd, strlen(motd));
   return 1;
 }
 int SCR_WriteLog(lua_State* l)
 {
+  World* world = World::GetPtr();
+
   world->WriteLog(lua_tostring(l, -1), SCRIPT);
   return 0;
 }
@@ -130,5 +142,4 @@ int SCR_AddChannel(lua_State* l)
 {
   return 0;
 }
-
 #endif

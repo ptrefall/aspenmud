@@ -23,12 +23,13 @@
 */
 #include "world.h"
 #include "component.h"
-
 //start components include
 #include "components/stats.h"
 
 void CreateComponents(void)
 {
+  World* world = World::GetPtr();
+
   world->WriteLog("Initializing components.");
   world->RegisterComponent("stats", STATS_CREATE, STATS_INIT);
 }
