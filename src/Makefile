@@ -11,7 +11,7 @@ ECHO = echo
 #PROF = -pg
 CC	= g++
 #debugging code (should always be used except for special cases).
-CFLAGS	= -ggdb -pedantic -Wall -Werror -O1
+CFLAGS	= -ggdb -pedantic -Wall -Werror -O1 -std=c++0x
 #makes the compile use our libraries.
 CFLAGS += -L../libs
 #makes the compiler use our includes.
@@ -19,7 +19,7 @@ CFLAGS += -L../libs
 CFLAGS += -I../includes
 
 #required libraries
-L_FLAGS	= -lcrypto -llua5.1 -ltinyxml
+L_FLAGS	= -lcrypto -ltinyxml -langelscript
 
 #formatting specific flags
 FORMATTER = astyle
@@ -29,7 +29,7 @@ FORMAT_FLAGS = --style=gnu
 MODULES = scripts syslog help components intermud
 
 #dependencies
-DEPS = tinyxml
+DEPS = tinyxml angelscript
 
 #source files to compile:
 S_FILES= world.cpp variant.cpp entity.cpp player.cpp socket.cpp\
@@ -65,7 +65,7 @@ clean-all:
 	@$(MAKE) clean
 	@$(ECHO) `date '+%H:%M:%S:'`  cleaning dependencies
 	@for d in $(DEPS);do cd ../dependencies/$$d;$(MAKE) clean;cd $(CURDIR);done
-	@$(RM) ../libs/* ../includes/*
+	@$(RM) ../libs/*
 
 format:
 	@$(ECHO) `date '+%H:%M:%S:'` Formatting
