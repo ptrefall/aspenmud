@@ -31,8 +31,8 @@ World::World()
 {
   _running = true;
   _server=new Server();
-  _log=new Log();
-  _log->Open(EVENT_FILE);
+  _logs = new std::map<std::string, Log*>();
+  RegisterLog(EVENT_FILE, EVENT_NAME);
   _users=new std::list<Player*>();
   _channels=new std::map<int,Channel*>();
   _options = new std::map<std::string, Option*>();
@@ -67,12 +67,26 @@ World::~World()
   std::map<int,Channel*>::iterator cit, citEnd;
   std::vector<Zone*>::iterator zit, zitEnd;
   std::map<std::string, Option*>::iterator oit, oitEnd;
+  std::map<std::string, Log*>::iterator lit, litEnd;
 
-  delete [] _motd;
-  delete [] _banner;
-  delete _log;
+  if (_motd)
+    {
+      delete [] _motd;
+    }
+  if (_banner)
+    {
+      delete [] _banner;
+    }
+
   delete _server;
   delete _users;
+
+  litEnd = _logs->end();
+  for (lit = _logs->begin(); lit != litEnd; ++lit)
+    {
+      delete (*lit).second;
+    }
+  delete _logs;
 
   citEnd=_channels->end();
   for (cit = _channels->begin(); cit != citEnd; ++cit)
@@ -173,9 +187,16 @@ Server* World::GetServer() const
   return _server;
 }
 
-Log* World::GetLog() const
+Log* World::GetLog(const std::string &name)
 {
-  return _log;
+  if (LogExists(name))
+    {
+      return (*_logs)[name];
+    }
+  else
+    {
+      return NULL;
+    }
 }
 
 std::list <Player*> *World::GetPlayers() const
@@ -1074,11 +1095,40 @@ void World::InitializeNums()
     }
 }
 
-void World::WriteLog(const std::string &data,LOG_LEVEL l)
+BOOL World::LogExists(const std::string &name)
 {
-  _log->Write(data, l);
-}
+  if (_logs->count(name))
+    {
+      return true;
+    }
 
+  return false;
+}
+BOOL World::RegisterLog(const std::string &path, const std::string &name)
+{
+  if (LogExists(name))
+    {
+      return false;
+    }
+  else
+    {
+      Log* log = new Log(path);
+      if (log)
+        {
+          (*_logs)[name] = log;
+          return true;
+        }
+    }
+
+  return false;
+}
+void World::WriteLog(const std::string &data, LOG_LEVEL l, const std::string &name)
+{
+  if (LogExists(name))
+    {
+      GetLog(name)->Write(data, l);
+    }
+}
 BOOL World::IsRunning() const
 {
   return _running;

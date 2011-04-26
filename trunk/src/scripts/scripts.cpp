@@ -9,11 +9,11 @@
 #ifdef MODULE_SCRIPTING
 Script::Script(Entity* obj)
 {
-_obj = obj;
+  _obj = obj;
 }
 
 BOOL InitializeScript()
 {
-return true;
+  return true;
 }
 #endif

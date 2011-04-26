@@ -26,7 +26,7 @@ class World
 {
   static World* _ptr;
   Server* _server; //our main server object.
-  Log *_log;
+  std::map<std::string, Log*> *_logs;
   ComponentFactory* _cfactory;
   std::list <Player*> *_users; //a list of the currently connected players.
   std::map <int,Channel*>* _channels;
@@ -295,8 +295,32 @@ public:
   BOOL CreateObject(Entity* obj);
   BOOL  CreateRoom(Room* room);
   void InitializeNums(void);
-  void WriteLog(const std::string &data,LOG_LEVEL l=INFORM);
-  Log* GetLog() const;
+  /*
+  *Checks to see if the log exists.
+  *Param: [in] the name of the log.
+  *Return: True if the log has been registered, false otherwise.
+  */
+  BOOL LogExists(const std::string &name);
+  /*
+  *Registers the logger if it does not already exist.
+  *Param: [in] the name of the logger to register.
+  *Return: True on success, false on failure.
+  */
+  BOOL RegisterLog(const std::string &path, const std::string &name);
+  /*
+  *Writes the specified data.
+  *Param: [in] the messsage to write.
+  *[in] [optional] the log file to write to.
+  *note: The log file must have already been registered with RegisterLog
+  *[in] the level of the message.
+  */
+  void WriteLog(const std::string &data, LOG_LEVEL l=INFORM, const std::string &name = EVENT_NAME);
+  /*
+  *Returns a pointer to the logger.
+  *Param: [in] the name of the logger.
+  *Return: A pointer to the specified logger, or NULL if it does not exist.
+  */
+  Log* GetLog(const std::string &name);
   /*
   *Checks to see if the game engine is still running.
   *Return: True if the game loop should continue, false otherwise.

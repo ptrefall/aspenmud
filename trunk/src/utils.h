@@ -12,6 +12,19 @@
 inline BOOL IsAlpha(const char* const character);
 BOOL FileExists(const std::string &name);
 /*
+*Gets the size of the file specified.
+*Param: [in] the fd of the file.
+*Return: the size of the file in bytes.
+*/
+UINT GetFileSize(int fd);
+/*
+*Retrieves the size of the specified file.
+*Param: [in] the name of the file.
+*return: the size of the file.
+*/
+UINT GetFileSize(const char* path);
+UINT GetFileSize(const std::string &path);
+/*
 *Tokenizes the string into chunks based on the delimiter.
 *Param: [in] the string to tokenize.
 *[out] a vector of strings, where the parts will go.
