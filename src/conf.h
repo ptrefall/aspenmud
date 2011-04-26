@@ -35,6 +35,8 @@
 #define BIN_FILE "../bin/aspen" //used for copyovers.
 #define EVENT_FILE "../logs/events.log" //our main log file
 #define EVENT_NAME "events" //the actual name of the event log.
+#define SCRIPT_FILE "../logs/script.log" //the name of the scripting log file.
+#define SCRIPT_NAME "script"
 #define HELP_FILE "../data/help.dat"
 #define SOCIALS_FILE "../data/socials.dat"
 //directories:

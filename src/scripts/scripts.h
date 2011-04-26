@@ -3,9 +3,15 @@
 #include "../conf.h"
 #include "../mud.h"
 #include "../entity.h"
-
+#include "../exception.h"
 #ifdef MODULE_SCRIPTING
 #include <angelscript.h>
+//script-wide exceptions:
+class ScriptException:public Exception
+{
+public:
+  ScriptException(const std::string &msg):Exception(msg) {}
+};
 
 class Script
 {
@@ -13,6 +19,8 @@ class Script
   Entity* _obj;
 public:
   Script(Entity* object);
+  ~Script();
+  void ReceiveMessage(asSMessageInfo *message);
 };
 #endif
 
