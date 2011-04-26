@@ -190,7 +190,7 @@ BOOL InitializeZones()
         {
           return false;
         }
-      if (!SaveZones())
+      if (!Zone::SaveZones())
         {
           return false;
         }

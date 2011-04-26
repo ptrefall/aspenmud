@@ -9,10 +9,10 @@
 
 class Script
 {
-asIScriptEngine *_engine;
-Entity* _obj;
+  asIScriptEngine *_engine;
+  Entity* _obj;
 public:
-Script(Entity* object);
+  Script(Entity* object);
 };
 #endif
 

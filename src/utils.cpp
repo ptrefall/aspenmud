@@ -30,6 +30,38 @@ BOOL FileExists(const std::string &name)
   return false;
 }
 
+UINT GetFileSize(int fd)
+{
+  struct stat info;
+  int res=fstat(fd, &info);
+  if (res)
+    {
+      return -1;
+    }
+  else
+    {
+      return info.st_size;
+    }
+}
+UINT GetFileSize(const char* path)
+{
+  struct stat info;
+  int res = stat(path, &info);
+  if (res)
+    {
+      return -1;
+    }
+  else
+    {
+      return info.st_size;
+    }
+}
+UINT GetFileSize(const std::string &path)
+{
+  return GetFileSize(path.c_str());
+}
+
+
 void Tokenize(const std::string &str, std::vector<std::string> &tokens, const std::string &del)
 {
   std::string::size_type lpos=str.find_first_not_of(del,0);

@@ -11,6 +11,8 @@
 #define LISTEN_BACKLOG 5 //the backlog for the listening socket.
 #define PULSES_PER_SECOND 60 //how many game loop itterations will be ran each second
 #define LOG_CONSOLE //will tell the logger to write to console. Comment out if you do not wish this.
+#define LOG_MAXSIZE 1024*1024 //1mb
+#define LOG_MAXFILES 10 //maximum number of logs to keep.
 #define MIN_LOG_LEVEL (LOG_LEVEL)WARN //the minimum level of logging that will be written to console.
 #define MUD_NAME std::string("Aspen") //name of your mud.
 #define MAX_CHAN_HISTORY_LENGTH 20 //the maximum number of entries channels will log.
@@ -32,6 +34,7 @@
 #define COPYOVER_FILE "../copyover.dat" //stores player connection info
 #define BIN_FILE "../bin/aspen" //used for copyovers.
 #define EVENT_FILE "../logs/events.log" //our main log file
+#define EVENT_NAME "events" //the actual name of the event log.
 #define HELP_FILE "../data/help.dat"
 #define SOCIALS_FILE "../data/socials.dat"
 //directories:
@@ -96,5 +99,5 @@ enum ExitDirection {nowhere, north, south, east, west, northeast, northwest, sou
 //starting up. Leaving it defined can't hurt, but comment it out if this is giving you some sort of problem.
 #define SECURE_INITIALIZATION
 //uncomment this if you want the code to check for files and create them if they do not exist. see socials.cpp and zone.cpp for examples.
-//#define NO_INIT_DEFAULTS
+#define NO_INIT_DEFAULTS
 #endif

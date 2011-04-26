@@ -1,5 +1,5 @@
-#ifndef HEADER_LOG
-#define HEADER_LOG
+#ifndef LOG_H
+#define LOG_H
 #include <string>
 #include <cstdio>
 #include "mud.h"
@@ -11,19 +11,25 @@
 */
 class Log
 {
-  FILE* out;
+  FILE* _out;
+  std::string _name;
 public:
-  Log();
+  Log(const std::string &file);
   ~Log();
-  /*
-  *Opens a log file.
-  *Params: [in] The name of the file to open.
-  */
-  void Open(std::string name);
   /*
   *Writes the data to the console and the file if possible.
   *Param: [in] The message to write.
   */
   void Write(const std::string &data,LOG_LEVEL l=INFORM);
+  /*
+  *Checks to see if the size of the current log file
+  *Is not over the set size.
+  *If the file is larger than LOG_MAXSIZE, the files will be cycled out.
+  */
+  void CheckSize();
+  /*
+  *Cycles through the files, renaming older files up to the maximum limit.
+  */
+  void CycleFiles();
 };
 #endif
