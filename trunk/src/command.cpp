@@ -127,14 +127,15 @@ Commandable::~Commandable()
   delete _commands;
 }
 
-void Commandable::AddCommand(Command* com)
+BOOL Commandable::AddCommand(Command* com)
 {
   if (CommandExists(com->GetName()))
     {
-      return;
+      return false;;
     }
 
   _commands->push_back(com);
+  return true;
 }
 BOOL Commandable::RemoveCommand(const std::string &name)
 {
@@ -197,7 +198,7 @@ std::vector <Command*> *Commandable::GetPtr()
 }
 
 
-void InitializeCommands()
+BOOL InitializeCommands()
 {
   World* world = World::GetPtr();
 
@@ -206,4 +207,5 @@ void InitializeCommands()
   InitializeMovementCommands();
   InitializeWizCommands();
   InitializeBuilderCommands();
+  return true;
 }

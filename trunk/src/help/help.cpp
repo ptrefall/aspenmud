@@ -309,7 +309,7 @@ BOOL CMDHedit::Execute(const std::string &verb, Player* mobile,std::vector<std::
 }
 #endif
 
-void InitializeHelp()
+BOOL InitializeHelp()
 {
 #ifdef MODULE_HELP
   World* world = World::GetPtr();
@@ -319,9 +319,12 @@ void InitializeHelp()
   if (!table)
     {
       world->WriteLog("Error creating help table.", CRIT);
+      return false;
     }
   world->AddProperty("help", (void*)table);
   world->commands.AddCommand(new CMDHelp());
   world->commands.AddCommand(new CMDAddTopic());
 #endif
+
+  return true;
 }

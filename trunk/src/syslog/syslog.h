@@ -7,7 +7,7 @@
 #include "../channel.h"
 #include "../player.h"
 
-void InitializeSyslog(void);
+BOOL InitializeSyslog(void);
 #ifdef MODULE_SYSLOG
 EVENT(SYSLOG_PlayerConnect);
 EVENT(SYSLOG_PlayerDisconnect);

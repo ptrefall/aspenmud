@@ -98,7 +98,7 @@ public:
   *Adds a channel to the worlds channel lookup table.
   *Param: [in] A pointer to the object to add.
   */
-  void AddChannel(Channel* chan,BOOL command=true);
+  BOOL AddChannel(Channel* chan,BOOL command=true);
   /*
   *Will locate a channel object based on it's ID.
   *Param: [in] the id of the channel.
@@ -116,6 +116,12 @@ public:
   *Param: [out] A pointer to a list of strings that will receive the chanel names.
   */
   void GetChannelNames(std::list <std::string>* out);
+  /*
+  *Checks to see if the specified channel exists.
+  *Param: [in] a pointer to the channel.
+  *Return: True if the channel exists, false otherwise.
+  */
+  BOOL ChannelExists(Channel* chan);
   /*
   *Registers the specified component
   *Params: [in] The name of the component.

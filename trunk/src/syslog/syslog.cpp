@@ -1,7 +1,7 @@
 #include <sstream>
 #include "syslog.h"
 
-void InitializeSyslog(void)
+BOOL InitializeSyslog()
 {
 #ifdef MODULE_SYSLOG
   World* world = World::GetPtr();
@@ -11,7 +11,8 @@ void InitializeSyslog(void)
   world->events.GetEvent("PlayerDisconnect")->Add(SYSLOG_PlayerDisconnect);
   world->AddChannel(new Channel("syslog","",RANK_ADMIN),false);
 #endif
-  return;
+
+  return true;
 }
 
 #ifdef MODULE_SYSLOG

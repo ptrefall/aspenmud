@@ -14,7 +14,7 @@
 #define LOG_MAXSIZE 1024*1024 //1mb
 #define LOG_MAXFILES 10 //maximum number of logs to keep.
 #define MIN_LOG_LEVEL (LOG_LEVEL)WARN //the minimum level of logging that will be written to console.
-#define MUD_NAME std::string("Aspen") //name of your mud.
+#define MUD_NAME "Aspen" //name of your mud.
 #define MAX_CHAN_HISTORY_LENGTH 20 //the maximum number of entries channels will log.
 #define GAME_IDLE_TIME (60*45) //the amount of time someone will be able to idle before they are kicked.
 #define LOGIN_IDLE_TIME (30) //the amount of time someone will be able to idle at login.
@@ -33,6 +33,7 @@
 #define LOGIN_FILE "../txt/welcome" //banner shown at login
 #define COPYOVER_FILE "../copyover.dat" //stores player connection info
 #define BIN_FILE "../bin/aspen" //used for copyovers.
+#define SETTINGS_FILE "../data/settings.xml" //used for holding aspen settings.
 #define EVENT_FILE "../logs/events.log" //our main log file
 #define EVENT_NAME "events" //the actual name of the event log.
 #define SCRIPT_FILE "../logs/script.log" //the name of the scripting log file.
