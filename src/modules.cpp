@@ -1,11 +1,19 @@
 #include "modules.h"
 
-void InitializeModules(void)
+BOOL InitializeModules(void)
 {
 #ifdef MODULE_SYSLOG
-  InitializeSyslog();
+  if(!InitializeSyslog())
+    {
+      return false;
+    }
 #endif
 #ifdef MODULE_HELP
-  InitializeHelp();
+  if(!InitializeHelp())
+    {
+      return false;
+    }
 #endif
+
+  return false;
 }

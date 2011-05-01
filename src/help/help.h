@@ -142,5 +142,5 @@ public:
 
 #endif
 
-void InitializeHelp();
+BOOL InitializeHelp();
 #endif

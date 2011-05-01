@@ -55,7 +55,7 @@ public:
   *Adds a command to the list of active commands:
   *Param: [in] A pointer to the command to add.
   */
-  virtual void AddCommand(Command* com);
+  virtual BOOL AddCommand(Command* com);
   /*
   *Removes the command from the list.
   *Param: [in] the name of the command.
@@ -85,5 +85,5 @@ public:
 *Command initialization
 *Param: [in] a pointer to the world object.
 */
-void InitializeCommands();
+BOOL InitializeCommands();
 #endif

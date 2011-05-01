@@ -34,9 +34,10 @@ void sig(int sig);
 
 int main(int argc, char** argv)
 {
-  World* world;
+  World* world = NULL;
   BOOL copyover=false; //are we rebooting for copyover?
   int listener=0; //the socket to listen on when recovering from copyover
+  int port = 0;
 
 #ifdef SECURE_INITIALIZATION
   if (getuid() == 0)
@@ -47,13 +48,11 @@ int main(int argc, char** argv)
 #endif
 
   world = World::GetPtr();
-  world->WriteLog("Initializing "+MUD_NAME+".");
+  world->WriteLog("Initializing "+std::string(MUD_NAME)+".");
+
 //initialize the server class:
-  int port;
 //determine if a port was specified. If not, use default.
-  switch (argc)
-    {
-    case 2:
+  if (argc == 2)
     {
       port = atoi(argv[1]);
       if ((port < 1024)||(port>65535))
@@ -61,9 +60,8 @@ int main(int argc, char** argv)
           world->WriteLog("Invalid port specified, program will now exit.", ERR);
           return EXIT_FAILURE;
         }
-      break;
     }
-    case 3:
+  else if (argc == 3)
     {
       if ((!strcmp(argv[1],"-c"))&&(atoi(argv[2])>0))
         {
@@ -71,9 +69,9 @@ int main(int argc, char** argv)
           listener=atoi(argv[2]);
         }
     }
-    default:
+  else
+    {
       port=DEFAULT_PORT;
-      break;
     }
 
   if (!world->InitializeFiles())
@@ -83,7 +81,11 @@ int main(int argc, char** argv)
     }
 
 //game initialization calls
-  InitializeCommands();
+  if (!InitializeCommands())
+    {
+      world->WriteLog("Could not initialize commands.", ERR);
+      return EXIT_FAILURE;
+    }
   InitializeChannels();
 #ifdef MODULE_SCRIPTING
   if (!InitializeScript())
@@ -101,7 +103,11 @@ int main(int argc, char** argv)
     }
 #endif
 
-  InitializeModules();
+  if (!InitializeModules())
+    {
+      world->WriteLog("Could not initialize modules.", ERR);
+      return EXIT_FAILURE;
+    }
   if (!InitializeZones())
     {
       world->WriteLog("could not initialize zones.", ERR);
@@ -109,7 +115,11 @@ int main(int argc, char** argv)
     }
 
   world->InitializeNums();
-  InitializeSocials();
+  if (!InitializeSocials())
+    {
+      world->WriteLog("Could not initialize the socials system.", ERR);
+      return EXIT_FAILURE;
+    }
   CreateComponents();
   world->SetRealUptime(time(NULL));
   world->SetCopyoverUptime(time(NULL));

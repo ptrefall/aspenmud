@@ -9,5 +9,5 @@
 #include "help/help.h"
 #endif
 
-void InitializeModules(void);
+BOOL InitializeModules(void);
 #endif

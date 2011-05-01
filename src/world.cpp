@@ -282,24 +282,47 @@ void World::GetChannelNames(std::list <std::string>* out)
     }
 }
 
-void World::AddChannel(Channel* chan,BOOL command)
+BOOL World::ChannelExists(Channel* chan)
 {
-  (*_channels)[_chanid]=chan;
-  RegisterOption(new Option(chan->GetName(),
-                            "Controls whether or not you can hear and broadcast to "+chan->GetName()+".",
-                            chan->GetAccess(), (chan->GetName()=="newbie"?Variant((int)1):Variant((int)0)), VAR_INT, true));
-  if (command)
+  std::map<int, Channel*>::iterator it, itEnd;
+
+  itEnd = _channels->end();
+  for (it = _channels->begin(); it != itEnd; ++it)
     {
-      CMDChan* com = new CMDChan();
-      com->SetName(chan->GetName());
-      com->SetAccess(chan->GetAccess());
-      if (chan->GetAlias() != "")
+      if ((*it).second == chan)
         {
-          com->AddAlias(chan->GetAlias());
+          return true;
         }
-      commands.AddCommand(com);
     }
-  _chanid++;
+
+  return false;
+}
+BOOL World::AddChannel(Channel* chan,BOOL command)
+{
+  if (!ChannelExists(chan))
+    {
+      (*_channels)[_chanid]=chan;
+      return true;
+      RegisterOption(new Option(chan->GetName(),
+                                "Controls whether or not you can hear and broadcast to "+chan->GetName()+".",
+                                chan->GetAccess(), (chan->GetName()=="newbie"?Variant((int)1):Variant((int)0)), VAR_INT, true));
+      if (command)
+        {
+          CMDChan* com = new CMDChan();
+          com->SetName(chan->GetName());
+          com->SetAccess(chan->GetAccess());
+          if (chan->GetAlias() != "")
+            {
+              com->AddAlias(chan->GetAlias());
+            }
+          commands.AddCommand(com);
+        }
+      _chanid++;
+
+      return true;
+    }
+
+  return false;
 }
 
 Channel* World::FindChannel(const int id) const
