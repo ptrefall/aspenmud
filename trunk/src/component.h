@@ -2,10 +2,12 @@
 #define COMPONENT_H
 #include <string>
 #include <vector>
+#include <tinyxml.h>
 #include "mud.h"
 #include "conf.h"
 #include "entity.h"
 #include "event.h"
+#include "property.hpp"
 
 class Component
 {
@@ -14,10 +16,14 @@ class Component
   std::string _name;
   std::vector <std::string> *_dependencies; //component dependencies.
 public:
+  Property variables;
   EventManager events;
   Component(const std::string &name);
   Component(void);
   virtual ~Component();
+  virtual void Serialize(TiXmlElement* root);
+  virtual void Deserialize(TiXmlElement* root);
+
   /*
   *Getters and setters
   *Getters:

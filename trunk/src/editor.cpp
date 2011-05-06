@@ -276,17 +276,9 @@ void Editor::Delete(void)
 
   if (_cursor==-1)
     {
-      if (!_lines.size())
-        {
-          _mobile->Message(MSG_INFO,"Buffer is empty.");
-          return;
-        }
-      else
-        {
-          _lines.erase(_lines.end());
-          _mobile->Message(MSG_INFO, "Deleted line.");
-          return;
-        }
+      _lines.erase(_lines.end());
+      _mobile->Message(MSG_INFO, "Deleted line.");
+      return;
     }
 
   for (it=_lines.begin(),i=0; i!=_cursor; i++, ++it);
