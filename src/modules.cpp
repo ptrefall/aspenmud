@@ -15,5 +15,5 @@ BOOL InitializeModules(void)
     }
 #endif
 
-  return false;
+  return true;
 }

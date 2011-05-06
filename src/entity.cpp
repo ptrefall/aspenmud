@@ -157,7 +157,7 @@ void Entity::Serialize(TiXmlElement* root)
       for (it=_components->begin(); it != itEnd; ++it)
         {
           component = new TiXmlElement("component");
-          component->SetAttribute("name", (*it)->GetName().c_str());
+          (*it)->Serialize(component);
           components->LinkEndChild(component);
         }
     }
@@ -201,6 +201,7 @@ void Entity::Deserialize(TiXmlElement* root)
   TiXmlElement* properties = NULL;
   TiXmlNode* node = NULL;
   int loc;
+  Component* com = NULL;
 
 //contents
   node = root->FirstChild("contents");
@@ -224,7 +225,9 @@ void Entity::Deserialize(TiXmlElement* root)
       for (node = components->FirstChild(); node; node = node->NextSibling())
         {
           component = node->ToElement();
-          AddComponent(world->CreateComponent(component->Attribute("name")));
+          com = world->CreateComponent(component->Attribute("name"));
+          com->Deserialize(component);
+          AddComponent(com);
         }
     }
 
