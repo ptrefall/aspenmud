@@ -9,13 +9,9 @@ class Stats:public Component
 {
 public:
   Stats(void);
+  EVENT(attached);
+  static EVENT(Added);
+  static COMCREATE(Create);
+  static COMINIT(Initialize);
 };
-
-//prototypes
-COMCREATE(STATS_CREATE);
-COMINIT(STATS_INIT);
-EVENT(STATS_ATTACHED);
-EVENT(STATS_ADD);
-
-
 #endif
