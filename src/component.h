@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <tinyxml.h>
+#include <boost/function.hpp>
 #include "mud.h"
 #include "conf.h"
 #include "entity.h"
@@ -70,9 +71,11 @@ public:
 *A function pointer passed to the component factory.
 *Used to point to the create methods of a component.
 */
-typedef Component* (*COMCREATECB)(void);
+typedef boost::function<Component* (void)> COMCREATECB;
 #define COMCREATE(name) Component* name(void)
-typedef void (*COMINITCB)(void);
-#define COMINIT(name) void name(void)
+#define CCOMCREATE(class, name) Component* class::name(void)
+typedef boost::function<void (void)> COMINITCB ;
+#define COMINIT(name) void name()
+#define CCOMINIT(class, name) void class::name(void)
 
 #endif

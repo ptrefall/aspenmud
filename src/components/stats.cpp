@@ -1,3 +1,4 @@
+#include <boost/bind.hpp>
 #include "stats.h"
 #include "../event.h"
 #include "../player.h"
@@ -9,33 +10,30 @@ Stats::Stats(void)
 {
   SetName("stats");
   events.RegisterEvent("StatChanged", new Event());
-  events.AddCallback("OnAttach", STATS_ATTACHED);
+  events.AddCallback("OnAttach", boost::bind(&Stats::attached, this, _1, _2));
 }
 
-COMCREATE(STATS_CREATE)
+CCOMCREATE(Stats, Create)
 {
   return new Stats();
 }
-COMINIT(STATS_INIT)
+CCOMINIT(Stats, Initialize)
 {
   World* world = World::GetPtr();
-  world->events.GetEvent("PlayerCreated")->Add(STATS_ADD);
-  world->events.GetEvent("PlayerConnect")->Add(STATS_ADD);
+  world->events.GetEvent("PlayerCreated")->Add(boost::bind(&Stats::Added, _1, _2));
+  world->events.GetEvent("PlayerConnect")->Add(boost::bind(&Stats::Added, _1, _2));
 }
 
-EVENT(STATS_ATTACHED)
+CEVENT(Stats, attached)
 {
-  OneArg* arg = (OneArg*)args;
-  Entity* obj = (Entity*) arg->_arg;
-
-  obj->variables.AddProperty("str", Variant(1));
-  obj->variables.AddProperty("con", Variant(1));
-  obj->variables.AddProperty("dex", Variant(1));
-  obj->variables.AddProperty("int", Variant(1));
-  obj->variables.AddProperty("wis", Variant(1));
+  variables.AddProperty("str", Variant(1));
+  variables.AddProperty("con", Variant(1));
+  variables.AddProperty("dex", Variant(1));
+  variables.AddProperty("int", Variant(1));
+  variables.AddProperty("wis", Variant(1));
 }
 
-EVENT(STATS_ADD) //called for new player and player logins.
+CEVENT(Stats, Added) //called for new player and player logins.
 {
   World* world = World::GetPtr();
 
