@@ -358,7 +358,24 @@ bool Entity::HasComponent(const std::string &name)
 
   return false;
 }
+Component* Entity::GetComponent(const std::string &name)
+{
+  std::vector <Component*>::iterator it, itEnd;
 
+  if (_components->size())
+    {
+      itEnd = _components->end();
+      for (it = _components->begin(); it != itEnd; ++it)
+        {
+          if ((*it)->GetName()==name)
+            {
+              return (*it);
+            }
+        }
+    }
+
+  return NULL;
+}
 void Entity::Attach(Entity* obj)
 {
   std::vector <Component*>::iterator it, itEnd;

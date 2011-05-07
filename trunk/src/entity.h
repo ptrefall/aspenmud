@@ -119,6 +119,12 @@ public:
   */
   bool HasComponent(const std::string &name);
   /*
+  *Retrieves a pointer to the component.
+  *Param: [in] the name of the component.
+  *Return: A pointer to the component, or NULL if it was not found.
+  */
+  Component* GetComponent(const std::string &name);
+  /*
   *Attaches the object to all the components in the list.
   *Should be called after adding a component.
   *Param: [in] the object to attach the components to.
