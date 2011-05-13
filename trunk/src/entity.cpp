@@ -157,6 +157,7 @@ void Entity::Serialize(TiXmlElement* root)
       for (it=_components->begin(); it != itEnd; ++it)
         {
           component = new TiXmlElement("component");
+          component->SetAttribute("name", (*it)->GetName().c_str());
           (*it)->Serialize(component);
           components->LinkEndChild(component);
         }
