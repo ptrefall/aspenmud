@@ -16,6 +16,7 @@
 #include "utils.h"
 #include "zone.h"
 #include "option.h"
+#include <boost/unordered_map.hpp>
 
 World* World::_ptr;
 World* World::GetPtr()
@@ -34,6 +35,7 @@ World::World()
   _logs = new std::map<std::string, Log*>();
   RegisterLog(EVENT_FILE, EVENT_NAME);
   _users=new std::list<Player*>();
+  _prompts = new boost::unordered_map<char, PROMPTCB>();
   _channels=new std::map<int,Channel*>();
   _options = new std::map<std::string, Option*>();
   _cfactory=new ComponentFactory();
@@ -104,6 +106,7 @@ World::~World()
 
   delete _cfactory;
   delete _properties;
+  delete _prompts;
 
   zitEnd = _zones->end();
   for (zit = _zones->begin(); zit != zitEnd; ++zit)
@@ -1187,4 +1190,46 @@ Option* World::GetGlobalOption(const std::string &name)
 std::map<std::string, Option*>* World::GetGlobalOptions()
 {
   return _options;
+}
+
+BOOL World::PromptExists(char prompt)
+{
+  return (_prompts->count(prompt)==0? false:true);
+}
+BOOL World::RegisterPrompt(char c, PROMPTCB callback)
+{
+  if (PromptExists(c))
+    {
+      return false;
+    }
+
+  (*_prompts)[c] = callback;
+  return true;
+}
+std::string World::BuildPrompt(const std::string &prompt)
+{
+  std::string::const_iterator it, itEnd;
+  std::string ret;
+
+  itEnd = prompt.end();
+  for (it = prompt.begin(); it != itEnd; ++it)
+    {
+      if ((*it) == '%' && ++it != itEnd)
+        {
+          if (PromptExists((*it)))
+            {
+              ret += ((*_prompts)[(*it)])();
+            }
+          else
+            {
+              ret += "%"+(*it);
+            }
+        }
+      else
+        {
+          ret += (*it);
+        }
+    }
+
+  return ret;
 }

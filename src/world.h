@@ -21,15 +21,20 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <boost/unordered_map.hpp>
+#include <boost/function.hpp>
+
+typedef boost::function<std::string (void)> PROMPTCB;
 
 class World
 {
   static World* _ptr;
   Server* _server; //our main server object.
-  std::map<std::string, Log*> *_logs;
   ComponentFactory* _cfactory;
   std::list <Player*> *_users; //a list of the currently connected players.
+  boost::unordered_map<char, PROMPTCB> *_prompts;
   std::map <int,Channel*>* _channels;
+  std::map<std::string, Log*> *_logs;
   std::map <std::string,void*> *_properties;
   std::map<std::string, Option*> *_options;
   std::vector<Zone*> *_zones;
@@ -361,5 +366,19 @@ public:
   *Return: a pointer to an std::map<std::string, Option*>.
   */
   std::map<std::string, Option*>* GetGlobalOptions();
+  /*
+  *Checks to see if the specified prompt handler exists.
+  *Param: [in] the letter of the handler to check for.
+  *return: True if the prompt exists, false otherwise.
+  */
+  BOOL PromptExists(char prompt);
+  /*
+  *Registers the prompt variable and handler.
+  *Param: [in] the letter to register for the prompt.
+  *Param: [in] a boost::function that points to the callback to retrieve information.
+  *Return: True if the prompt could be registered, false otherwise.
+  */
+  BOOL RegisterPrompt(char prompt, PROMPTCB callback);
+  std::string BuildPrompt(const std::string &prompt);
 };
 #endif

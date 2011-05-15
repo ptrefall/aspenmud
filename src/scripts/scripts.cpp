@@ -34,6 +34,7 @@ Script::Script(Entity* obj)
         }
       throw(ScriptException("An error occured while trying to register the message callback for "+_obj->GetName()+". Error: "+error+"."));
     }
+
 }
 Script::~Script()
 {
@@ -70,16 +71,13 @@ void Script::ReceiveMessage(asSMessageInfo *message)
         }
       else
         {
-          goto logit;
+          world->WriteLog(st.str(), SCRIPT, "script");
         }
     }
   else
     {
-      goto logit;
+      world->WriteLog(st.str(), SCRIPT, "script");
     }
-
-logit:
-  world->WriteLog(st.str(), SCRIPT, "script");
 }
 #endif
 
