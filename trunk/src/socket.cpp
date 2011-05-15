@@ -154,6 +154,7 @@ bool Socket::Read()
 bool Socket::Flush()
 {
   int b=0, w=0;
+  World* world = World::GetPtr();
   if (!_outBuffer.length())
     {
       return true;
@@ -161,7 +162,7 @@ bool Socket::Flush()
 //prepend buffer to prompt
   if ((_mobile!=NULL)&&(_con==con_game))
     {
-      _outBuffer+="\r\n"+_mobile->GetPrompt()+TELNET_IAC+TELNET_GA;
+      _outBuffer+="\r\n"+world->BuildPrompt(_mobile->GetPrompt())+TELNET_IAC+TELNET_GA;
     }
 
   while (_outBuffer.length() > 0)

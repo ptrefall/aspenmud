@@ -120,14 +120,22 @@ std::string Channel::_Patternize(const std::string &message,Player* caller)
 {
   std::string m=message;
   std::stringstream format;
-  std::string::iterator it;
+  std::string::iterator it, itEnd;
   BOOL emote=false;
   if (m[0]==':')
     {
       emote=true;
       m.erase(m.begin());
     }
-  for (it=_pattern.begin(); it!=_pattern.end(); it++)
+  if (emote)
+    {
+      itEnd = _epattern.end();
+    }
+  else
+    {
+      itEnd = _pattern.end();
+    }
+  for (it=_pattern.begin(); it != itEnd; ++it)
     {
       if (((*it)=='%')&&((it++)!=(emote?_epattern.end():_pattern.end())))
         {
