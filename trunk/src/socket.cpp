@@ -162,7 +162,7 @@ bool Socket::Flush()
 //prepend buffer to prompt
   if ((_mobile!=NULL)&&(_con==con_game))
     {
-      _outBuffer+="\r\n"+world->BuildPrompt(_mobile->GetPrompt())+TELNET_IAC+TELNET_GA;
+      _outBuffer+="\r\n"+world->BuildPrompt(_mobile->GetPrompt(), _mobile)+TELNET_IAC+TELNET_GA;
     }
 
   while (_outBuffer.length() > 0)

@@ -52,9 +52,16 @@ FLAG BitClear(FLAG flag,int pos);
 BOOL BitIsSet(FLAG flag,int pos);
 //minmax
 template <typename T>
-inline T Min(const T a,const T b);
+inline T Min(const T a,const T b)
+{
+  return (a<b?a:b);
+}
 template <typename T>
-inline T Max(const T a,const T b);
+inline T Max(const T a,const T b)
+{
+  return (a>b?a:b);
+}
+
 /*
 *converts a list of strings to an english list (a, b, c, and d).
 *Param: [in] a pointer to a list of std::string.

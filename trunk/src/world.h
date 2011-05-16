@@ -24,7 +24,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/function.hpp>
 
-typedef boost::function<std::string (void)> PROMPTCB;
+typedef boost::function<std::string (Player*)> PROMPTCB;
 
 class World
 {
@@ -379,6 +379,6 @@ public:
   *Return: True if the prompt could be registered, false otherwise.
   */
   BOOL RegisterPrompt(char prompt, PROMPTCB callback);
-  std::string BuildPrompt(const std::string &prompt);
+  std::string BuildPrompt(const std::string &prompt, Player* mobile);
 };
 #endif

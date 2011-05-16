@@ -299,17 +299,6 @@ BOOL BitIsSet(FLAG flag,int pos)
   return flag&(1<<pos);
 }
 
-template <typename T>
-inline T Min(const T a, const T b)
-{
-  return (a<b?a:b);
-}
-template <typename T>
-inline T Max(const T a, const T b)
-{
-  return (a>b?a:b);
-}
-
 std::string EnglishList(std::list<std::string> *in)
 {
   std::list <std::string>::iterator it;
