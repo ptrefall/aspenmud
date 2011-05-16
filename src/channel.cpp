@@ -210,7 +210,7 @@ FLAG Channel::GetAccess(void) const
 
 std::list <HistoryNode*>* Channel::GetHistory(void) const
 {
-  return _history;
+  return (_history->size()?_history:NULL);
 }
 
 void Channel::AddListener(Player* subscriber,BOOL quiet)

@@ -343,6 +343,7 @@ Channel* World::FindChannel(const std::string &name)
   std::map<int,Channel*>::iterator it;
   std::map<int, Channel*>::iterator itEnd;
 
+  itEnd = _channels->end();
   for (it = _channels->begin(); it != itEnd; ++it)
     {
       if ((*it).second->GetName()==name)
@@ -350,6 +351,7 @@ Channel* World::FindChannel(const std::string &name)
           return ((*it).second);
         }
     }
+
   return NULL;
 }
 
