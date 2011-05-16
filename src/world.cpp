@@ -612,7 +612,7 @@ BOOL World::DoCommand(Player* mobile,std::string args)
                           params.push_back(args.substr(arg_start, arg_end - arg_start));
                       }
           */
-          if (isalnum(line[i]))
+          if (isprint(line[i]))
             {
               int arg_start = i;
               for (; i < len; i++)
@@ -1206,7 +1206,7 @@ BOOL World::RegisterPrompt(char c, PROMPTCB callback)
   (*_prompts)[c] = callback;
   return true;
 }
-std::string World::BuildPrompt(const std::string &prompt)
+std::string World::BuildPrompt(const std::string &prompt, Player* mobile)
 {
   std::string::const_iterator it, itEnd;
   std::string ret;
@@ -1218,7 +1218,7 @@ std::string World::BuildPrompt(const std::string &prompt)
         {
           if (PromptExists((*it)))
             {
-              ret += ((*_prompts)[(*it)])();
+              ret += ((*_prompts)[(*it)])(mobile);
             }
           else
             {
