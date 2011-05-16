@@ -292,7 +292,7 @@ BOOL CMDHist::Execute(const std::string &verb, Player* mobile,std::vector<std::s
 
   Channel* chan=NULL;
   std::list <HistoryNode*> *history;
-  std::list <HistoryNode*>::iterator it;
+  std::list <HistoryNode*>::iterator it, itEnd;
   TimeInfo tm;
 
   if (!args.size())
@@ -302,7 +302,7 @@ BOOL CMDHist::Execute(const std::string &verb, Player* mobile,std::vector<std::s
     }
 
   chan=world->FindChannel(args[0]);
-  if (chan==NULL)
+  if (!chan)
     {
       mobile->Message(MSG_ERROR,"That channel doesn't exist.");
       return false;
