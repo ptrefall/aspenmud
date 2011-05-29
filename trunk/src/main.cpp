@@ -149,6 +149,8 @@ int main(int argc, char** argv)
   signal(SIGQUIT,sig);
   signal(SIGHUP,sig);
 
+//load state:
+  world->LoadState();
 //start the game loop:
   world->WriteLog("Entering game loop.");
   GameLoop();

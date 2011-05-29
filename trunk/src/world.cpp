@@ -5,6 +5,7 @@
 #include <string>
 #include <cstring>
 #include <ctime>
+#include <tinyxml.h>
 #include "world.h"
 #include "channel.h"
 #include "player.h"
@@ -16,6 +17,7 @@
 #include "utils.h"
 #include "zone.h"
 #include "option.h"
+#include "serializer.h"
 #include <boost/unordered_map.hpp>
 
 World* World::_ptr;
@@ -45,6 +47,7 @@ World::World()
   _objects=new std::map<VNUM,Entity*>();
   _onumPool=new std::vector <VNUM>();
   _rnumPool=new std::vector<VNUM>();
+  _state = new std::map<std::string, ISerializable*>();
   _maxOnum=0;
   _maxRnum=0;
   _chanid=1;
@@ -70,6 +73,7 @@ World::~World()
   std::vector<Zone*>::iterator zit, zitEnd;
   std::map<std::string, Option*>::iterator oit, oitEnd;
   std::map<std::string, Log*>::iterator lit, litEnd;
+  std::map<std::string, ISerializable*>::iterator sit, sitEnd;
 
   if (_motd)
     {
@@ -96,6 +100,13 @@ World::~World()
       delete (*cit).second;
     }
   delete _channels;
+
+  sitEnd = _state->end();
+  for (sit = _state->begin(); sit != sitEnd; ++sit)
+    {
+      delete (*sit).second;
+    }
+  delete _state;
 
   oitEnd = _options->end();
   for (oit = _options->begin(); oit != oitEnd; ++oit)
@@ -138,6 +149,7 @@ void World::Shutdown()
     }
   events.CallEvent("Shutdown", NULL, (void*)this);
   _running = false;
+  SaveState();
 }
 void World::Copyover(Player* mobile)
 {
@@ -1234,4 +1246,83 @@ std::string World::BuildPrompt(const std::string &prompt, Player* mobile)
     }
 
   return ret;
+}
+
+BOOL World::AddState(const std::string &name, ISerializable* s)
+{
+  if (StateExists(name))
+    {
+      return false;
+    }
+
+  (*_state)[name] = s;
+  return true;
+}
+BOOL World::RemoveState(const std::string &name)
+{
+  if (!StateExists(name))
+    {
+      return false;
+    }
+
+  _state->erase(name);
+  return true;
+}
+BOOL World::StateExists(const std::string &name)
+{
+  return (_state->count(name)==1?true:false);
+}
+
+BOOL World::SaveState()
+{
+  std::map<std::string, ISerializable*>::iterator sit, sitEnd;
+  TiXmlDocument doc;
+  TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
+  doc.LinkEndChild(decl);
+  TiXmlElement* root = new TiXmlElement("state");
+  TiXmlElement* element = NULL;
+
+  sitEnd = _state->end();
+  for (sit = _state->begin(); sit != sitEnd; ++sit)
+    {
+      element = new TiXmlElement((*sit).first.c_str());
+      element->SetAttribute("name", (*sit).first.c_str());
+      (*sit).second->Serialize(element);
+      root->LinkEndChild(element);
+    }
+
+  doc.LinkEndChild(root);
+  doc.SaveFile(SETTINGS_FILE);
+  return true;
+}
+BOOL World::LoadState()
+{
+  TiXmlDocument doc(SETTINGS_FILE);
+  std::string name;
+  if (!doc.LoadFile())
+    {
+      WriteLog("Could not load the world state file.", WARN);
+      return false;
+    }
+
+  TiXmlElement* root = doc.FirstChild("state")->ToElement();
+  TiXmlElement* element = NULL;
+  TiXmlNode* node = NULL;
+
+  for (node = root->FirstChild(); node; node = node->NextSibling())
+    {
+      element = node->ToElement();
+      name = element->Attribute("name");
+      if (!StateExists(name))
+        {
+          WriteLog(std::string("Could not find a matching registered state for "+name+" in the state register. This state will not be deserialized."), WARN);
+          continue;
+        }
+      else
+        {
+          (*_state)[name]->Deserialize(element);
+        }
+    }
+
+  return true;
 }

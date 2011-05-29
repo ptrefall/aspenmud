@@ -296,7 +296,7 @@ FLAG BitClear(FLAG flag,int pos)
 }
 BOOL BitIsSet(FLAG flag,int pos)
 {
-  return flag&(1<<pos);
+  return  (flag & (1 << pos)) == flag;
 }
 
 std::string EnglishList(std::list<std::string> *in)

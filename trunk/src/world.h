@@ -16,6 +16,7 @@
 #include "player.h"
 #include "component.h"
 #include "ComponentFactory.h"
+#include "serializer.h"
 #include "room.h"
 #include "zone.h"
 #include <string>
@@ -37,6 +38,7 @@ class World
   std::map<std::string, Log*> *_logs;
   std::map <std::string,void*> *_properties;
   std::map<std::string, Option*> *_options;
+  std::map<std::string, ISerializable*> *_state;
   std::vector<Zone*> *_zones;
   std::map<VNUM,Room*> *_rooms;
   std::map<VNUM,Entity*> *_objects;
@@ -380,5 +382,30 @@ public:
   */
   BOOL RegisterPrompt(char prompt, PROMPTCB callback);
   std::string BuildPrompt(const std::string &prompt, Player* mobile);
+  /*
+  *Adds the state to the list of pre-existing states to be serialized.
+  *Param: [in] the name of the state to add.
+  *Param: [in] a pointer to an object which inherits ISerializable.
+  *Return: True if the state could be added, false otherwise.
+  */
+  BOOL AddState(const std::string &name, ISerializable* s);
+  /*
+  *Removes the specified state by name.
+  *Param: [in] the name of the state to remove.
+  *Return: True if the state can be removed, false otherwise.
+  */
+  BOOL RemoveState(const std::string &name);
+  /*
+  *Checks to see if the specified state exists.
+  *Param: [in] the name of the state.
+  *Return: True if the state exists, false otherwise.
+  */
+  BOOL StateExists(const std::string &name);
+  /*
+  *Saves and loads the world state, respectively.
+  *Return: True on success, false on failure.
+  */
+  BOOL SaveState();
+  BOOL LoadState();
 };
 #endif

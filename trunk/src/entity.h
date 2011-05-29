@@ -14,8 +14,9 @@
 #include "variant.h"
 #include "command.h"
 #include "property.hpp"
+#include "serializer.h"
 
-class Entity
+class Entity:public ISerializable
 {
   std::list <Entity*> _contents;
   std::vector <Component*> *_components;
