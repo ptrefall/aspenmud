@@ -64,14 +64,14 @@ BOOL Server::Listen(const int port)
   // try to bind the mud port
   if (bind(control, (struct sockaddr *) &my_addr, sizeof(my_addr)) == -1)
     {
-      world->WriteLog("Could not bind socket.");
+      world->WriteLog("Could not bind socket.", CRIT);
       close(control);
       return false;
     }
   // start listening
   if (listen(control, LISTEN_BACKLOG) == -1)
     {
-      world->WriteLog("Could not set parent socket to listening state.");
+      world->WriteLog("Could not set parent socket to listening state.", CRIT);
       close(control);
       return false;
     }

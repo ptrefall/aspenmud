@@ -33,7 +33,7 @@
 #define LOGIN_FILE "../txt/welcome" //banner shown at login
 #define COPYOVER_FILE "../copyover.dat" //stores player connection info
 #define BIN_FILE "../bin/aspen" //used for copyovers.
-#define SETTINGS_FILE "../data/settings.xml" //used for holding aspen settings.
+#define SETTINGS_FILE "../data/mud.dat"
 #define EVENT_FILE "../logs/events.log" //our main log file
 #define EVENT_NAME "events" //the actual name of the event log.
 #define SCRIPT_FILE "../logs/script.log" //the name of the scripting log file.
