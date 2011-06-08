@@ -15,6 +15,7 @@ void InitializeWizCommands()
   world->commands.AddCommand(new CMDMkgod());
   world->commands.AddCommand(new CMDShutdown());
   world->commands.AddCommand(new CMDMkbuilder());
+  world->commands.AddCommand(new CMDBan());
 }
 
 CMDCopyover::CMDCopyover()
@@ -111,5 +112,35 @@ BOOL CMDShutdown::Execute(const std::string &verb, Player* mobile,std::vector<st
 {
   World* world = World::GetPtr();
   world->Shutdown();
+  return true;
+}
+
+CMDBan::CMDBan()
+{
+  SetName("ban");
+  SetAccess(RANK_ADMIN);
+}
+BOOL CMDBan::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  if (args.size() != 1)
+    {
+      mobile->Message(MSG_ERROR, "Syntax: ban <address>");
+      return false;
+    }
+
+  World*world = World::GetPtr();
+  BanList* blist = world->GetServer()->GetBanList();
+  if (blist->AddressExists(args[0]))
+    {
+      mobile->Message(MSG_ERROR, "That address is already in the ban list.");
+      return false;
+    }
+  if (!blist->AddAddress(args[0]))
+    {
+      mobile->Message(MSG_ERROR, "Malformed address.");
+      return false;
+    }
+
+  mobile->Message(MSG_INFO, "Added.");
   return true;
 }

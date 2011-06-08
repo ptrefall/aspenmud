@@ -288,15 +288,15 @@ std::string Columnize(std::vector<std::string> *data, int cols, std::vector<std:
 
 FLAG BitSet(FLAG flag,int pos)
 {
-  return flag|=(1<<pos);
+  return flag|=pos;
 }
 FLAG BitClear(FLAG flag,int pos)
 {
-  return flag&=~(1<<pos);
+  return flag&=~pos;
 }
 BOOL BitIsSet(FLAG flag,int pos)
 {
-  return  (flag & (1 << pos)) == flag;
+  return (flag & pos) == pos;
 }
 
 std::string EnglishList(std::list<std::string> *in)

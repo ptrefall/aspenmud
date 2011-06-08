@@ -62,6 +62,10 @@ public:
   World();
   ~World();
   /*
+  *Initializes the server object.
+  */
+  void InitializeServer();
+  /*
   *Shuts down the mud: saves open objects, sends messages to players, etc.
   */
   void Shutdown(void);

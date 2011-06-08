@@ -33,7 +33,6 @@ World* World::GetPtr()
 World::World()
 {
   _running = true;
-  _server=new Server();
   _logs = new std::map<std::string, Log*>();
   RegisterLog(EVENT_FILE, EVENT_NAME);
   _users=new std::list<Player*>();
@@ -51,7 +50,7 @@ World::World()
   _maxOnum=0;
   _maxRnum=0;
   _chanid=1;
-
+  _server = NULL;
 //events
   events.RegisterEvent("LivingPulse",new DelayedEvent(LIVING_PULSE,0));
   events.RegisterEvent("WorldPulse", new DelayedEvent(WORLD_PULSE, 0));
@@ -83,8 +82,10 @@ World::~World()
     {
       delete [] _banner;
     }
-
-  delete _server;
+  if (_server)
+    {
+      delete _server;
+    }
   delete _users;
 
   litEnd = _logs->end();
@@ -130,6 +131,10 @@ World::~World()
   delete _objects;
   delete _onumPool;
   delete _rnumPool;
+}
+void World::InitializeServer()
+{
+  _server=new Server();
 }
 
 void World::Shutdown()
