@@ -73,6 +73,7 @@ int main(int argc, char** argv)
     {
       port=DEFAULT_PORT;
     }
+  world->InitializeServer();
 
   if (!world->InitializeFiles())
     {

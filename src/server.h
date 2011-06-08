@@ -8,6 +8,22 @@
 #include "mud.h"
 #include "conf.h"
 #include "socket.h"
+#include "serializer.h"
+
+class BanList:public ISerializable
+{
+  std::vector<unsigned long> _addresses;
+public:
+  BanList();
+  ~BanList();
+  BOOL AddAddress(const std::string &address);
+  BOOL RemoveAddress(const std::string &address);
+  BOOL AddressExists(const std::string &address);
+  BOOL AddressExists(unsigned long address);
+  void ListAddresses(std::vector<std::string> *addresses);
+  void Serialize(TiXmlElement* root);
+  void Deserialize(TiXmlElement* root);
+};
 
 class Server
 {
@@ -25,7 +41,8 @@ class Server
   fd_set               fSet;
   fd_set               rSet;
   sockaddr_in          my_addr;
-  struct timeval       lastSleep;
+  timeval       lastSleep;
+  BanList* blist;
 public:
   Server  (void);
   ~Server ( void );
@@ -61,6 +78,8 @@ public:
   void Recover(int listener);
 //Adds the specified socket to the socket list and adds it to the descriptor set:
   void AddSock(Socket* sock);
+//Retrieves a pointer to the banlist container object.
+  BanList* GetBanList() const;
 };
 #endif
 

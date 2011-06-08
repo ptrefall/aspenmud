@@ -375,11 +375,11 @@ void Player::SetLevel(const UINT l)
   _level=l;
 }
 
-int Player::GetRank(void) const
+FLAG Player::GetRank() const
 {
   return _rank;
 }
-void Player::SetRank(const int s)
+void Player::SetRank(const FLAG s)
 {
   _rank=s;
 }

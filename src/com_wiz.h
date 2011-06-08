@@ -32,4 +32,10 @@ public:
   CMDShutdown();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+class CMDBan:public Command
+{
+public:
+  CMDBan();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
 #endif

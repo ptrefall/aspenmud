@@ -78,8 +78,8 @@ public:
   void SetTitle(const std::string &s);
   UINT GetLevel(void) const;
   void SetLevel(UINT s);
-  int GetRank(void) const;
-  void SetRank(const int s);
+  FLAG GetRank() const;
+  void SetRank(const FLAG s);
   UINT GetOnlineTime(void) const;
   void SetOnlineTime(UINT s);
   UINT GetFirstLogin(void) const;
