@@ -16,6 +16,8 @@ void InitializeWizCommands()
   world->commands.AddCommand(new CMDShutdown());
   world->commands.AddCommand(new CMDMkbuilder());
   world->commands.AddCommand(new CMDBan());
+  world->commands.AddCommand(new CMDSilence());
+  world->commands.AddCommand(new CMDUnsilence());
 }
 
 CMDCopyover::CMDCopyover()
@@ -65,8 +67,9 @@ BOOL CMDMkgod::Execute(const std::string &verb, Player* mobile,std::vector<std::
       return false;
     }
 
-  target->SetRank(BitSet(mobile->GetRank(),RANK_GOD));
+  target->SetRank(BitSet(mobile->GetRank(), RANK_PLAYTESTER|RANK_NEWBIEHELPER|RANK_BUILDER|RANK_ADMIN|RANK_GOD));
   target->Message(MSG_INFO,"You suddenly feel more godlike.");
+  mobile->Message(MSG_INFO, Capitalize(target->GetName())+" has been made a god.");
   return true;
 }
 
@@ -92,6 +95,11 @@ BOOL CMDMkbuilder::Execute(const std::string &verb, Player* mobile,std::vector<s
       mobile->Message(MSG_ERROR,"That person couldn't be found.");
       return false;
     }
+  if (mobile == target)
+    {
+      mobile->Message(MSG_INFO, "You may not make yourself a builder.");
+      return false;
+    }
   if (BitIsSet(target->GetRank(),RANK_BUILDER))
     {
       mobile->Message(MSG_ERROR,"That person is already a builder.");
@@ -100,9 +108,10 @@ BOOL CMDMkbuilder::Execute(const std::string &verb, Player* mobile,std::vector<s
 
   target->SetRank(BitSet(mobile->GetRank(),RANK_BUILDER));
   target->Message(MSG_INFO,"You were made a builder.");
-
+  mobile->Message(MSG_INFO, Capitalize(target->GetName())+" was made a builder.");
   return true;
 }
+
 CMDShutdown::CMDShutdown()
 {
   SetName("shutdown");
@@ -124,8 +133,21 @@ BOOL CMDBan::Execute(const std::string &verb, Player* mobile,std::vector<std::st
 {
   if (args.size() != 1)
     {
-      mobile->Message(MSG_ERROR, "Syntax: ban <address>");
-      return false;
+      World*world = World::GetPtr();
+      BanList* blist = world->GetServer()->GetBanList();
+      std::vector<std::string>* addresses = new std::vector<std::string>();
+      std::vector<std::string> header;
+
+      int i = 0;
+      for (i = 0; i < 5; i++)
+        {
+          header.push_back("address");
+        }
+
+      blist->ListAddresses(addresses);
+      mobile->Message(MSG_LIST, Columnize(addresses, 5, &header));
+      delete addresses;
+      return true;
     }
 
   World*world = World::GetPtr();
@@ -142,5 +164,84 @@ BOOL CMDBan::Execute(const std::string &verb, Player* mobile,std::vector<std::st
     }
 
   mobile->Message(MSG_INFO, "Added.");
+  return true;
+}
+
+CMDSilence::CMDSilence()
+{
+  SetName("silence");
+  SetAccess(RANK_ADMIN);
+}
+BOOL CMDSilence::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  Player* targ = NULL;
+  World* world = World::GetPtr();
+
+  if (!args.size())
+    {
+      mobile->Message(MSG_ERROR, "Syntax: silence <player>");
+      return false;
+    }
+
+  targ = world->FindPlayer(args[0]);
+  if (!targ)
+    {
+      mobile->Message(MSG_ERROR, "Could not find the specified player.");
+      return false;
+    }
+  if (targ->HasAccess(RANK_ADMIN) || targ->HasAccess(RANK_GOD))
+    {
+      mobile->Message(MSG_ERROR, "That player should be demoted before you try to silence them.");
+      return false;
+    }
+
+  if (BitIsSet(mobile->GetFlag(), PF_SILENCE))
+    {
+      mobile->Message(MSG_ERROR, "That player has already been silenced.");
+      return false;
+    }
+
+  targ->SetFlag(BitSet(targ->GetFlag(), PF_SILENCE));
+  mobile->Message(MSG_INFO, Capitalize(targ->GetName())+" was silenced.");
+  world->WriteLog(Capitalize(targ->GetName())+" was silenced by "+Capitalize(mobile->GetName())+".");
+  targ->Message(MSG_ERROR, "You were silenced by "+Capitalize(mobile->GetName())+".");
+
+  return true;
+}
+
+CMDUnsilence::CMDUnsilence()
+{
+  SetName("unsilence");
+  SetAccess(RANK_ADMIN);
+}
+BOOL CMDUnsilence::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  Player* targ = NULL;
+  World* world = World::GetPtr();
+
+  if (!args.size())
+    {
+      mobile->Message(MSG_ERROR, "Syntax: unsilence <player>");
+      return false;
+    }
+
+  targ = world->FindPlayer(args[0]);
+  if (!targ)
+    {
+      mobile->Message(MSG_ERROR, "Could not find the specified player.");
+      return false;
+    }
+
+  if (!BitIsSet(targ->GetFlag(), PF_SILENCE))
+    {
+      mobile->Message(MSG_INFO, "That player is not silenced.");
+      return false;
+    }
+
+  targ->SetFlag(BitClear(mobile->GetFlag(), PF_SILENCE));
+  mobile->Message(MSG_INFO, Capitalize(targ->GetName())+" has been unsilenced.");
+  world->WriteLog(Capitalize(targ->GetName())+" was unsilenced by "+Capitalize(mobile->GetName())+".");
+  targ->Message(MSG_INFO, "You were unsilenced by "+Capitalize(mobile->GetName())+".");
+
   return true;
 }
