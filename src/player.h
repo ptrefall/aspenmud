@@ -26,6 +26,10 @@ public:
 //Message types:
 enum MessageType {MSG_NORMAL, MSG_ERROR,MSG_INFO,MSG_CRITICAL,MSG_CHANNEL,MSG_LIST};
 
+//player flags
+#define PF_SILENCE 1<<1
+
+
 class Player:public Living
 {
   unsigned char *_password;
@@ -34,7 +38,8 @@ class Player:public Living
   std::string _title;
   std::string _prompt;
   int _level;
-  int _rank;
+  FLAG _rank;
+  FLAG _flag;
   time_t _firstLogin;
   time_t _onlineTime;
   time_t _lastLogin;
@@ -80,6 +85,8 @@ public:
   void SetLevel(UINT s);
   FLAG GetRank() const;
   void SetRank(const FLAG s);
+  FLAG GetFlag() const;
+  void SetFlag(FLAG flag);
   UINT GetOnlineTime(void) const;
   void SetOnlineTime(UINT s);
   UINT GetFirstLogin(void) const;

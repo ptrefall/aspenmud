@@ -22,7 +22,8 @@ Player::Player()
   _prompt=">";
   _title="the brave";
   _level=1;
-  _rank=RANK_PLAYER;
+  _rank = BitSet(0, RANK_PLAYER);
+  _flag = 0;
   _firstLogin=0;
   _onlineTime=0;
   _lastLogin=0;
@@ -135,7 +136,7 @@ void Player::Serialize(TiXmlDocument* doc)
   root->SetAttribute("prompt", _prompt.c_str());
   root->SetAttribute("level", _level);
   root->SetAttribute("rank", _rank);
-
+  root->SetAttribute("flag", _flag);
   Living::Serialize(root);
   doc->LinkEndChild(root);
 }
@@ -207,7 +208,7 @@ void Player::Deserialize(TiXmlElement* root)
   _prompt = root->Attribute("prompt");
   root->Attribute("level", &_level);
   root->Attribute("rank", &_rank);
-
+  root->Attribute("flag", &_flag);
   Living::Deserialize(root->FirstChild("living")->ToElement());
 }
 
@@ -382,6 +383,15 @@ FLAG Player::GetRank() const
 void Player::SetRank(const FLAG s)
 {
   _rank=s;
+}
+
+FLAG Player::GetFlag() const
+{
+  return _flag;
+}
+void Player::SetFlag(FLAG flag)
+{
+  _flag = flag;
 }
 
 UINT Player::GetOnlineTime(void) const

@@ -119,7 +119,7 @@ BOOL PlayerExists(const std::string &name)
 
 BOOL IsFirstUser()
 {
-  int count=0;
+  int count = 0;
 #ifdef ASPEN_UNIX
   std::string path=(PLAYER_DIR);
   DIR* search=opendir(path.c_str());
@@ -139,12 +139,13 @@ BOOL IsFirstUser()
             }
           else
             {
-              count=1;
+              count = 1;
             }
         }
     }
 #endif
-  return (count==1?false:true);
+
+  return count==1?true:false;
 }
 
 void Lower(std::string &str)

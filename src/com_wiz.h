@@ -38,4 +38,16 @@ public:
   CMDBan();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+class CMDSilence:public Command
+{
+public:
+  CMDSilence();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
+class CMDUnsilence:public Command
+{
+public:
+  CMDUnsilence();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
 #endif

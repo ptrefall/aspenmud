@@ -272,8 +272,7 @@ void Channel::RemoveListener(Player* subscriber,BOOL quiet)
 
 void Channel::Broadcast(Player* caller,const std::string &message,BOOL access)
 {
-  std::list <Player*>::iterator it;
-  std::list <Player*>::iterator itEnd;
+  std::list <Player*>::iterator it, itEnd;
   std::string paternized;
   if (access)
     {
@@ -287,6 +286,11 @@ void Channel::Broadcast(Player* caller,const std::string &message,BOOL access)
   if (message=="")
     {
       caller->Message(MSG_ERROR,"You must provide a message.");
+      return;
+    }
+  if (BitIsSet(caller->GetFlag(), PF_SILENCE))
+    {
+      caller->Message(MSG_ERROR, "You can not broadcast to channels while you are silenced.");
       return;
     }
 

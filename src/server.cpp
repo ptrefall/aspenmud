@@ -566,6 +566,7 @@ void Server::Accept()
     {
       pSocket->Write("This IP has been banned.");
       pSocket->Kill();
+      delete pSocket;
       return;
     }
 
