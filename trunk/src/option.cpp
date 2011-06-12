@@ -82,7 +82,7 @@ Variant GetOptionValue(const std::string &name, const Player* mobile)
     {
       return mobile->GetOption(name)->_data;
     }
-  if (world->OptionExists(name))
+  else if (world->OptionExists(name))
     {
       return world->GetGlobalOption(name)->GetData();
     }

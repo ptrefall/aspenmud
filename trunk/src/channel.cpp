@@ -48,8 +48,7 @@ EVENT(UnsubscribeChannels)
   World* world = World::GetPtr();
 
   std::list <std::string>* names=new std::list <std::string>();
-  std::list <std::string>::iterator it;
-  std::list<std::string>::iterator itEnd;
+  std::list <std::string>::iterator it, itEnd;
   Channel* chan=NULL;
   Player* mobile=(Player*)caller;
   world->GetChannelNames(names);
@@ -77,8 +76,7 @@ Channel::Channel(const std::string &name,const std::string &alias,const FLAG acc
 }
 Channel::~Channel(void)
 {
-  std::list <HistoryNode*>::iterator it;
-  std::list<HistoryNode*>::iterator itEnd;
+  std::list <HistoryNode*>::iterator it, itEnd;
   if (_history->size())
     {
       itEnd = _history->end();
@@ -87,11 +85,10 @@ Channel::~Channel(void)
           delete (*it);
         }
     }
-
   delete _history;
+
   delete _listeners;
 }
-
 
 void Channel::_AddHistoryEntry(const std::string &message)
 {
@@ -215,8 +212,7 @@ std::list <HistoryNode*>* Channel::GetHistory(void) const
 
 void Channel::AddListener(Player* subscriber,BOOL quiet)
 {
-  std::list<Player*>::iterator it;
-  std::list<Player*>::iterator itEnd;
+  std::list<Player*>::iterator it, itEnd;
 
   if (!subscriber->HasAccess(_access))
     {
@@ -248,8 +244,8 @@ void Channel::AddListener(Player* subscriber,BOOL quiet)
 }
 void Channel::RemoveListener(Player* subscriber,BOOL quiet)
 {
-  std::list<Player*>::iterator it;
-  std::list <Player*>::iterator itEnd;
+  std::list<Player*>::iterator it, itEnd;
+
   itEnd = _listeners->end();
   for (it = _listeners->begin(); it != itEnd; ++it)
     {
@@ -274,6 +270,7 @@ void Channel::Broadcast(Player* caller,const std::string &message,BOOL access)
 {
   std::list <Player*>::iterator it, itEnd;
   std::string paternized;
+
   if (access)
     {
       if (!caller->HasAccess(_access))
