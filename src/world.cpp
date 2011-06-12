@@ -1094,17 +1094,66 @@ BOOL World::CreateRoom(Room* room)
 
   return false;
 }
+BOOL World::RecycleObject(Entity* obj)
+{
+  int type = obj->GetType();
+  if (type == 1)
+    {
+      _onumPool->push_back(obj->GetOnum());
+    }
+  else if(type == 2)
+    {
+      _rnumPool->push_back(obj->GetOnum());
+    }
+  else
+    {
+      return false;
+    }
+
+//we recursively recycle everything in contents.
+  std::list<Entity*>* contents = obj->GetContents();
+  std::list<Entity*>::iterator it, itEnd;
+  Entity* location = NULL;
+
+//recursively delete objects held by the object being deleted.
+  itEnd = contents->end();
+  for (it = contents->begin(); it != itEnd; ++it)
+    {
+      RecycleObject((*it));
+    }
+
+//check to see if this object is stored in another. If so, we need to remove it.
+  location = obj->GetLocation();
+  if (location)
+    {
+      contents = location->GetContents();
+      itEnd = contents->end();
+      for (it = contents->begin(); it != itEnd; ++it)
+        {
+          if ((*it) == obj)
+            {
+              contents->erase(it);
+              break;
+            }
+        }
+    }
+
+  delete obj;
+
+  return true;
+}
 
 void World::InitializeNums()
 {
   WriteLog("Initializing vnums for pool.");
   int max=0;
   int i;
-  std::map<VNUM,Room*>::iterator rt;
-  std::map<VNUM,Entity*>::iterator ot;
+  std::map<VNUM,Room*>::iterator rt, rtEnd;
+  std::map<VNUM,Entity*>::iterator ot, otEnd;
 
 //iterate through rooms first and find the max number.
-  for (rt=_rooms->begin(); rt!=_rooms->end(); rt++)
+  rtEnd = _rooms->end();
+  for (rt=_rooms->begin(); rt != rtEnd; ++rt)
     {
       if ((*rt).first>max)
         {
@@ -1123,7 +1172,8 @@ void World::InitializeNums()
 
 //now we do the same with objects:
   max=0;
-  for (ot=_objects->begin(); ot!=_objects->end(); ot++)
+  otEnd = _objects->end();
+  for (ot=_objects->begin(); ot != otEnd; ++ot)
     {
       if ((*ot).first>max)
         {

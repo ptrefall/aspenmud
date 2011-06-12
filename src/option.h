@@ -13,7 +13,7 @@
 
 class Option
 {
-  int _rank;
+  FLAG _rank;
   Variant _data; //the value.
   VARIABLE_TYPE _type; //the type that the value should hold.
   BOOL _toggle;
@@ -42,7 +42,9 @@ public:
 };
 
 /*
-*One of the problems with Players is that they're holding an entire option setup, which they do not need.
+*This makes the overall setup easier, though the design becomes a bit more confusing.
+*Rather than hold an option node per player which is just a copy of the option node stored on world, we store the name and the value of the option.
+*We also store a pointer to the main option node.
 */
 struct OptionNode
 {

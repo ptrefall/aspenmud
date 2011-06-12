@@ -1,5 +1,6 @@
 #include "command.h"
 #include "world.h"
+#include "utils.h"
 #include "com_gen.h"
 #include "com_wiz.h"
 #include "com_builder.h"
@@ -10,7 +11,7 @@ Command::Command()
   _name = "";
   _subcmd=0;
   _type = normal;
-  _access = RANK_PLAYER;
+  _access = BitSet(0, RANK_PLAYER);
   _position = any;
 }
 Command::~Command()

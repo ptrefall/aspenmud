@@ -311,6 +311,7 @@ public:
   */
   BOOL CreateObject(Entity* obj);
   BOOL  CreateRoom(Room* room);
+  BOOL RecycleObject(Entity* obj);
   void InitializeNums(void);
   /*
   *Checks to see if the log exists.
