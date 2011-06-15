@@ -4,6 +4,7 @@
 #include "../mud.h"
 #include "../entity.h"
 #include "../exception.h"
+#include "../event.h"
 #ifdef MODULE_SCRIPTING
 #include <angelscript.h>
 //script-wide exceptions:
@@ -21,6 +22,7 @@ public:
   Script(Entity* object);
   ~Script();
   void ReceiveMessage(asSMessageInfo *message);
+  EVENT(OnLoad);
 };
 #endif
 

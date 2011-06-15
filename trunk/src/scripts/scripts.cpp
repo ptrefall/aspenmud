@@ -1,14 +1,18 @@
 #include <string>
 #include <sstream>
+#include <boost/bind.hpp>
 #include "../conf.h"
 #include "../mud.h"
 #include "../entity.h"
 #include "../world.h"
 #include "../player.h"
+#include "../event.h"
 #include "scripts.h"
 
 #ifdef MODULE_SCRIPTING
 #include <angelscript.h>
+#include "scriptbuilder/scriptbuilder.h"
+#include "scriptstdstring/scriptstdstring.h"
 
 Script::Script(Entity* obj)
 {
@@ -17,6 +21,7 @@ Script::Script(Entity* obj)
 
   _obj = obj;
   _engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
+
   ret = _engine->SetMessageCallback(asMETHOD(Script, ReceiveMessage), this, asCALL_THISCALL);
   if (ret != 0)
     {
@@ -35,9 +40,12 @@ Script::Script(Entity* obj)
       throw(ScriptException("An error occured while trying to register the message callback for "+_obj->GetName()+". Error: "+error+"."));
     }
 
+  RegisterStdString(_engine);
+  _obj->events.AddCallback("loaded", boost::bind(&Script::OnLoad, this, _1, _2));
 }
 Script::~Script()
 {
+  _engine->Release();
 }
 
 void Script::ReceiveMessage(asSMessageInfo *message)
@@ -78,6 +86,64 @@ void Script::ReceiveMessage(asSMessageInfo *message)
     {
       world->WriteLog(st.str(), SCRIPT, "script");
     }
+}
+
+CEVENT(Script, OnLoad)
+{
+  World* world = World::GetPtr();
+  int ret = 0;
+  CScriptBuilder builder;
+  ret = builder.StartNewModule(_engine, "global");
+  if (ret < 0)
+    {
+      world->WriteLog("Could not create script builder.", SCRIPT, "script");
+      return;
+    }
+  ret = builder.AddSectionFromMemory(_obj->GetScript().c_str());
+  if (ret < 0)
+    {
+      world->WriteLog("Could not load script from object.", SCRIPT, "script");
+      return;
+    }
+  ret = builder.BuildModule();
+  if (ret < 0)
+    {
+      world->WriteLog("Compilation error.", SCRIPT, "script");
+      return;
+    }
+
+  asIScriptModule *module = _engine->GetModule("global");
+  int gfid = module->GetFunctionIdByDecl("void main()");
+  if (gfid < 0)
+    {
+      world->WriteLog("Could not find entrypoint.", SCRIPT, "script");
+      return;
+    }
+
+  asIScriptContext *context = _engine->CreateContext();
+  if (!context)
+    {
+      world->WriteLog("Could not create script context", SCRIPT, "script");
+      return;
+    }
+  context->Prepare(gfid);
+
+  ret = context->Execute();
+  switch(ret)
+    {
+    default:
+      world->WriteLog("Received an unknown return code from Execute.");
+      break;
+    case asEXECUTION_ABORTED:
+    case asEXECUTION_SUSPENDED:
+    case asEXECUTION_FINISHED:
+      break;
+    case asEXECUTION_EXCEPTION:
+      world->WriteLog("Script exited with exception: "+std::string(context->GetExceptionString()), SCRIPT, "script");
+      break;
+    }
+
+  context->Release();
 }
 #endif
 

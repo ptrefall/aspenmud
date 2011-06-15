@@ -34,9 +34,13 @@ Entity::Entity(void)
                      boost::protect(boost::bind(&Entity::GetDescription, this)),
                      boost::protect(boost::bind(&Entity::SetDescription, this, _1))));
 #endif
+#ifdef MODULE_SCRIPTING
+  scriptobj = new Script(this);
+#endif
 
   events.RegisterEvent("PostLook", new Event());
   events.RegisterEvent("PreLook",new Event());
+  events.RegisterEvent("loaded", new Event());
 }
 Entity::~Entity(void)
 {
@@ -47,6 +51,7 @@ Entity::~Entity(void)
       delete (*it);
     }
   delete _components;
+
   delete _aliases;
 
 #ifdef OLC
@@ -57,6 +62,10 @@ Entity::~Entity(void)
       delete (*oit);
     }
   delete _olcs;
+#endif
+
+#ifdef MODULE_SCRIPTING
+  delete scriptobj;
 #endif
 }
 
