@@ -45,7 +45,7 @@ std::string Repete(const std::string &filler,const int count);
 std::string Center(const std::string &str,const int width);
 std::string Explode(std::vector <std::string> &parts, const std::string &del = " ");
 std::string StripWhitespace(const std::string &str);
-
+void NumberToString(char* buffer, int number);
 //bitfield manipulation
 FLAG BitSet(FLAG flag,int pos);
 FLAG BitClear(FLAG flag,int pos);

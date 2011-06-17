@@ -12,12 +12,15 @@
 #include "command.h"
 #include "olc.h"
 #include "editor.h"
+#ifdef MODULE_SCRIPTING
+#include "scripts/scripts.h"
+#endif
 
 Entity::Entity(void)
 {
   _name="A blank object";
   _desc="You see nothing special.";
-  _script="--scripting starts here\n";
+  _script="";
   _location=NULL;
   _type=1;
   _onum=0;
@@ -34,13 +37,9 @@ Entity::Entity(void)
                      boost::protect(boost::bind(&Entity::GetDescription, this)),
                      boost::protect(boost::bind(&Entity::SetDescription, this, _1))));
 #endif
-#ifdef MODULE_SCRIPTING
-  scriptobj = new Script(this);
-#endif
 
   events.RegisterEvent("PostLook", new Event());
   events.RegisterEvent("PreLook",new Event());
-  events.RegisterEvent("loaded", new Event());
 }
 Entity::~Entity(void)
 {
@@ -62,10 +61,6 @@ Entity::~Entity(void)
       delete (*oit);
     }
   delete _olcs;
-#endif
-
-#ifdef MODULE_SCRIPTING
-  delete scriptobj;
 #endif
 }
 
@@ -266,6 +261,16 @@ void Entity::Deserialize(TiXmlElement* root)
   root->Attribute("onum", &_onum);
   root->Attribute("type", &_type);
   root->Attribute("location", &loc);
+//we need to add ourselves to the object registry.
+  if (GetType() == 1)
+    {
+      world->AddObject(_onum, this);
+    }
+  else
+    {
+      world->AddRoom(_onum, (Room*)this);
+    }
+
   if (!loc)
     {
       _location=NULL;
@@ -283,6 +288,12 @@ void Entity::Deserialize(TiXmlElement* root)
           _location=world->GetRoom(loc);
         }
     }
+
+//now we execute the script on the object.
+#ifdef MODULE_SCRIPTING
+  Script* script = (Script*)world->GetProperty("script");
+  script->Execute(this);
+#endif
 }
 
 std::string Entity::DoLook(Player* mobile)

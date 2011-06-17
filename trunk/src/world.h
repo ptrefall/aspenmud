@@ -386,6 +386,12 @@ public:
   *Return: True if the prompt could be registered, false otherwise.
   */
   BOOL RegisterPrompt(char prompt, PROMPTCB callback);
+  /*
+  *Format's a player's prompt.
+  *Param: [in] the string with formatting characters.
+  *Param: [in] a pointer to the player object.
+  *Return: the new prompt with formatting characters replaced.
+  */
   std::string BuildPrompt(const std::string &prompt, Player* mobile);
   /*
   *Adds the state to the list of pre-existing states to be serialized.

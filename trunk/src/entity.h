@@ -15,9 +15,6 @@
 #include "command.h"
 #include "property.hpp"
 #include "serializer.h"
-#ifdef MODULE_SCRIPTING
-#include "scripts/scripts.h"
-#endif
 
 class Entity:public ISerializable
 {
@@ -34,9 +31,6 @@ class Entity:public ISerializable
   std::string _desc;
   std::string _script; //the scripting associated with this object.
   std::string _plural;
-#ifdef MODULE_SCRIPTING
-  Script* scriptobj;
-#endif
 public:
 //these are objects we need to store on each entity.
   EventManager events;

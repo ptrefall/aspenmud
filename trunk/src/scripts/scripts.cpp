@@ -6,20 +6,19 @@
 #include "../entity.h"
 #include "../world.h"
 #include "../player.h"
-#include "../event.h"
+#include "../utils.h"
 #include "scripts.h"
 
 #ifdef MODULE_SCRIPTING
 #include <angelscript.h>
-#include "scriptbuilder/scriptbuilder.h"
-#include "scriptstdstring/scriptstdstring.h"
+#include <scriptbuilder.h>
+#include <scriptstdstring.h>
 
-Script::Script(Entity* obj)
+Script::Script()
 {
   int ret = 0;
   std::string error;
 
-  _obj = obj;
   _engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
 
   ret = _engine->SetMessageCallback(asMETHOD(Script, ReceiveMessage), this, asCALL_THISCALL);
@@ -37,11 +36,10 @@ Script::Script(Entity* obj)
           error = "argument not supported";
           break;
         }
-      throw(ScriptException("An error occured while trying to register the message callback for "+_obj->GetName()+". Error: "+error+"."));
+      throw(ScriptException("An error occured while trying to register the message callback. Error: "+error+"."));
     }
 
   RegisterStdString(_engine);
-  _obj->events.AddCallback("loaded", boost::bind(&Script::OnLoad, this, _1, _2));
 }
 Script::~Script()
 {
@@ -69,65 +67,56 @@ void Script::ReceiveMessage(asSMessageInfo *message)
       st << "[UNKNOWN] ";
     }
   st << "line " << message->row << "col " << message->col << "section " << message->section << ": " << message->message;
-//now we need to see if the object is a player, and if so if it is a builder or higher. If not, we need to pass the message to the logger.
-  if (_obj->IsPlayer())
-    {
-      if (((Player*)_obj)->HasAccess(RANK_BUILDER))
-        {
-          ((Player*)_obj)->Message(MSG_INFO, st.str());
-          return;
-        }
-      else
-        {
-          world->WriteLog(st.str(), SCRIPT, "script");
-        }
-    }
-  else
-    {
-      world->WriteLog(st.str(), SCRIPT, "script");
-    }
+  world->WriteLog(st.str(), SCRIPT, "script");
 }
 
-CEVENT(Script, OnLoad)
+BOOL Script::Execute(Entity* object)
 {
+  if (object->GetScript() == "")
+    {
+      return true;
+    }
+
   World* world = World::GetPtr();
   int ret = 0;
   CScriptBuilder builder;
-  ret = builder.StartNewModule(_engine, "global");
+  char idstr [11];
+  NumberToString(idstr, object->GetOnum());
+  ret = builder.StartNewModule(_engine, idstr);
   if (ret < 0)
     {
       world->WriteLog("Could not create script builder.", SCRIPT, "script");
-      return;
+      return false;
     }
-  ret = builder.AddSectionFromMemory(_obj->GetScript().c_str());
+  ret = builder.AddSectionFromMemory(object->GetScript().c_str());
   if (ret < 0)
     {
       world->WriteLog("Could not load script from object.", SCRIPT, "script");
-      return;
+      return false;
     }
   ret = builder.BuildModule();
   if (ret < 0)
     {
       world->WriteLog("Compilation error.", SCRIPT, "script");
-      return;
+      return false;
     }
 
-  asIScriptModule *module = _engine->GetModule("global");
-  int gfid = module->GetFunctionIdByDecl("void main()");
+  asIScriptModule *module = _engine->GetModule(idstr);
+  int gfid = module->GetFunctionIdByDecl("void main(Entity* obj)");
   if (gfid < 0)
     {
       world->WriteLog("Could not find entrypoint.", SCRIPT, "script");
-      return;
+      return false;
     }
 
   asIScriptContext *context = _engine->CreateContext();
   if (!context)
     {
       world->WriteLog("Could not create script context", SCRIPT, "script");
-      return;
+      return false;
     }
   context->Prepare(gfid);
-
+  context->SetArgObject(0, object);
   ret = context->Execute();
   switch(ret)
     {
@@ -144,6 +133,7 @@ CEVENT(Script, OnLoad)
     }
 
   context->Release();
+  return true;
 }
 #endif
 
@@ -155,6 +145,9 @@ BOOL InitializeScript()
     {
       world->WriteLog("Something seems to have registered a script log already. Writing there anyway.", WARN);
     }
+
+  Script* script = new Script();
+  world->AddProperty("script", script);
 #endif
   return true;
 }

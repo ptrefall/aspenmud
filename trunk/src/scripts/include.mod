@@ -1,2 +1,1 @@
-S_FILES += scripts/scriptbuilder/scriptbuilder.cpp scripts/scriptstdstring/scriptstdstring.cpp\
-scripts/scripts.cpp
+S_FILES += scripts/scripts.cpp
