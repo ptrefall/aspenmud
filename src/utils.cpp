@@ -233,6 +233,10 @@ std::string StripWhitespace(const std::string &str)
       return (str.substr(str.find_first_of(" \r\n")));
     }
 }
+void NumberToString(char* buffer, int number)
+{
+  sprintf(buffer, "%d", number);
+}
 
 std::string Columnize(std::vector<std::string> *data, int cols, std::vector<std::string>* headers, int width)
 {

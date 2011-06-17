@@ -17,12 +17,11 @@ public:
 class Script
 {
   asIScriptEngine *_engine;
-  Entity* _obj;
 public:
-  Script(Entity* object);
+  Script();
   ~Script();
   void ReceiveMessage(asSMessageInfo *message);
-  EVENT(OnLoad);
+  BOOL Execute(Entity* object);
 };
 #endif
 

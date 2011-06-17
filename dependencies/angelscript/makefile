@@ -4,6 +4,7 @@ AR = ar
 RANLIB = ranlib
 CC	= g++
 CFLAGS	= -O3 -s
+CFLAGS += -I../../includes
 OUTPUT = ../../libs/libangelscript.a
 
 S_FILES = as_atomic.cpp as_builder.cpp as_bytecode.cpp as_callfunc.cpp as_callfunc_arm.cpp \
@@ -12,7 +13,7 @@ S_FILES = as_atomic.cpp as_builder.cpp as_bytecode.cpp as_callfunc.cpp as_callfu
   as_generic.cpp as_gc.cpp as_globalproperty.cpp as_memory.cpp as_module.cpp \
   as_objecttype.cpp as_outputbuffer.cpp as_parser.cpp as_restore.cpp as_scriptcode.cpp\
   as_scriptengine.cpp as_scriptfunction.cpp as_scriptnode.cpp as_scriptobject.cpp as_string.cpp \
-  as_string_util.cpp as_thread.cpp as_tokenizer.cpp as_typeinfo.cpp as_variablescope.cpp
+  as_string_util.cpp as_thread.cpp as_tokenizer.cpp as_typeinfo.cpp as_variablescope.cpp scriptstdstring/scriptstdstring.cpp scriptbuilder/scriptbuilder.cpp
 
 O_FILES := $(patsubst %.cpp,%.o, $(filter %.cpp, $(S_FILES)))
 all: $(O_FILES)
