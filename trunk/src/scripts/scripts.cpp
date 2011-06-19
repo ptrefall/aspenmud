@@ -7,6 +7,7 @@
 #include "../world.h"
 #include "../player.h"
 #include "../utils.h"
+#include "../olc.h"
 #include "scripts.h"
 
 #ifdef MODULE_SCRIPTING
@@ -40,6 +41,8 @@ Script::Script()
     }
 
   RegisterStdString(_engine);
+  RegisterEntity();
+  RegisterWorld();
 }
 Script::~Script()
 {
@@ -69,6 +72,30 @@ void Script::ReceiveMessage(asSMessageInfo *message)
   st << "line " << message->row << "col " << message->col << "section " << message->section << ": " << message->message;
   world->WriteLog(st.str(), SCRIPT, "script");
 }
+
+void Script::RegisterEntity()
+{
+  _engine->RegisterObjectType("Entity", sizeof(Entity), asOBJ_REF);
+  _engine->RegisterObjectMethod("Entity", "string GetName()", asMETHOD(Entity, GetName), asCALL_THISCALL);
+  _engine->RegisterObjectMethod("Entity", "void SetName(string name)", asMETHOD(Entity, GetName), asCALL_THISCALL);
+}
+void Script::RegisterWorld()
+{
+  _engine->RegisterObjectType("World", sizeof(World), asOBJ_REF);
+  _engine->RegisterGlobalFunction("World* GetWorld", asFUNCTION(GetWorldPointer), asCALL_CDECL);
+}
+
+#ifdef MODULE_OLC
+CEVENT(Script, AddOlc)
+{
+  Entity* object = (Entity*)caller;
+
+  object->AddOlc("script", "Editing object script", EDITOR,
+                 boost::bind(OlcEditor, _1, _2, _3,
+                             boost::protect(boost::bind(&Entity::GetDescription, object)),
+                             boost::protect(boost::bind(&Entity::SetDescription, object, _1))));
+}
+#endif
 
 BOOL Script::Execute(Entity* object)
 {
@@ -135,6 +162,11 @@ BOOL Script::Execute(Entity* object)
   context->Release();
   return true;
 }
+
+World* GetWorldPointer()
+{
+  return World::GetPtr();
+}
 #endif
 
 BOOL InitializeScript()
@@ -148,6 +180,9 @@ BOOL InitializeScript()
 
   Script* script = new Script();
   world->AddProperty("script", script);
+#ifdef MODULE_OLC
+  world->events.AddCallback("ObjectLoaded", boost::bind(&Script::AddOlc, _1, _2));
+#endif
 #endif
   return true;
 }

@@ -5,6 +5,7 @@
 #include "../entity.h"
 #include "../exception.h"
 #include "../event.h"
+#include "../world.h"
 #ifdef MODULE_SCRIPTING
 #include <angelscript.h>
 //script-wide exceptions:
@@ -21,8 +22,15 @@ public:
   Script();
   ~Script();
   void ReceiveMessage(asSMessageInfo *message);
+  void RegisterEntity();
+  void RegisterWorld();
+#ifdef MODULE_OLC
+  static EVENT(AddOlc);
+#endif
   BOOL Execute(Entity* object);
 };
+
+World* GetWorldPointer();
 #endif
 
 BOOL InitializeScript();

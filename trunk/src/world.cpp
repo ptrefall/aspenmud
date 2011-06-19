@@ -60,10 +60,7 @@ World::World()
   events.RegisterEvent("PlayerDeleted", new Event());
   events.RegisterEvent("Shutdown", new Event());
   events.RegisterEvent("Copyover", new Event());
-#ifdef MODULE_SCRIPTING
-  events.RegisterEvent("ScriptLoaded", new Event());
-  events.RegisterEvent("ScriptUnloaded", new Event());
-#endif
+  events.RegisterEvent("ObjectLoaded", new Event());
 }
 
 World::~World()

@@ -26,6 +26,7 @@ Entity::Entity(void)
   _onum=0;
   _components=new std::vector<Component*>();
   _aliases = new std::vector<std::string>();
+
 #ifdef OLC
   _olcs = new std::vector<struct OLC_DATA*>();
   AddOlc("name", "Please enter the name of the object", STRING,
@@ -294,6 +295,9 @@ void Entity::Deserialize(TiXmlElement* root)
   Script* script = (Script*)world->GetProperty("script");
   script->Execute(this);
 #endif
+
+//and now we notify everything that an object was loaded:
+  world->events.CallEvent("ObjectLoaded", NULL, this);
 }
 
 std::string Entity::DoLook(Player* mobile)
