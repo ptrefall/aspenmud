@@ -25,23 +25,4 @@ public:
   OneArg(void* arg):_arg(arg) { }
   void* _arg;
 };
-
-//this breaks our general style, but there's no need to declare this or include anything
-//if scripts aren't enabled anyway, so we'll just move on with breaking the style, shall we?
-#ifdef MODULE_SCRIPTING
-class ScriptUnloadedArg:public EventArgs
-{
-public:
-  ScriptUnloadedArg(void* arg):_arg(arg) { }
-  void* _arg;
-};
-
-class ScriptLoadedArg:public EventArgs
-{
-public:
-  ScriptLoadedArg(void* arg, Entity* obj):_arg(arg), _obj(obj) { }
-  void* _arg;
-  Entity* _obj;
-};
-#endif
 #endif
