@@ -24,7 +24,7 @@ public:
   void ReceiveMessage(asSMessageInfo *message);
   void RegisterEntity();
   void RegisterWorld();
-#ifdef MODULE_OLC
+#ifdef OLC
   static EVENT(AddOlc);
 #endif
   BOOL Execute(Entity* object);
