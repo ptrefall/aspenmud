@@ -75,10 +75,7 @@ void Log::Write(const std::string &data,LOG_LEVEL l)
 
       fprintf(_out, "%s %s: %s\n", level.c_str(), stime, data.c_str());
 #ifdef LOG_CONSOLE
-      if (MIN_LOG_LEVEL>=l)
-        {
-          printf("%s %s: %s\n", level.c_str(),stime,data.c_str());
-        }
+      printf("%s %s: %s\n", level.c_str(),stime,data.c_str());
 #endif
 
       if (stime)

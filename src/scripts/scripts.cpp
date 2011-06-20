@@ -1,6 +1,7 @@
 #include <string>
 #include <sstream>
 #include <boost/bind.hpp>
+#include <boost/bind/protect.hpp>
 #include "../conf.h"
 #include "../mud.h"
 #include "../entity.h"
@@ -83,17 +84,18 @@ void Script::RegisterWorld()
 {
   _engine->RegisterObjectType("World", sizeof(World), asOBJ_REF);
   _engine->RegisterGlobalFunction("World* GetWorld", asFUNCTION(GetWorldPointer), asCALL_CDECL);
+  _engine->RegisterObjectMethod("World", "void Shutdown()", asMETHOD(World, Shutdown), asCALL_THISCALL);
 }
 
-#ifdef MODULE_OLC
+#ifdef OLC
 CEVENT(Script, AddOlc)
 {
   Entity* object = (Entity*)caller;
 
   object->AddOlc("script", "Editing object script", EDITOR,
                  boost::bind(OlcEditor, _1, _2, _3,
-                             boost::protect(boost::bind(&Entity::GetDescription, object)),
-                             boost::protect(boost::bind(&Entity::SetDescription, object, _1))));
+                             boost::protect(boost::bind(&Entity::GetScript, object)),
+                             boost::protect(boost::bind(&Entity::SetScript, object, _1))));
 }
 #endif
 
@@ -180,7 +182,7 @@ BOOL InitializeScript()
 
   Script* script = new Script();
   world->AddProperty("script", script);
-#ifdef MODULE_OLC
+#ifdef OLC
   world->events.AddCallback("ObjectLoaded", boost::bind(&Script::AddOlc, _1, _2));
 #endif
 #endif
