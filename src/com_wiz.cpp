@@ -18,6 +18,8 @@ void InitializeWizCommands()
   world->commands.AddCommand(new CMDBan());
   world->commands.AddCommand(new CMDSilence());
   world->commands.AddCommand(new CMDUnsilence());
+  world->commands.AddCommand(new CMDDisconnect());
+  world->commands.AddCommand(new CMDEcho());
 }
 
 CMDCopyover::CMDCopyover()
@@ -242,6 +244,72 @@ BOOL CMDUnsilence::Execute(const std::string &verb, Player* mobile,std::vector<s
   mobile->Message(MSG_INFO, Capitalize(targ->GetName())+" has been unsilenced.");
   world->WriteLog(Capitalize(targ->GetName())+" was unsilenced by "+Capitalize(mobile->GetName())+".");
   targ->Message(MSG_INFO, "You were unsilenced by "+Capitalize(mobile->GetName())+".");
+
+  return true;
+}
+
+CMDDisconnect::CMDDisconnect()
+{
+  SetName("disconnect");
+  SetAccess(RANK_ADMIN);
+}
+BOOL CMDDisconnect::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  World* world = World::GetPtr();
+  Player* target = NULL;
+
+  if (!args.size())
+    {
+      mobile->Message(MSG_ERROR, "Syntax: disconnect <player>");
+      return false;
+    }
+
+  target=world->FindPlayer(args[0]);
+  if (!target)
+    {
+      mobile->Message(MSG_ERROR, "I could not find that player.");
+      return false;
+    }
+  if (mobile == target)
+    {
+      mobile->Message(MSG_ERROR, "If you really want to disconnect yourself, you could just use quit.");
+      return false;
+    }
+
+  if ((BitIsSet(target->GetRank(), RANK_GOD)) || (BitIsSet(target->GetRank(), RANK_ADMIN)))
+    {
+      mobile->Message(MSG_ERROR, "You can't disconnect that person.");
+      return false;
+    }
+
+  target->GetSocket()->Kill();
+  return true;
+}
+
+CMDEcho::CMDEcho()
+{
+  SetName("echo");
+  SetAccess(RANK_ADMIN);
+}
+BOOL CMDEcho::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  World* world = World::GetPtr();
+
+  if (!args.size())
+    {
+      mobile->Message(MSG_ERROR, "Syntax: echo <message>");
+      return false;
+    }
+
+  std::string msg = Explode(args);
+  std::list<Player*>::iterator it, itEnd;
+  std::list<Player*>* players = world->GetPlayers();
+
+  itEnd = players->end();
+  for (it = players->begin(); it != itEnd; ++it)
+    {
+      (*it)->Message(MSG_INFO, msg);
+    }
 
   return true;
 }

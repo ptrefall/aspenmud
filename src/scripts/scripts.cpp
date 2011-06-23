@@ -80,7 +80,8 @@ void Script::RegisterEntity()
   int r = 0;
   r = _engine->RegisterObjectType("Entity", sizeof(Entity), asOBJ_REF);
   assert(r >= 0);
-  _engine->RegisterObjectMethod("Entity", "string GetName()", asMETHOD(Entity, GetName), asCALL_THISCALL);
+  r = _engine->RegisterObjectMethod("Entity", "string GetName() const", asMETHOD(Entity, GetName), asCALL_THISCALL);
+  assert(r >= 0);
   r = _engine->RegisterObjectMethod("Entity", "void SetName(string name)", asMETHOD(Entity, GetName), asCALL_THISCALL);
   assert(r >= 0);
 }
@@ -89,7 +90,7 @@ void Script::RegisterWorld()
   int r = 0;
   r = _engine->RegisterObjectType("World", sizeof(World), asOBJ_REF);
   assert(r >= 0);
-  r = _engine->RegisterGlobalFunction("World@ GetWorld()", asFUNCTION(GetWorldPointer), asCALL_CDECL);
+  r = _engine->RegisterGlobalFunction("World@+ GetWorld()", asFUNCTION(GetWorldPointer), asCALL_CDECL);
   assert(r >= 0);
   r = _engine->RegisterObjectMethod("World", "void Shutdown()", asMETHOD(World, Shutdown), asCALL_THISCALL);
   assert(r >= 0);
