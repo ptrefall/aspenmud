@@ -18,6 +18,7 @@ Room::Room(void)
   events.RegisterEvent("OnLook", new Event());
   _exits = new std::vector<Exit*>();
   _zone=NULL;
+  _rflag = 0;
   SetOnum(ROOM_NOWHERE);
   SetType(2);
   events.AddCallback("PostLook", ROOM_POST_LOOK);
@@ -120,10 +121,18 @@ Zone* Room::GetZone(void) const
   return _zone;
 }
 
+void Room::SetRoomFlag(FLAG flag)
+{
+  _rflag = flag;
+}
+FLAG Room::GetRoomFlag()
+{
+  return _rflag;
+}
+
 void Room::TellAll(const std::string &message)
 {
-  std::list<Living*>::iterator it;
-  std::list<Living*>::iterator itEnd;
+  std::list<Living*>::iterator it, itEnd;
 
   itEnd = _mobiles.end();
   for (it = _mobiles.begin(); it != itEnd; ++it)
@@ -137,10 +146,9 @@ void Room::TellAll(const std::string &message)
 void Room::TellAllBut(const std::string &message, std::list <Player*>* players)
 {
   std::list<Player*> left;
-  std::list<Player*>::iterator pit;
-  std::list<Player*>::iterator pitEnd;
-  std::list <Living*>::iterator lit;
-  std::list <Living*>::iterator litEnd;
+  std::list<Player*>::iterator pit, pitEnd;
+  std::list <Living*>::iterator lit, litEnd;
+
   BOOL found = false;
 
   pitEnd = players->end();
@@ -169,13 +177,25 @@ void Room::TellAllBut(const std::string &message, std::list <Player*>* players)
       (*pit)->Message(MSG_INFO, message);
     }
 }
+void Room::TellAllBut(const std::string &message, Player* exclude)
+{
+  std::list<Living*>::iterator it, itEnd;
+
+  itEnd = _mobiles.end();
+  for (it = _mobiles.begin(); it != itEnd; ++it)
+    {
+      if ((*it)->IsPlayer() &&(*it) != exclude)
+        {
+          ((Player*)(*it))->Message(MSG_INFO,message);
+        }
+    }
+}
 
 void Room::Serialize(TiXmlElement* root)
 {
   TiXmlElement* room = new TiXmlElement("room");
   TiXmlElement* exits = new TiXmlElement("exits");
-  std::vector<Exit*>::iterator it;
-  std::vector<Exit*>::iterator itEnd = _exits->end();
+  std::vector<Exit*>::iterator it, itEnd;
 
   if (_exits->size())
     {
@@ -185,6 +205,8 @@ void Room::Serialize(TiXmlElement* root)
         }
     }
   room->LinkEndChild(exits);
+
+  room->SetAttribute("rflag", _rflag);
   Entity::Serialize(room);
   root->LinkEndChild(room);
 }
@@ -205,6 +227,7 @@ void Room::Deserialize(TiXmlElement* room)
       ex = NULL;
     }
 
+  room->Attribute("rflag", &_rflag);
   Entity::Deserialize(room->FirstChild("entity")->ToElement());
 }
 

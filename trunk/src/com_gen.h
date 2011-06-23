@@ -79,4 +79,11 @@ public:
   CMDLook();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+
+class CMDSay:public Command
+{
+public:
+  CMDSay();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
 #endif

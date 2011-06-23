@@ -53,8 +53,19 @@
 #define RANK_BUILDER 1<<5
 #define RANK_ADMIN 1<<29
 #define RANK_GOD 1<<30
+//flags
+//player flags
+#define PF_SILENCE 1<<1
+//room flags
+#define PF_NOSAY 1<<1
+
 //logger levels
 enum LOG_LEVEL {INFORM,WARN,ERR,CRIT,SCRIPT, PLAYER, CONNECTION};
+//Message types:
+enum MessageType {MSG_NORMAL, MSG_ERROR,MSG_INFO,MSG_CRITICAL,MSG_CHANNEL,MSG_LIST};
+
+
+
 //positions:
 enum POSITION {any, unconcious, sleeping, laying, resting, sitting, standing, flying};
 //exit/room constants:

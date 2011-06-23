@@ -120,32 +120,34 @@ BOOL PlayerExists(const std::string &name)
 BOOL IsFirstUser()
 {
   int count = 0;
-#ifdef ASPEN_UNIX
   std::string path=(PLAYER_DIR);
   DIR* search=opendir(path.c_str());
-  struct dirent* dir;
-  if (search)
+  struct dirent* dir = NULL;
+
+  if (!search)
     {
-      while (1)
+      return false;
+    }
+
+  while (1)
+    {
+      dir=readdir(search);
+      if (!dir)
         {
-          dir=readdir(search);
-          if (!dir)
-            {
-              break;
-            }
-          if (dir->d_name[0]=='.')
-            {
-              continue;
-            }
-          else
-            {
-              count = 1;
-            }
+          break;
+        }
+      if (dir->d_name[0] == '.')
+        {
+          continue;
+        }
+      else
+        {
+          count = 1;
+          break;
         }
     }
-#endif
 
-  return count==1?true:false;
+  return (count==1?false:true);
 }
 
 void Lower(std::string &str)

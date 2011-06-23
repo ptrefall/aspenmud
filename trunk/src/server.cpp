@@ -331,7 +331,10 @@ BOOL Server::PollSockets()
             {
               break;
             }
-          world->DoCommand(mob, input);
+          if (!world->DoCommand(mob, input))
+            {
+              mob->Message(MSG_ERROR, "I did not understand that.");
+            }
           break;
         }
 //login username prompt
@@ -448,7 +451,7 @@ BOOL Server::PollSockets()
 //passwords matched, see if the player is the first user. If so, make it a god.
           if (IsFirstUser())
             {
-              mob->SetRank(BitSet(mob->GetRank(), RANK_PLAYTESTER|RANK_NEWBIEHELPER|RANK_BUILDER|RANK_ADMIN|RANK_GOD));
+              mob->SetRank(RANK_PLAYER|RANK_PLAYTESTER|RANK_NEWBIEHELPER|RANK_BUILDER|RANK_ADMIN|RANK_GOD);
               sock->Write("You are the first player to create, rank set to God.\n");
             }
 

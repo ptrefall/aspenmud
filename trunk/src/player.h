@@ -23,13 +23,6 @@ public:
   FileLoadException(const std::string &msg):Exception(msg) { }
 };
 
-//Message types:
-enum MessageType {MSG_NORMAL, MSG_ERROR,MSG_INFO,MSG_CRITICAL,MSG_CHANNEL,MSG_LIST};
-
-//player flags
-#define PF_SILENCE 1<<1
-
-
 class Player:public Living
 {
   unsigned char *_password;
