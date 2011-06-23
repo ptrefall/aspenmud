@@ -24,6 +24,7 @@ class Room:public Entity
   std::list <Living*> _mobiles;
   std::vector<Exit*> *_exits;
   Zone* _zone;
+  FLAG _rflag;
 public:
   Room(void);
   virtual ~Room(void);
@@ -61,11 +62,31 @@ public:
   */
   Zone* GetZone(void) const;
   /*
+  *Sets the flags on the room object.
+  *Param: [in] the new flags.
+  */
+  virtual void SetRoomFlag(FLAG flag);
+  /*
+  *Returns the flags set on the room.
+  */
+  virtual FLAG GetRoomFlag();
+  /*
   *Sends a message to all players in the room.
   *Param: [in] the message to send.
   */
   virtual void TellAll(const std::string &message);
+  /*
+  *Tells everyone in the room, except for a specific group of people.
+  *Param: [in] the message to send.
+  *Param: [in] a pointer to the list of players to exclude.
+  */
   virtual void TellAllBut(const std::string & message, std::list <Player*>* players);
+  /*
+  *Sends a message to everyone but the specified target.
+  *Param: [in] The message to send.
+  *Param: [in] the target to exclude.
+  */
+  virtual void TellAllBut(const std::string &message, Player* exclude);
 //serialization
   virtual void Serialize(TiXmlElement* root);
   virtual void Deserialize(TiXmlElement* node);

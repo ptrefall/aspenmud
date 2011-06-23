@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <cassert>
 #include <boost/bind.hpp>
 #include <boost/bind/protect.hpp>
 #include "../conf.h"
@@ -76,15 +77,22 @@ void Script::ReceiveMessage(asSMessageInfo *message)
 
 void Script::RegisterEntity()
 {
-  _engine->RegisterObjectType("Entity", sizeof(Entity), asOBJ_REF);
+  int r = 0;
+  r = _engine->RegisterObjectType("Entity", sizeof(Entity), asOBJ_REF);
+  assert(r >= 0);
   _engine->RegisterObjectMethod("Entity", "string GetName()", asMETHOD(Entity, GetName), asCALL_THISCALL);
-  _engine->RegisterObjectMethod("Entity", "void SetName(string name)", asMETHOD(Entity, GetName), asCALL_THISCALL);
+  r = _engine->RegisterObjectMethod("Entity", "void SetName(string name)", asMETHOD(Entity, GetName), asCALL_THISCALL);
+  assert(r >= 0);
 }
 void Script::RegisterWorld()
 {
-  _engine->RegisterObjectType("World", sizeof(World), asOBJ_REF);
-  _engine->RegisterGlobalFunction("World* GetWorld", asFUNCTION(GetWorldPointer), asCALL_CDECL);
-  _engine->RegisterObjectMethod("World", "void Shutdown()", asMETHOD(World, Shutdown), asCALL_THISCALL);
+  int r = 0;
+  r = _engine->RegisterObjectType("World", sizeof(World), asOBJ_REF);
+  assert(r >= 0);
+  r = _engine->RegisterGlobalFunction("World@ GetWorld()", asFUNCTION(GetWorldPointer), asCALL_CDECL);
+  assert(r >= 0);
+  r = _engine->RegisterObjectMethod("World", "void Shutdown()", asMETHOD(World, Shutdown), asCALL_THISCALL);
+  assert(r >= 0);
 }
 
 #ifdef OLC
@@ -131,7 +139,7 @@ BOOL Script::Execute(Entity* object)
     }
 
   asIScriptModule *module = _engine->GetModule(idstr);
-  int gfid = module->GetFunctionIdByDecl("void main(Entity* obj)");
+  int gfid = module->GetFunctionIdByDecl("void main(Entity& obj)");
   if (gfid < 0)
     {
       world->WriteLog("Could not find entrypoint.", SCRIPT, "script");

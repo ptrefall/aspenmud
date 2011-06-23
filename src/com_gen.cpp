@@ -434,3 +434,17 @@ BOOL CMDLook::Execute(const std::string &verb, Player* mobile,std::vector<std::s
   mobile->Message(MSG_INFO,obj->DoLook(mobile));
   return true;
 }
+
+CMDSay::CMDSay()
+{
+  SetName("say");
+}
+BOOL CMDSay::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  if (!args.size())
+    {
+      mobile->Message(MSG_ERROR, "Say what?");
+      return false;
+    }
+
+}

@@ -22,7 +22,7 @@ Player::Player()
   _prompt=">";
   _title="the brave";
   _level=1;
-  _rank = BitSet(0, RANK_PLAYER);
+  _rank = RANK_PLAYER;
   _flag = 0;
   _firstLogin=0;
   _onlineTime=0;

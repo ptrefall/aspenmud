@@ -2,8 +2,6 @@
 #ifndef MUD_H
 #define MUD_H
 #include <boost/function.hpp> //this is needed so we can forward declare our olc typedef.
-//if there is a way around this, I would love to know!
-
 //used to show where an exception was thrown:
 #define WHERE() std::string(" In ")+std::string(__FUNCTION__)+std::string(" at ")+std::string(__FILE__)+std::string(".")
 //typedefs:
