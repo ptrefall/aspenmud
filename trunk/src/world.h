@@ -81,7 +81,7 @@ public:
   /*
   *Returns: a pointer to a list of pointers to player objects.
   */
-  std::list <Player*> *GetPlayers(void) const;
+  std::list <Player*> *GetPlayers() const;
   /*
   *Adds the player to the players list.
   *Only connected players should be added. Inactive players shouldn't be in this list.

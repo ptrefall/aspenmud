@@ -50,4 +50,18 @@ public:
   CMDUnsilence();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+
+class CMDDisconnect:public Command
+{
+public:
+  CMDDisconnect();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
+
+class CMDEcho:public Command
+{
+public:
+  CMDEcho();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
 #endif

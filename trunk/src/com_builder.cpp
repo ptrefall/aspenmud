@@ -111,39 +111,90 @@ CMDDig::CMDDig()
 BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
   World* world = World::GetPtr();
+  int toid = 0;
+  Room* room = NULL;
+  Room* location = (Room*)mobile->GetLocation();
 
-  if (!args.size())
-    {
-      mobile->Message(MSG_ERROR,"Syntax: dig <direction>\nCreates another room in the direction you specified.");
-      return false;
-    }
-  if (!IsValidExit(args[0]))
-    {
-      mobile->Message(MSG_ERROR, "Syntax: dig <north|n, south|s, east|e, west|w,\nnortheast|ne, southeast|se, northwest|sw, or southwest|sw");
-      return false;
-    }
+  Zone* zone = NULL;
+  Exit* orig = NULL; //from current room to another room.
+  Exit* other = NULL; //from other room to current.
+  std::string dir;
 
-  Room* room;
-  Room* location;
-  Zone* zone;
-  Exit* orig; //from current room to another room.
-  Exit* other; //from other room to current.
-  std::string dir=SwapExit(args[0]);
-  location=(Room*)mobile->GetLocation();
-
+//initial error checking and argument parsing
   if (!location)
     {
       mobile->Message(MSG_ERROR, "You can't dig here.");
       return false;
     }
-  room=new Room();
-  world->CreateRoom(room);
-  zone=location->GetZone();
-  if (zone)
+  if (!args.size())
     {
-      room->SetZone(zone);
+      mobile->Message(MSG_ERROR,"Syntax: dig <direction> Creates another room in the direction you specified, and creates exits back and forth.\n"
+                      "dig <direction> <rnum> Creates an exit in the specified direction to the specified rnum.\n"
+                      "dig <direction> to <rnum> Creates an exit in the specified room to the specified rnum.");
+      return false;
     }
-  zone->AddRoom(room->GetOnum());
+
+  if (args.size() > 1)
+    {
+      if (args.size() == 2)
+        {
+          toid = atoi(args[1].c_str());
+          if (!toid)
+            {
+              mobile->Message(MSG_ERROR, "Invalid rnum given.");
+              return false;
+            }
+        }
+      else if (args.size() == 3)
+        {
+          toid = atoi(args[1].c_str());
+          if (!toid)
+            {
+              mobile->Message(MSG_ERROR, "Invalid rnum given.");
+              return false;
+            }
+        }
+      else
+        {
+          mobile->Message(MSG_ERROR,"Syntax: dig <direction> Creates another room in the direction you specified, and creates exits back and forth.\n"
+                          "dig <direction> <rnum> Creates an exit in the specified direction to the specified rnum.\n"
+                          "dig <direction> to <rnum> Creates an exit in the specified room to the specified rnum.");
+          return false;
+        }
+    }
+
+  if (!IsValidExit(args[0]))
+    {
+      mobile->Message(MSG_ERROR, "That is an invalid direction.\nYou can dig <north|n, south|s, east|e, west|w,\nnortheast|ne, southeast|se, northwest|sw, or southwest|sw");
+      return false;
+    }
+  if (location->ExitExists(GetDirectionByName(args[0])))
+    {
+      mobile->Message(MSG_ERROR, "That exit already exists.");
+      return false;
+    }
+
+  dir=SwapExit(args[0]);
+
+  if (!toid)
+    {
+      room=new Room();
+      world->CreateRoom(room);
+      zone=location->GetZone();
+      if (zone)
+        {
+          room->SetZone(zone);
+        }
+      zone->AddRoom(room->GetOnum());
+    }
+  else
+    {
+      room = world->GetRoom(toid);
+      if (!room)
+        {
+          mobile->Message(MSG_ERROR, "That rnum does not exist.");
+        }
+    }
 
   orig=new Exit(room->GetOnum());
   orig->SetDirection(GetDirectionByName(args[0]));
