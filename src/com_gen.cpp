@@ -23,6 +23,7 @@ void InitializeGenCommands()
   world->commands.AddCommand(new CMDUptime());
   world->commands.AddCommand(new CMDWhois());
   world->commands.AddCommand(new CMDLook());
+  world->commands.AddCommand(new CMDCoord());
 }
 
 //quit
@@ -441,10 +442,39 @@ CMDSay::CMDSay()
 }
 BOOL CMDSay::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  std::string message;
   if (!args.size())
     {
       mobile->Message(MSG_ERROR, "Say what?");
       return false;
     }
 
+  message = Explode(args);
+  ((Room*)mobile->GetLocation())->TellAllBut(Capitalize(mobile->GetName())+" says, '"+message+"'", mobile);
+  mobile->Message(MSG_INFO, "You say, '"+message+"'");
+
+  return true;
+}
+
+CMDCoord::CMDCoord()
+{
+  SetName("coord");
+  AddAlias("coords");
+}
+BOOL CMDCoord::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  Room* location = (Room*)mobile->GetLocation();
+  std::stringstream st;
+  point *p = NULL;
+
+  if (!location)
+    {
+      mobile->Message(MSG_INFO, "You are not in a room.");
+      return false;
+    }
+
+  p = location->GetCoord();
+  st << "You are at coords (" << p->x << ", " << p->y << ", " << p->z << ").";
+  mobile->Message(MSG_INFO, st.str());
+  return true;
 }

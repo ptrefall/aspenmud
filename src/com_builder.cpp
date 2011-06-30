@@ -114,6 +114,7 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
   int toid = 0;
   Room* room = NULL;
   Room* location = (Room*)mobile->GetLocation();
+  point p;
 
   Zone* zone = NULL;
   Exit* orig = NULL; //from current room to another room.
@@ -184,8 +185,8 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
       if (zone)
         {
           room->SetZone(zone);
+          zone->AddRoom(room->GetOnum());
         }
-      zone->AddRoom(room->GetOnum());
     }
   else
     {
@@ -193,8 +194,56 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
       if (!room)
         {
           mobile->Message(MSG_ERROR, "That rnum does not exist.");
+          return false;
         }
     }
+
+  p = *location->GetCoord();
+  if (args[0] == "north" || args[0] == "n")
+    {
+      p.y++;
+    }
+  else if (args[0] == "south" || args[0] == "s")
+    {
+      p.y--;
+    }
+  else if (args[0] == "east" || args[0] == "e")
+    {
+      p.x++;
+    }
+  else if (args[0] == "west" || args[0] == "w")
+    {
+      p.x--;
+    }
+  else if(args[0] == "northeast" || args[0] == "ne")
+    {
+      p.y++;
+      p.x++;
+    }
+  else if(args[0] == "northwest" || args[0] == "nw")
+    {
+      p.y++;
+      p.x--;
+    }
+  else if(args[0] == "southeast" || args[0] == "se")
+    {
+      p.x++;
+      p.y--;
+    }
+  else if(args[0] == "southwest" || args[0] == "sw")
+    {
+      p.y--;
+      p.x--;
+    }
+  else if (args[0] == "up" || args[0] == "u")
+    {
+      p.z++;
+    }
+  else if (args[0] == "down" || args[0] == "d")
+    {
+      p.z--;
+    }
+  room->SetCoord(p);
 
   orig=new Exit(room->GetOnum());
   orig->SetDirection(GetDirectionByName(args[0]));

@@ -481,3 +481,27 @@ std::string TimeInfo::ToString(void)
   st << hour << ":" << minute << ":" << second;
   return st.str();
 }
+
+point::point()
+{
+  x = y = z = 0;
+}
+point::point(int X, int Y, int Z)
+{
+  x = X;
+  y = Y;
+  z = Z;
+}
+
+BOOL point::operator ==(const point &p)
+{
+  return (p.x == x && p.y == y && p.z == z);
+}
+
+point& point::operator =(point& p)
+{
+  x = p.x;
+  y = p.y;
+  z = p.z;
+  return *this;
+}

@@ -117,4 +117,16 @@ public:
   void Calculate(time_t data);
   std::string ToString(void);
 };
+
+class point
+{
+public:
+  int x;
+  int y;
+  int z;
+  point();
+  point(int X, int Y, int Z);
+  BOOL operator ==(const point &p);
+  point& operator =(point &p);
+};
 #endif
