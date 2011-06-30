@@ -191,6 +191,15 @@ void Room::TellAllBut(const std::string &message, Player* exclude)
     }
 }
 
+point* Room::GetCoord()
+{
+  return &_coord;
+}
+void Room::SetCoord(point& coord)
+{
+  _coord = coord;
+}
+
 void Room::Serialize(TiXmlElement* root)
 {
   TiXmlElement* room = new TiXmlElement("room");
@@ -207,6 +216,9 @@ void Room::Serialize(TiXmlElement* root)
   room->LinkEndChild(exits);
 
   room->SetAttribute("rflag", _rflag);
+  room->SetAttribute("x", _coord.x);
+  room->SetAttribute("y", _coord.y);
+  room->SetAttribute("z", _coord.z);
   Entity::Serialize(room);
   root->LinkEndChild(room);
 }
@@ -228,6 +240,9 @@ void Room::Deserialize(TiXmlElement* room)
     }
 
   room->Attribute("rflag", &_rflag);
+  room->Attribute("x", &_coord.x);
+  room->Attribute("y", &_coord.y);
+  room->Attribute("z", &_coord.z);
   Entity::Deserialize(room->FirstChild("entity")->ToElement());
 }
 

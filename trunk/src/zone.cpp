@@ -7,6 +7,7 @@
 #include "world.h"
 #include "room.h"
 #include "event.h"
+#include "utils.h"
 
 static int zone_saves;
 
@@ -150,7 +151,7 @@ void Zone::Deserialize(TiXmlElement* zone)
 BOOL InitializeZones()
 {
   World* world = World::GetPtr();
-
+  point p;
   struct stat FInfo;
   world->WriteLog("Initializing areas.");
   if ((stat(AREA_FILE,&FInfo))!=-1)
@@ -182,6 +183,7 @@ BOOL InitializeZones()
           return false;
         }
       room->SetName("A blank room");
+      room->SetCoord(p);
       if (!world->CreateRoom(room))
         {
           return false;

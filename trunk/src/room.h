@@ -14,6 +14,7 @@
 #include "player.h"
 #include "event.h"
 #include "zone.h"
+#include "utils.h"
 
 EVENT(ROOM_POST_LOOK);
 
@@ -25,6 +26,7 @@ class Room:public Entity
   std::vector<Exit*> *_exits;
   Zone* _zone;
   FLAG _rflag;
+  point _coord;
 public:
   Room(void);
   virtual ~Room(void);
@@ -87,6 +89,16 @@ public:
   *Param: [in] the target to exclude.
   */
   virtual void TellAllBut(const std::string &message, Player* exclude);
+  /*
+  *Returns a point structure with the coordenates of a room.
+  *Return: a pointer to the coords structure.
+  */
+  point* GetCoord();
+  /*
+  *Sets the coord structure.
+  *Param: [in] the coord structure to copy.
+  */
+  void SetCoord(point& coord);
 //serialization
   virtual void Serialize(TiXmlElement* root);
   virtual void Deserialize(TiXmlElement* node);

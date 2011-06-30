@@ -31,6 +31,7 @@ public:
 };
 
 World* GetWorldPointer();
+void DummyRef(void* args);
 #endif
 
 BOOL InitializeScript();

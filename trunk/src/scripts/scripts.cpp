@@ -80,6 +80,10 @@ void Script::RegisterEntity()
   int r = 0;
   r = _engine->RegisterObjectType("Entity", sizeof(Entity), asOBJ_REF);
   assert(r >= 0);
+  r = _engine->RegisterObjectBehaviour("Entity", asBEHAVE_ADDREF, "void dummyref()", asFUNCTION(DummyRef), asCALL_CDECL_OBJLAST);
+  assert(r >= 0);
+  r = _engine->RegisterObjectBehaviour("Entity", asBEHAVE_RELEASE, "void dummyref()", asFUNCTION(DummyRef), asCALL_CDECL_OBJLAST);
+  assert(r >= 0);
   r = _engine->RegisterObjectMethod("Entity", "string GetName() const", asMETHOD(Entity, GetName), asCALL_THISCALL);
   assert(r >= 0);
   r = _engine->RegisterObjectMethod("Entity", "void SetName(string name)", asMETHOD(Entity, GetName), asCALL_THISCALL);
@@ -90,7 +94,11 @@ void Script::RegisterWorld()
   int r = 0;
   r = _engine->RegisterObjectType("World", sizeof(World), asOBJ_REF);
   assert(r >= 0);
-  r = _engine->RegisterGlobalFunction("World@+ GetWorld()", asFUNCTION(GetWorldPointer), asCALL_CDECL);
+  r = _engine->RegisterObjectBehaviour("World", asBEHAVE_ADDREF, "void dummyref()", asFUNCTION(DummyRef), asCALL_CDECL_OBJLAST);
+  assert(r >= 0);
+  r = _engine->RegisterObjectBehaviour("World", asBEHAVE_RELEASE, "void dummyref()", asFUNCTION(DummyRef), asCALL_CDECL_OBJLAST);
+  assert(r >= 0);
+  r = _engine->RegisterGlobalFunction("World@ GetWorld()", asFUNCTION(GetWorldPointer), asCALL_CDECL);
   assert(r >= 0);
   r = _engine->RegisterObjectMethod("World", "void Shutdown()", asMETHOD(World, Shutdown), asCALL_THISCALL);
   assert(r >= 0);
@@ -140,7 +148,7 @@ BOOL Script::Execute(Entity* object)
     }
 
   asIScriptModule *module = _engine->GetModule(idstr);
-  int gfid = module->GetFunctionIdByDecl("void main(Entity& obj)");
+  int gfid = module->GetFunctionIdByDecl("void main(Entity@ obj)");
   if (gfid < 0)
     {
       world->WriteLog("Could not find entrypoint.", SCRIPT, "script");
@@ -177,6 +185,10 @@ BOOL Script::Execute(Entity* object)
 World* GetWorldPointer()
 {
   return World::GetPtr();
+}
+
+void DummyRef(void* args)
+{
 }
 #endif
 

@@ -86,4 +86,11 @@ public:
   CMDSay();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+
+class CMDCoord:public Command
+{
+public:
+  CMDCoord();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
 #endif
