@@ -165,6 +165,10 @@ BOOL CMDToggle::Execute(const std::string &verb, Player* mobile,std::vector<std:
       for (git = goptions->begin(); git != gitEnd; ++git)
         {
           gopt = (*git).second;
+          if (poptions->count((*git).first))
+            {
+              continue;
+            }
           if (gopt->CanToggle())
             {
               cols->push_back(gopt->GetName());
@@ -298,7 +302,7 @@ BOOL CMDHist::Execute(const std::string &verb, Player* mobile,std::vector<std::s
 
   if (!args.size())
     {
-      mobile->Message(MSG_INFO,"Syntax: hist [channel name].");
+      mobile->Message(MSG_ERROR,"Syntax: hist [channel name].");
       return false;
     }
 
@@ -311,7 +315,7 @@ BOOL CMDHist::Execute(const std::string &verb, Player* mobile,std::vector<std::s
 
   history=chan->GetHistory();
 
-  if (!history->size())
+  if ((!history) || (!history->size()))
     {
       mobile->Message(MSG_INFO,"There is no recorded history, perhaps you should say something?");
       return true;

@@ -319,15 +319,15 @@ BOOL World::AddChannel(Channel* chan,BOOL command)
   if (!ChannelExists(chan))
     {
       (*_channels)[_chanid]=chan;
-      return true;
       RegisterOption(new Option(chan->GetName(),
-                                "Controls whether or not you can hear and broadcast to "+chan->GetName()+".",
+                                "Whether you will hear the channel.",
                                 chan->GetAccess(), (chan->GetName()=="newbie"?Variant((int)1):Variant((int)0)), VAR_INT, true));
       if (command)
         {
           CMDChan* com = new CMDChan();
           com->SetName(chan->GetName());
           com->SetAccess(chan->GetAccess());
+          com->SetSubcmd(_chanid);
           if (chan->GetAlias() != "")
             {
               com->AddAlias(chan->GetAlias());
@@ -335,7 +335,6 @@ BOOL World::AddChannel(Channel* chan,BOOL command)
           commands.AddCommand(com);
         }
       _chanid++;
-
       return true;
     }
 

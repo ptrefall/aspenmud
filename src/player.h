@@ -145,13 +145,12 @@ public:
   *Toggles the specified option to on if it is off, or off if it is on.
   *Param: [in] The name of the option.
   */
-  void ToggleOption(const std::string &option);
+  BOOL ToggleOption(const std::string &option);
   /*
   *Retrieves a pointer to the players configuration mapping.
   *Return: a pointer to a map of type <std::string,int>.
   */
   std::map<std::string, OptionNode*>* GetOptions(void) const;
-
   /*
   *Checks to see if the player has the specified rank.
   *Param: [in] The rank to check for.
