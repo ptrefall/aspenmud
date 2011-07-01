@@ -471,8 +471,30 @@ BOOL Player::OptionExists(const std::string &option) const
 {
   return (_config->count(option))==0?false:true;
 }
-void Player::ToggleOption(const std::string &option)
+BOOL Player::ToggleOption(const std::string &option)
 {
+  World* world = World::GetPtr();
+  Option* opt = NULL;
+  OptionNode* node = NULL;
+  if ((world->OptionExists(option)) && (!OptionExists(option)))
+    {
+      opt = world->GetGlobalOption(option);
+      node = new OptionNode();
+      node->_option = opt;
+      if (opt->GetData().Typeof() == VAR_INT)
+        {
+          if (opt->GetData().GetInt())
+            {
+              node->_data.SetInt(0);
+            }
+          else
+            {
+              node->_data.SetInt(1);
+            }
+          (*_config)[option] = node;
+        }
+      return true;
+    }
   if (OptionExists(option))
     {
       if ((*_config)[option]->_data.Typeof() == VAR_INT)
@@ -486,7 +508,10 @@ void Player::ToggleOption(const std::string &option)
               (*_config)[option]->_data.SetInt(1);
             }
         }
+      return true;
     }
+
+  return false;
 }
 std::map<std::string, OptionNode*>* Player::GetOptions(void) const
 {
