@@ -63,5 +63,6 @@ class MenuInput:public InputHandle
 {
 public:
   void Input(void* arg, const std::string &input);
+  void Active(in_data* in);
 };
 #endif

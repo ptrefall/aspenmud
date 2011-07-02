@@ -24,7 +24,7 @@ void InputHandle::Attach(Socket* sock)
 {
   _sock = sock;
 }
-void InputHandle::Active()
+void InputHandle::Active(in_data* in)
 {
 }
 void InputHandle::Input(void* arg, const std::string &input)
@@ -272,7 +272,7 @@ void Socket::ClearInput()
       if (HasHandle())
         {
           in = _input->top();
-          in->handle->Active();
+          in->handle->Active(in);
         }
     }
 }
