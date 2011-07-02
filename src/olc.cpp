@@ -141,7 +141,6 @@ void OlcInput::Input(void* arg, const std::string &input)
     }
     }
   _sock->ClearInput();
-  data->menudata->menu->ShowMenu();
   delete data;
 }
 
