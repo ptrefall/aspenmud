@@ -180,7 +180,6 @@ void OlcEditor(Entity* ed, Player* mob, const Variant* input, boost::function<st
   std::vector<std::string>::iterator it, itEnd;
 
   edit->events.AddCallback("save", boost::bind(SaveString, _1, _2, set));
-
   Tokenize(get(), lines, "\n");
   itEnd = lines.end();
   for (it = lines.begin(); it != itEnd; ++it)

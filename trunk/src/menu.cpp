@@ -119,7 +119,7 @@ MENU_DATA* Menu::GetDataByIndex(unsigned int index)
   return _options.at(index);
 }
 
-BOOL Menu::Attach(void)
+BOOL Menu::Attach()
 {
   if ((_sock==NULL) || (_attached))
     {
@@ -212,4 +212,8 @@ void MenuInput::Input(void* arg, const std::string &input)
     }
   option = m->GetDataByIndex(result);
   (option->callback)(m->GetMobile(), m, option->args, option->subitem);
+}
+void MenuInput::Active(in_data* in)
+{
+  ((Menu*)in->args)->ShowMenu();
 }

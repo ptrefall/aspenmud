@@ -19,13 +19,13 @@
 *This is the connection type that each player has, it is used to hold the state of their current connection.
 */
 enum ConType {con_name,con_password,con_newname,con_newpass,con_verpass,con_game};
-
 class Socket;
 
 /*
 *The input handler is used to allow for another function to receive input.
 *This is particularly useful when you want to request input from a user, and you can't stop the game. In order to request input, you create a handler, set the args field to the object that will receive the notification and push it to the input stack.
 */
+struct in_data;
 class InputHandle
 {
 protected:
@@ -34,7 +34,7 @@ public:
   InputHandle();
   ~InputHandle();
   void Attach(Socket* sock);
-  virtual void Active();
+  virtual void Active(in_data* in);
   virtual void Input(void* arg, const std::string &input);
 };
 
@@ -77,7 +77,6 @@ public:
   *Return: The input buffer of the socket.
   */
   std::string          GetInBuffer    ( void );
-
   /*
   *Returns the connection type
   *Return: the type of connection that is associated with this socket.
