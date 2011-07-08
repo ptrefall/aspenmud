@@ -10,6 +10,7 @@
 #include "mud.h"
 #include "conf.h"
 #include "event.h"
+#include "eventManager.h"
 #include "eventargs.h"
 #include "variant.h"
 #include "command.h"

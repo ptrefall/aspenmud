@@ -1,5 +1,6 @@
 #include "living.h"
 #include "event.h"
+#include "delayedEvent.h"
 #include <tinyxml.h>
 
 Living::Living()
