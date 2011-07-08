@@ -13,6 +13,7 @@
 #include "command.h"
 #include "channel.h"
 #include "event.h"
+#include "eventManager.h"
 #include "player.h"
 #include "component.h"
 #include "ComponentFactory.h"

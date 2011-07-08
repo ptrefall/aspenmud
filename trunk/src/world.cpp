@@ -6,11 +6,11 @@
 #include <cstring>
 #include <ctime>
 #include <tinyxml.h>
+#include <boost/unordered_map.hpp>
 #include "world.h"
 #include "channel.h"
 #include "player.h"
 #include "socket.h"
-#include "com_gen.h"
 #include "command.h"
 #include "component.h"
 #include "ComponentFactory.h"
@@ -18,7 +18,11 @@
 #include "zone.h"
 #include "option.h"
 #include "serializer.h"
-#include <boost/unordered_map.hpp>
+#include "event.h"
+#include "delayedEvent.h"
+#include "eventManager.h"
+#include "com_gen.h"
+
 
 World* World::_ptr;
 World* World::GetPtr()

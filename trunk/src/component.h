@@ -8,6 +8,7 @@
 #include "conf.h"
 #include "entity.h"
 #include "event.h"
+#include "eventManager.h"
 #include "property.hpp"
 
 class Component
