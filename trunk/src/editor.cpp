@@ -153,18 +153,16 @@ Editor::~Editor()
 
 BOOL Editor::Load(void)
 {
-  OneArg* arg = new OneArg((void*)this);
-  events.CallEvent("load", arg, _mobile);
-  delete arg;
+  EditorLoadedArgs arg(this);
+  events.CallEvent("load", &arg, _mobile);
   return true;
 }
 void Editor::Save(void)
 {
   _dirty=false;
   _mobile->Message(MSG_INFO, "saved.");
-  OneArg* arg = new OneArg((void*)this);
-  events.CallEvent("save", arg, this);
-  delete arg;
+  EditorSavedArgs arg(this);
+  events.CallEvent("save", &arg, this);
   return;
 }
 
@@ -357,9 +355,8 @@ BOOL Editor::EnterEditor(Player* mobile)
 void Editor::LeaveEditor()
 {
   _mobile->GetSocket()->ClearInput();
-  OneArg* arg = new OneArg((void*)this);
-  events.CallEvent("atexit", arg, this);
-  delete arg;
+  EditorExitedArgs arg(this);
+  events.CallEvent("atexit", &arg, this);
   delete this;
 }
 void Editor::SetArg(void* arg)

@@ -183,7 +183,5 @@ public:
   EVENT(LoadDescription);
   EVENT(SaveDescription);
 #endif
-
 };
-
 #endif

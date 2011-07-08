@@ -69,8 +69,7 @@ Entity* Component::GetObject(void) const
 void Component::Attach(Entity* obj)
 {
   World* world = World::GetPtr();
-  std::vector<std::string>::iterator it;
-  std::vector<std::string>::iterator itEnd;
+  std::vector<std::string>::iterator it, itEnd;
 
   if (_attached)
     {
@@ -85,7 +84,7 @@ void Component::Attach(Entity* obj)
       obj->AddComponent(world->CreateComponent((*it)));
     }
 
-  OneArg arg(obj);
+  ComponentAttachedArgs arg(obj);
   events.CallEvent("OnAttach", &arg, (void*)this);
   _attached = true;
 }
