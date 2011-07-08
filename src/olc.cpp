@@ -157,8 +157,8 @@ void OlcString(Entity* ed, Player* mob, const Variant* input, boost::function<st
 
 void SaveString(EventArgs* args, void* caller, boost::function<void (const std::string&)> set)
 {
-  OneArg* arg = (OneArg*)args;
-  Editor* ed = (Editor*)arg->_arg;
+  EditorSavedArgs *arg = (EditorSavedArgs*)args;
+  Editor* ed = (Editor*)arg->editor;
   std::string str;
   std::vector<std::string>::iterator it, itEnd;
 
