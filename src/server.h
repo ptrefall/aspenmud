@@ -2,28 +2,13 @@
 *Main server class
 *Handles incoming connections, and passes info to the parser.
 */
-
 #ifndef SERVER_H
 #define SERVER_H
 #include "mud.h"
 #include "conf.h"
 #include "socket.h"
 #include "serializer.h"
-
-class BanList:public ISerializable
-{
-  std::vector<unsigned long> _addresses;
-public:
-  BanList();
-  ~BanList();
-  BOOL AddAddress(const std::string &address);
-  BOOL RemoveAddress(const std::string &address);
-  BOOL AddressExists(const std::string &address);
-  BOOL AddressExists(unsigned long address);
-  void ListAddresses(std::vector<std::string> *addresses);
-  void Serialize(TiXmlElement* root);
-  void Deserialize(TiXmlElement* root);
-};
+#include "banList.h"
 
 class Server
 {
