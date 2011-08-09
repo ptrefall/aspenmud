@@ -1,1 +1,1 @@
-S_FILES += help/help.cpp
+S_FILES += help/HelpEntry.cpp help/HelpTable.cpp help/help.cpp
