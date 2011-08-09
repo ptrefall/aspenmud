@@ -65,9 +65,9 @@ BOOL Server::Listen(const int port)
   // attach the control socket to it's own filedescriptor set
   FD_SET(control, &fSet);
   // settings for this socket, (and set the listning port)
-  my_addr.sin_family      = PF_INET;
+  my_addr.sin_family = PF_INET;
   my_addr.sin_addr.s_addr = INADDR_ANY;
-  my_addr.sin_port        = htons(port);
+  my_addr.sin_port = htons(port);
   // try to bind the mud port
   if (bind(control, (struct sockaddr *) &my_addr, sizeof(my_addr)) == -1)
     {
