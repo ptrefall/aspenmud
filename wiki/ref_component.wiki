@@ -1,12 +1,17 @@
-#summery Component class reference
+#summary Component class reference
+
 
 =Component=
-file: component.h
+<wiki:toc max_depth="1" />
+
+file: component.h<br>
 Synopsis: The component class provides a way to add functionality and extend in-game objects.
+----
 
 ==Public fields=
   * variables: a property tree holding variables associated with the component.
   * events: an EventManager object that allows for events to be bound to the object.
+----
 
 ==Constructor==
 
@@ -15,4 +20,3 @@ Synopsis: The component class provides a way to add functionality and extend in-
   * [in] the name of the component.
 
 `Component();`
-
