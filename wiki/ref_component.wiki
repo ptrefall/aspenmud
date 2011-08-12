@@ -1,0 +1,18 @@
+#summery Component class reference
+
+=Component=
+file: component.h
+Synopsis: The component class provides a way to add functionality and extend in-game objects.
+
+==Public fields=
+  * variables: a property tree holding variables associated with the component.
+  * events: an EventManager object that allows for events to be bound to the object.
+
+==Constructor==
+
+`Component(const std::string &name);`
+==Parameters==
+  * [in] the name of the component.
+
+`Component();`
+
