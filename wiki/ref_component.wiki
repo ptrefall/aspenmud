@@ -1,22 +1,25 @@
 #summary Component class reference
 
+<wiki:toc max_depth="2" />
 
-=Component=
-<wiki:toc max_depth="1" />
-
-file: component.h<br>
-Synopsis: The component class provides a way to add functionality and extend in-game objects.
+  * file: component.h
+  * Synopsis: The component class provides a way to add functionality and extend in-game objects.
 ----
 
-==Public fields=
-  * variables: a property tree holding variables associated with the component.
-  * events: an EventManager object that allows for events to be bound to the object.
+=Public fields=
+
+==variables==
+ a PropertyTree holding variables associated with the component.
+
+==events==
+an EventManager object that allows for events to be bound to the object.
+
 ----
 
-==Constructor==
+=Members=
 
-`Component(const std::string &name);`
-==Parameters==
-  * [in] the name of the component.
+==`Component(const std::string &name)`==
+===Parameters===
+  * <nowiki>[in]</nowiki> the name of the component.
 
-`Component();`
+==`Component();`==
