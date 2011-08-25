@@ -9,7 +9,7 @@
 =Public fields=
 
 ==variables==
- a PropertyTree holding variables associated with the component.
+a PropertyTree holding variables associated with the component.
 
 ==events==
 an EventManager object that allows for events to be bound to the object.
@@ -20,6 +20,20 @@ an EventManager object that allows for events to be bound to the object.
 
 ==`Component(const std::string &name)`==
 ===Parameters===
-  * <nowiki>[in]</nowiki> the name of the component.
+  * in: the name of the component.
+
+===Description===
+
+Initializes the component to all default values, and sets the name to the one provided.
 
 ==`Component();`==
+===Description===
+
+Initializes the component to all default values.
+
+==`  void SetName(const std::string &name)`==
+
+===Parameters===
+  * In: The name of the component.
+===Description===
+Sets the name of the component to the name specified.
