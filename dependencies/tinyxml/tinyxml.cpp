@@ -29,7 +29,7 @@ distribution.
 #include <iostream>
 #endif
 
-#include "tinyxml.h"
+#include "../../includes/tinyxml.h"
 
 FILE* TiXmlFOpen( const char* filename, const char* mode );
 
@@ -598,6 +598,19 @@ const char* TiXmlElement::Attribute( const char* name, int* i ) const
 		result = attrib->Value();
 		if ( i ) {
 			attrib->QueryIntValue( i );
+		}
+	}
+	return result;
+}
+const char* TiXmlElement::Attribute( const char* name, unsigned int* i ) const
+{
+	const TiXmlAttribute* attrib = attributeSet.Find( name );
+	const char* result = 0;
+
+	if ( attrib ) {
+		result = attrib->Value();
+		if ( i ) {
+			attrib->QueryIntValue( (int*)i );
 		}
 	}
 	return result;
