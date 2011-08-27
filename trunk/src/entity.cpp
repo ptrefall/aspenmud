@@ -250,7 +250,7 @@ void Entity::Deserialize(TiXmlElement* root)
   _desc = root->Attribute("desc");
   _script = root->Attribute("script");
   _plural = root->Attribute("plural");
-  root->Attribute("onum", &_onum);
+  root->Attribute("onum", (unsigned int*)&_onum);
   root->Attribute("location", &loc);
 //we need to add ourselves to the object registry.
       world->AddObject(_onum, this);

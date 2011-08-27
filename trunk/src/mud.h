@@ -6,7 +6,7 @@
 #define WHERE() std::string(" In ")+std::string(__FUNCTION__)+std::string(" at ")+std::string(__FILE__)+std::string(".")
 //typedefs:
 typedef int FLAG; //bitfield flags
-typedef int VNUM;
+typedef unsigned int VNUM;
 typedef int BOOL;
 typedef unsigned int UINT;
 typedef unsigned int DWORD;
