@@ -24,7 +24,6 @@ Entity::Entity(void)
   _desc="You see nothing special.";
   _script="";
   _location=NULL;
-  _type=1;
   _onum=0;
   _components=new std::vector<Component*>();
   _aliases = new std::vector<std::string>();
@@ -117,15 +116,6 @@ std::list<Entity*>* Entity::GetContents()
   return &_contents;
 }
 
-int Entity::GetType(void) const
-{
-  return _type;
-}
-void Entity::SetType(int type)
-{
-  _type=type;
-}
-
 VNUM Entity::GetOnum(void) const
 {
   return _onum;
@@ -191,7 +181,6 @@ void Entity::Serialize(TiXmlElement* root)
   ent->SetAttribute("script", _script.c_str());
   ent->SetAttribute("plural", _plural.c_str());
   ent->SetAttribute("onum", _onum);
-  ent->SetAttribute("type", _type);
   ent->SetAttribute("location", (_location?_location->GetOnum():0));
 
   root->LinkEndChild(ent);
@@ -262,40 +251,22 @@ void Entity::Deserialize(TiXmlElement* root)
   _script = root->Attribute("script");
   _plural = root->Attribute("plural");
   root->Attribute("onum", &_onum);
-  root->Attribute("type", &_type);
   root->Attribute("location", &loc);
 //we need to add ourselves to the object registry.
-  if (GetType() == 1)
-    {
       world->AddObject(_onum, this);
-    }
-  else
-    {
-      world->AddRoom(_onum, (Room*)this);
-    }
-
   if (!loc)
     {
       _location=NULL;
     }
   else
     {
-      if (_type==1)
-        {
-//it's an object
           _location=world->GetObject(loc);
-        }
-      else if (_type==2)
-        {
-//it's a room
-          _location=world->GetRoom(loc);
-        }
     }
 
 //now we execute the script on the object.
 #ifdef MODULE_SCRIPTING
-  Script* script = (Script*)world->GetProperty("script");
-  script->Execute(this);
+//  Script* script = (Script*)world->GetProperty("script");
+//  script->Execute(this);
 #endif
 
 //and now we notify everything that an object was loaded:

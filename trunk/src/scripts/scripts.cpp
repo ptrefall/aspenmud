@@ -1,211 +1,264 @@
 #include <string>
 #include <sstream>
-#include <cassert>
-#include <boost/bind.hpp>
-#include <boost/bind/protect.hpp>
-#include "../conf.h"
-#include "../mud.h"
-#include "../entity.h"
-#include "../world.h"
-#include "../player.h"
-#include "../utils.h"
-#include "../olc.h"
+#include <sys/time.h>
 #include "scripts.h"
+#include "scr_world.h"
+#include "scr_player.h"
+#include "scr_entity.h"
+#include "../mud.h"
+#include "../conf.h"
+#include "../world.h"
+#include "../command.h"
+#include "../event.h"
+#include "../eventargs.h"
+#include "../variant.h"
 
 #ifdef MODULE_SCRIPTING
-#include <angelscript.h>
-#include <scriptbuilder.h>
-#include <scriptstdstring.h>
-
 Script::Script()
 {
-  int ret = 0;
-  std::string error;
-
-  _engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
-
-  ret = _engine->SetMessageCallback(asMETHOD(Script, ReceiveMessage), this, asCALL_THISCALL);
-  if (ret != 0)
-    {
-      switch(ret)
-        {
-        default:
-          error = "unknown";
-          break;
-        case asINVALID_ARG:
-          error = "invalid Argument";
-          break;
-        case asNOT_SUPPORTED:
-          error = "argument not supported";
-          break;
-        }
-      throw(ScriptException("An error occured while trying to register the message callback. Error: "+error+"."));
-    }
-
-  RegisterStdString(_engine);
-  RegisterEntity();
-  RegisterWorld();
+  state = lua_open();
+  luaL_openlibs(state);
 }
 Script::~Script()
 {
-  _engine->Release();
+  lua_close(state);
 }
 
-void Script::ReceiveMessage(asSMessageInfo *message)
+void Script::Execute(const std::string &code)
 {
-  World* world = World::GetPtr();
+  int index = 0;
 
-//we need to create our string:
-  std::stringstream st;
-  switch(message->type)
+//we load our code to be executed.
+  int status = luaL_loadbuffer(state, code.c_str(), code.length(), "execution");
+  if (!status)
     {
-    case asMSGTYPE_ERROR:
-      st << "[ERROR] ";
-      break;
-    case asMSGTYPE_WARNING:
-      st << "[WARNING] ";
-      break;
-    case asMSGTYPE_INFORMATION:
-      st << "[INFO] ";
-      break;
-    default:
-      st << "[UNKNOWN] ";
+//we push our traceback function on to the stack.
+      lua_getglobal(state, "debug");
+      lua_getfield(state, -1, "traceback");
+      lua_remove(state, -2);
+      index = lua_gettop(state);
+//we call the code.
+      status = lua_pcall(state, 0, 0, index);
+      lua_remove(state, index);
+//if it failed, we garbage collect.
+      if (status)
+        {
+          lua_gc(state, LUA_GCCOLLECT, 0);
+        }
     }
-  st << "line " << message->row << "col " << message->col << "section " << message->section << ": " << message->message;
-  world->WriteLog(st.str(), SCRIPT, "script");
 }
-
-void Script::RegisterEntity()
+lua_State* Script::GetState() const
 {
-  int r = 0;
-  r = _engine->RegisterObjectType("Entity", sizeof(Entity), asOBJ_REF);
-  assert(r >= 0);
-  r = _engine->RegisterObjectBehaviour("Entity", asBEHAVE_ADDREF, "void dummyref()", asFUNCTION(DummyRef), asCALL_CDECL_OBJLAST);
-  assert(r >= 0);
-  r = _engine->RegisterObjectBehaviour("Entity", asBEHAVE_RELEASE, "void dummyref()", asFUNCTION(DummyRef), asCALL_CDECL_OBJLAST);
-  assert(r >= 0);
-  r = _engine->RegisterObjectMethod("Entity", "string GetName() const", asMETHOD(Entity, GetName), asCALL_THISCALL);
-  assert(r >= 0);
-  r = _engine->RegisterObjectMethod("Entity", "void SetName(string name)", asMETHOD(Entity, GetName), asCALL_THISCALL);
-  assert(r >= 0);
-}
-void Script::RegisterWorld()
-{
-  int r = 0;
-  r = _engine->RegisterObjectType("World", sizeof(World), asOBJ_REF);
-  assert(r >= 0);
-  r = _engine->RegisterObjectBehaviour("World", asBEHAVE_ADDREF, "void dummyref()", asFUNCTION(DummyRef), asCALL_CDECL_OBJLAST);
-  assert(r >= 0);
-  r = _engine->RegisterObjectBehaviour("World", asBEHAVE_RELEASE, "void dummyref()", asFUNCTION(DummyRef), asCALL_CDECL_OBJLAST);
-  assert(r >= 0);
-  r = _engine->RegisterGlobalFunction("World@ GetWorld()", asFUNCTION(GetWorldPointer), asCALL_CDECL);
-  assert(r >= 0);
-  r = _engine->RegisterObjectMethod("World", "void Shutdown()", asMETHOD(World, Shutdown), asCALL_THISCALL);
-  assert(r >= 0);
-}
-
-#ifdef OLC
-CEVENT(Script, AddOlc)
-{
-  Entity* object = (Entity*)caller;
-
-  object->AddOlc("script", "Editing object script", EDITOR,
-                 boost::bind(OlcEditor, _1, _2, _3,
-                             boost::protect(boost::bind(&Entity::GetScript, object)),
-                             boost::protect(boost::bind(&Entity::SetScript, object, _1))));
+  return state;
 }
 #endif
 
-BOOL Script::Execute(Entity* object)
+BOOL InitializeScript(void)
 {
-  if (object->GetScript() == "")
-    {
-      return true;
-    }
-
   World* world = World::GetPtr();
-  int ret = 0;
-  CScriptBuilder builder;
-  char idstr [11];
-  NumberToString(idstr, object->GetOnum());
-  ret = builder.StartNewModule(_engine, idstr);
-  if (ret < 0)
-    {
-      world->WriteLog("Could not create script builder.", SCRIPT, "script");
-      return false;
-    }
-  ret = builder.AddSectionFromMemory(object->GetScript().c_str());
-  if (ret < 0)
-    {
-      world->WriteLog("Could not load script from object.", SCRIPT, "script");
-      return false;
-    }
-  ret = builder.BuildModule();
-  if (ret < 0)
-    {
-      world->WriteLog("Compilation error.", SCRIPT, "script");
-      return false;
-    }
 
-  asIScriptModule *module = _engine->GetModule(idstr);
-  int gfid = module->GetFunctionIdByDecl("void main(Entity@ obj)");
-  if (gfid < 0)
-    {
-      world->WriteLog("Could not find entrypoint.", SCRIPT, "script");
-      return false;
-    }
-
-  asIScriptContext *context = _engine->CreateContext();
-  if (!context)
-    {
-      world->WriteLog("Could not create script context", SCRIPT, "script");
-      return false;
-    }
-  context->Prepare(gfid);
-  context->SetArgObject(0, object);
-  ret = context->Execute();
-  switch(ret)
-    {
-    default:
-      world->WriteLog("Received an unknown return code from Execute.");
-      break;
-    case asEXECUTION_ABORTED:
-    case asEXECUTION_SUSPENDED:
-    case asEXECUTION_FINISHED:
-      break;
-    case asEXECUTION_EXCEPTION:
-      world->WriteLog("Script exited with exception: "+std::string(context->GetExceptionString()), SCRIPT, "script");
-      break;
-    }
-
-  context->Release();
-  return true;
-}
-
-World* GetWorldPointer()
-{
-  return World::GetPtr();
-}
-
-void DummyRef(void* args)
-{
-}
-#endif
-
-BOOL InitializeScript()
-{
 #ifdef MODULE_SCRIPTING
-  World* world = World::GetPtr();
-  if (!world->RegisterLog(SCRIPT_FILE, SCRIPT_NAME))
+  world->WriteLog("Initializing scripting.");
+  world->commands.AddCommand(new CMDExecute());
+Script* scr = new Script();
+  if (!InitWorldScript(scr))
     {
-      world->WriteLog("Something seems to have registered a script log already. Writing there anyway.", WARN);
+      world->WriteLog("Initialization of world script system failed.", ERR);
+      return false;
     }
-
-  Script* script = new Script();
-  world->AddProperty("script", script);
-#ifdef OLC
-  world->events.AddCallback("ObjectLoaded", boost::bind(&Script::AddOlc, _1, _2));
-#endif
+  if (!InitPlayerScript(scr))
+    {
+      world->WriteLog("Initialization of player script system failed.", ERR);
+      return false;
+    }
+  if (!InitEntityScript(scr))
+    {
+      world->WriteLog("Initialization of entity script failed.", ERR);
+      return false;
+    }
+world->AddProperty("script", (void*)scr);
 #endif
   return true;
 }
+
+#ifdef MODULE_SCRIPTING
+CMDExecute::CMDExecute()
+{
+  SetName("execute");
+  AddAlias("exec");
+  AddAlias("eval");
+  SetAccess(RANK_BUILDER);
+}
+BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  timeval prev, now; //used for timing the whole thing.
+  std::stringstream st; //used for printing results.
+  std::vector<std::string>::iterator it, itEnd;
+  std::string input;
+  int elapsed = 0;
+  Script* scr = NULL;
+
+  scr = new Script();
+  if (!scr)
+    {
+      mobile->Message(MSG_INFO, "could not create script interface.");
+      return false;
+    }
+
+  lua_State* state = scr->GetState();
+  gettimeofday(&prev, NULL);
+//we set the fd first
+  lua_pushnumber(state, mobile->GetSocket()->GetControl());
+  lua_setglobal(state, "__fd__");
+//now we assign a "me" keyword to the player.
+  UserData* data = (UserData*)lua_newuserdata(state, sizeof(UserData));
+  data->ptr = (void*)mobile;
+  data->type = type_player;
+  lua_setglobal(state, "me");
+//we push our print replacement to the global table:
+  lua_pushcfunction(state, SCR_Print);
+  lua_setfield(state, LUA_GLOBALSINDEX, "print");
+
+//expand our arguments into a full string.
+  itEnd = args.end();
+  for (it = args.begin(); it != itEnd; ++it)
+    {
+      input += (*it);
+    }
+
+//execute the code.
+  scr->Execute(input);
+//  st << "Result: " << (ret == NULL?"no return":ret) << "\n";
+  delete scr;
+
+  gettimeofday(&now, NULL);
+  elapsed = (now.tv_sec - prev.tv_sec) * 1000;
+  elapsed += (now.tv_usec - prev.tv_usec) / 1000;
+  st << "[execution took " << elapsed << " ms].";
+  mobile->Message(MSG_INFO, st.str());
+  return true;
+}
+
+void SCR_Error(lua_State* l, const char* msg)
+{
+  lua_pushlstring(l, msg, strlen(msg));
+  lua_error(l);
+}
+
+Variant IndexToVariant(lua_State* l, int index)
+{
+  int type = 0;
+
+  if (lua_isnoneornil(l, index))
+    {
+      SCR_Error(l, "Specified index is either out of range or nil.");
+      return Variant();
+    }
+
+  type = lua_type(l, index);
+  switch(type)
+    {
+    default:
+      SCR_Error(l, "Can not convert the type at the specified index.");
+      return Variant();
+    case LUA_TNUMBER:
+      return Variant(lua_tonumber(l, index));
+    case LUA_TBOOLEAN:
+      return lua_toboolean(l, index);
+    case LUA_TSTRING:
+      return Variant(lua_tostring(l, index));
+    }
+}
+BOOL VariantToStack(lua_State* l, Variant& var)
+{
+  VARIABLE_TYPE type = var.Typeof();
+
+  switch(type)
+    {
+    case VAR_INT:
+      lua_pushinteger(l, var.GetInt());
+      return true;
+    case VAR_DOUBLE:
+      lua_pushnumber(l, var.GetDouble());
+      return true;
+    case VAR_BYTE:
+      lua_pushinteger(l, (int)var.GetByte());
+      return true;
+    case VAR_STR:
+      lua_pushstring(l, var.GetStr().c_str());
+      return true;
+    default:
+      SCR_Error(l, "Invalid variable type handled when pushing a variant to the stack.");
+      return false;
+    }
+}
+
+BOOL IsPlayer(lua_State* l, UserData* udata)
+{
+  if (!udata)
+    {
+      SCR_Error(l, "Udata passed to IsPlayer was NULL.");
+      return false;
+    }
+
+  if ((udata->type != type_player) || (udata->ptr == NULL))
+    {
+      SCR_Error(l, "Invalid type.");
+      return false;
+    }
+
+  return true;
+}
+BOOL IsLiving(lua_State* l, UserData* udata)
+{
+  if ((udata->type != type_player) || (udata->type != type_npc) || (udata->ptr == NULL))
+    {
+      SCR_Error(l, "Invalid type.");
+      return false;
+    }
+
+  return true;
+}
+BOOL IsObject(lua_State* l, UserData* udata)
+{
+  if ((udata->type != type_player) || (udata->type != type_npc) || (udata->type != type_object) || (udata->ptr == NULL))
+    {
+      SCR_Error(l, "Invalid type.");
+      return false;
+    }
+
+  return true;
+}
+int SCR_Print(lua_State* l)
+{
+  std::string data;
+  int nargs = lua_gettop(l);
+  int i = 0;
+  int fd = 0;
+  const char* result = NULL;
+
+  lua_getglobal(l, "tostring");
+  for (i = 1; i <= nargs; i++)
+    {
+      lua_pushvalue(l, -1);
+      lua_pushvalue(l, i);
+      lua_call(l, 1, 1);
+      result = lua_tostring(l, -1);
+      if (result == NULL)
+        {
+          SCR_Error(l, "Error in print function--NULL was returned from tostring.");
+          return 0;
+        }
+
+      if (i > 1)
+        data += "    ";
+      data += result;
+      lua_pop(l, 1);
+    }
+  data += "\n";
+  lua_getglobal(l, "__fd__");
+  fd = lua_tonumber(l, -1);
+  write(fd, data.c_str(), data.length());
+  return 0;
+}
+#endif

@@ -311,7 +311,7 @@ void Player::EnterGame(BOOL quiet)
 //move the player if it doesn't already have a location
   if (GetLocation()==NULL)
     {
-      SetLocation(world->GetRoom(ROOM_START));
+      SetLocation(world->GetObject(ROOM_START));
     }
 //if there were password attempts, tell the player.
   if (_invalidPassword)

@@ -27,7 +27,6 @@ class Entity:public ISerializable
 #endif
   VNUM _onum;
   Entity* _location;
-  int _type;
   std::string _name;
   std::string _desc;
   std::string _script; //the scripting associated with this object.
@@ -63,17 +62,6 @@ public:
   *Return: A pointer to an std::list of pointers to objects.
   */
   std::list<Entity*>* GetContents();
-  /*
-  *Returns the type of the entity.
-  *Return: 1 for object, 2 for room.
-  *Note: don't add more types, this is just used for assigning the entity's objhect to the correct vnum table.
-  */
-  int GetType(void) const;
-  /*
-  *Sets the object type.
-  *Param: [in] the type of the object (1 for object, 2 for room).
-  */
-  void SetType(int type);
   /*
   *Returns: The object's vnum.
   */

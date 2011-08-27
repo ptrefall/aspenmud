@@ -23,7 +23,6 @@
 #include "eventManager.h"
 #include "com_gen.h"
 
-
 World* World::_ptr;
 World* World::GetPtr()
 {
@@ -46,13 +45,10 @@ World::World()
   _cfactory=new ComponentFactory();
   _properties=new std::map<std::string,void*>();
   _zones=new std::vector<Zone*>();
-  _rooms=new std::map<VNUM,Room*>();
   _objects=new std::map<VNUM,Entity*>();
   _onumPool=new std::vector <VNUM>();
-  _rnumPool=new std::vector<VNUM>();
   _state = new std::map<std::string, ISerializable*>();
   _maxOnum=0;
-  _maxRnum=0;
   _chanid=1;
   _server = NULL;
 //events
@@ -66,7 +62,6 @@ World::World()
   events.RegisterEvent("Copyover", new Event());
   events.RegisterEvent("ObjectLoaded", new Event());
 }
-
 World::~World()
 {
   std::map<int,Channel*>::iterator cit, citEnd;
@@ -128,10 +123,8 @@ World::~World()
     }
   delete _zones;
 
-  delete _rooms;
   delete _objects;
   delete _onumPool;
-  delete _rnumPool;
 }
 void World::InitializeServer()
 {
@@ -473,38 +466,6 @@ BOOL World::RegisterComponent(const std::string &name,COMCREATECB cb, COMINITCB 
 Component*  World::CreateComponent(const std::string &name)
 {
   return _cfactory->Create(name);
-}
-
-BOOL World::AddRoom(VNUM num,Room* room)
-{
-  if (RoomExists(num))
-    {
-      return false;
-    }
-
-  (*_rooms)[num]=room;
-  return true;
-}
-Room* World::GetRoom(VNUM num)
-{
-  if (!RoomExists(num))
-    {
-      return NULL;
-    }
-  return (*_rooms)[num];
-}
-BOOL World::RemoveRoom(VNUM num)
-{
-  if (!RoomExists(num))
-    {
-      return false;
-    }
-  _rooms->erase(num);
-  return true;
-}
-BOOL World::RoomExists(VNUM num)
-{
-  return (_rooms->count(num)==0?false:true);
 }
 
 BOOL World::AddObject(VNUM num, Entity* obj)
@@ -1071,44 +1032,9 @@ BOOL World::CreateObject(Entity* obj)
 
   return false;
 }
-BOOL World::CreateRoom(Room* room)
-{
-  VNUM id;
-
-  if (_rnumPool->size())
-    {
-      id=_rnumPool->back();
-      _rnumPool->pop_back();
-      room->SetOnum(id);
-      AddRoom(id,room);
-      return true;
-    }
-  else
-    {
-      _maxOnum++;
-      id=_maxOnum;
-      room->SetOnum(id);
-      AddRoom(id,room);
-      return true;
-    }
-
-  return false;
-}
 BOOL World::RecycleObject(Entity* obj)
 {
-  int type = obj->GetType();
-  if (type == 1)
-    {
       _onumPool->push_back(obj->GetOnum());
-    }
-  else if(type == 2)
-    {
-      _rnumPool->push_back(obj->GetOnum());
-    }
-  else
-    {
-      return false;
-    }
 
 //we recursively recycle everything in contents.
   std::list<Entity*>* contents = obj->GetContents();
@@ -1139,7 +1065,6 @@ BOOL World::RecycleObject(Entity* obj)
     }
 
   delete obj;
-
   return true;
 }
 
@@ -1147,30 +1072,9 @@ void World::InitializeNums()
 {
   WriteLog("Initializing vnums for pool.");
   int max=0;
-  int i;
-  std::map<VNUM,Room*>::iterator rt, rtEnd;
+  int i = 0;
   std::map<VNUM,Entity*>::iterator ot, otEnd;
 
-//iterate through rooms first and find the max number.
-  rtEnd = _rooms->end();
-  for (rt=_rooms->begin(); rt != rtEnd; ++rt)
-    {
-      if ((*rt).first>max)
-        {
-          max=(*rt).first;
-        }
-    }
-  _maxRnum=max;
-  for (i=0; i!=max; i++)
-    {
-      if (!GetRoom(i))
-        {
-//GetRoom returned NULL, we have an empty number to add to the pool
-          _rnumPool->push_back(i);
-        }
-    }
-
-//now we do the same with objects:
   max=0;
   otEnd = _objects->end();
   for (ot=_objects->begin(); ot != otEnd; ++ot)

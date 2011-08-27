@@ -19,7 +19,7 @@ CFLAGS += -L../libs
 CFLAGS += -I../includes
 
 #required libraries
-L_FLAGS	= -lcrypto -ltinyxml -langelscript
+L_FLAGS	= -lcrypto -ltinyxml -llua5.1
 
 #formatting specific flags
 FORMATTER = astyle
@@ -29,7 +29,7 @@ FORMAT_FLAGS = --style=gnu
 MODULES = scripts syslog help components intermud
 
 #dependencies
-DEPS = tinyxml angelscript
+DEPS = tinyxml
 
 #source files to compile:
 S_FILES= world.cpp variant.cpp entity.cpp player.cpp socket.cpp\
