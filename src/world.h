@@ -43,10 +43,8 @@ class World
   std::vector<Zone*> *_zones;
   std::map<VNUM,Room*> *_rooms;
   std::map<VNUM,Entity*> *_objects;
-  std::vector<VNUM> *_onumPool;
-  std::vector <VNUM> *_rnumPool;
+  std::vector <VNUM> *_onumPool;
   VNUM _maxOnum;
-  VNUM _maxRnum;
   int _chanid;
   time_t _ruptime; //real uptime.
   time_t _cuptime; //uptime since last copyover.
@@ -149,30 +147,6 @@ public:
   */
   Component*  CreateComponent(const std::string &name);
   /*
-  *Adds a room to the mapping.
-  *Param: [in] The number of the room object.
-  *[in] A pointer to the object to add.
-  *Return: True on success, false otherwise.
-  */
-  BOOL AddRoom(VNUM num,Room* room);
-  /*
-  *Gets a room object based on its number.
-  *Param: [in] the number of the room object to retrieve.
-  *Return: A pointer to the room object, or NULL if it wasn't in the list.
-  */
-  Room* GetRoom(VNUM num);
-  /*
-  *Removes a room from the list
-  *Param: [in] the number of the object to remove
-  *Return: True on success, false on failure.
-  */
-  BOOL RemoveRoom(VNUM num);
-  /*
-  *Checks to see if the specified room exists.
-  *Return: True on success, false otherwise.
-  */
-  BOOL RoomExists(VNUM num);
-  /*
   *Adds an object to the object table.
   *Param: [in] a VNUM for the object to add.
   *[in] A pointer to the object.
@@ -217,7 +191,6 @@ public:
   *Param: [in] the time of last copyover.
   */
   void SetCopyoverUptime(time_t tm);
-
   /*
   *Adds a property to the world's property table.
   *Param: [in] the name of the property to add.
@@ -311,9 +284,18 @@ public:
   *Return: True on success, false on failure.
   */
   BOOL CreateObject(Entity* obj);
-  BOOL  CreateRoom(Room* room);
+/*
+*Recycles the specified object.
+*This will take the object's onum, and push it into the pool of reserved object numbers. We also delete the object's contents.
+*Param: [in] the pointer to the object.
+*Return: True if the object could be recycled, false otherwise.
+*/
   BOOL RecycleObject(Entity* obj);
-  void InitializeNums(void);
+/*
+*Iterates through all of the objects and finds the max number.
+*We find the numbers in the object pool that aren't used and add it to the reserved pool.
+*/
+  void InitializeNums();
   /*
   *Checks to see if the log exists.
   *Param: [in] the name of the log.

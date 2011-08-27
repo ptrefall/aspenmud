@@ -27,9 +27,8 @@ Zone::~Zone()
   itEnd = _rnums.end();
   for (it = _rnums.begin(); it != itEnd; ++it)
     {
-      room = world->GetRoom((*it));
-      world->RemoveRoom((*it));
-      delete room;
+      room = (Room*)world->GetObject((*it));
+      world->RecycleObject((Entity*)room);
     }
 }
 
@@ -65,7 +64,7 @@ BOOL Zone::AddRoom(VNUM num)
         }
     }
   _rnums.push_back(num);
-  world->GetRoom(num)->SetZone(this);
+  ((Room*)world->GetObject(num))->SetZone(this);
   return true;
 }
 BOOL Zone::RemoveRoom(VNUM num)
@@ -78,7 +77,7 @@ BOOL Zone::RemoveRoom(VNUM num)
       if ((*it)==num)
         {
           _rnums.erase(it);
-          world->RemoveRoom(num);
+          world->RemoveObject(num);
           return true;
         }
     }
@@ -107,7 +106,7 @@ void Zone::Serialize(TiXmlElement* root)
     {
       for (it = _rnums.begin(); it != itEnd; ++it)
         {
-          room=world->GetRoom((*it));
+          room=(Room*)world->GetObject((*it));
           if (room)
             {
               room->Serialize(rooms);
@@ -141,7 +140,7 @@ void Zone::Deserialize(TiXmlElement* zone)
       iterator = node->ToElement();
       room=new Room();
       room->Deserialize(iterator);
-      world->AddRoom(room->GetOnum(),room);
+      world->AddObject(room->GetOnum(),room);
       AddRoom(room->GetOnum());
       room=NULL;
     }
@@ -184,7 +183,7 @@ BOOL InitializeZones()
         }
       room->SetName("A blank room");
       room->SetCoord(p);
-      if (!world->CreateRoom(room))
+      if (!world->CreateObject(room))
         {
           return false;
         }

@@ -53,11 +53,11 @@ BOOL DoMove(const std::string &verb, Player* mobile,std::vector<std::string> &ar
 
 //call the event to signal that the player is moving
   room->events.CallEvent("OnExit", NULL, (void*)mobile);
-  dest = world->GetRoom(exit->GetTo());
+  dest = (Room*)world->GetObject(exit->GetTo());
   mobile->MoveTo(dest);
   dest->events.CallEvent("OnEnter", NULL, (void*)mobile);
 
-  mobile->Message(MSG_INFO, world->GetRoom(exit->GetTo())->DoLook(mobile));
+  mobile->Message(MSG_INFO, ((Room*)world->GetObject(exit->GetTo()))->DoLook(mobile));
   return true;
 }
 

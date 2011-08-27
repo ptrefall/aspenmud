@@ -72,8 +72,7 @@ BOOL CMDRlist::Execute(const std::string &verb, Player* mobile,std::vector<std::
 
   std::stringstream st;
   std::list <VNUM>* nums=new std::list<VNUM>();
-  std::list <VNUM>::iterator it;
-  std::list<VNUM>::iterator itEnd;
+  std::list <VNUM>::iterator it, itEnd;
   Lower(args[0]);
   Zone* zone=world->GetZone(args[0]);
   Room* room=NULL;
@@ -91,7 +90,7 @@ BOOL CMDRlist::Execute(const std::string &verb, Player* mobile,std::vector<std::
   itEnd=nums->end();
   for (it = nums->begin(); it != itEnd; ++it)
     {
-      room=world->GetRoom((*it));
+      room = (Room*)world->GetObject((*it));
       if (room)
         {
           st << "[" << room->GetOnum() << "] " << room->GetName() << "\n";
@@ -180,7 +179,7 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
   if (!toid)
     {
       room=new Room();
-      world->CreateRoom(room);
+      world->CreateObject(room);
       zone=location->GetZone();
       if (zone)
         {
@@ -190,7 +189,7 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
     }
   else
     {
-      room = world->GetRoom(toid);
+      room = (Room*)world->GetObject(toid);
       if (!room)
         {
           mobile->Message(MSG_ERROR, "That rnum does not exist.");

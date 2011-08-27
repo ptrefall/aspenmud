@@ -80,9 +80,6 @@ public:
   Property *AddProperty(const std::string &name, const Variant& value)
   {
     size_t dotInd = name.find_first_of(".");
-    std::vector<Property *>::iterator it = Children.begin();
-    std::vector<Property*>::iterator itEnd = Children.end();
-
     Property *prop = NULL;
 
     if (dotInd != std::string::npos)
