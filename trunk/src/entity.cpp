@@ -253,20 +253,20 @@ void Entity::Deserialize(TiXmlElement* root)
   root->Attribute("onum", (unsigned int*)&_onum);
   root->Attribute("location", &loc);
 //we need to add ourselves to the object registry.
-      world->AddObject(_onum, this);
+  world->AddObject(_onum, this);
   if (!loc)
     {
       _location=NULL;
     }
   else
     {
-          _location=world->GetObject(loc);
+      _location=world->GetObject(loc);
     }
 
 //now we execute the script on the object.
 #ifdef MODULE_SCRIPTING
-//  Script* script = (Script*)world->GetProperty("script");
-//  script->Execute(this);
+  Script* script = (Script*)world->GetProperty("script");
+  script->Execute(this, GetScript());
 #endif
 
 //and now we notify everything that an object was loaded:

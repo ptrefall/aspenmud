@@ -35,22 +35,13 @@ struct UserData
 class Script
 {
   lua_State *state;
-  Entity* _obj;
-  std::string _script;
 public:
   Script();
   ~Script();
-  void SetObj(Entity* obj);
-  Entity* GetObj(void) const;
-  void Execute(const std::string &code);
+  void Execute(Entity* obj, const std::string &code);
   lua_State* GetState() const;
 };
 
-EVENT(EVENT_INIT_PLAYER_SCRIPT);
-#endif
-
-BOOL InitializeScript(void);
-#ifdef MODULE_SCRIPTING
 class CMDExecute:public Command
 {
 public:
@@ -107,4 +98,6 @@ BOOL IsObject(lua_State* l, UserData* udata);
 */
 int SCR_Print(lua_State* l);
 #endif
+
+BOOL InitializeScript();
 #endif
