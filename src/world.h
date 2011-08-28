@@ -284,17 +284,17 @@ public:
   *Return: True on success, false on failure.
   */
   BOOL CreateObject(Entity* obj);
-/*
-*Recycles the specified object.
-*This will take the object's onum, and push it into the pool of reserved object numbers. We also delete the object's contents.
-*Param: [in] the pointer to the object.
-*Return: True if the object could be recycled, false otherwise.
-*/
+  /*
+  *Recycles the specified object.
+  *This will take the object's onum, and push it into the pool of reserved object numbers. We also delete the object's contents.
+  *Param: [in] the pointer to the object.
+  *Return: True if the object could be recycled, false otherwise.
+  */
   BOOL RecycleObject(Entity* obj);
-/*
-*Iterates through all of the objects and finds the max number.
-*We find the numbers in the object pool that aren't used and add it to the reserved pool.
-*/
+  /*
+  *Iterates through all of the objects and finds the max number.
+  *We find the numbers in the object pool that aren't used and add it to the reserved pool.
+  */
   void InitializeNums();
   /*
   *Checks to see if the log exists.

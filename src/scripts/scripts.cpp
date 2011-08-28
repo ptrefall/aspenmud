@@ -24,18 +24,38 @@ Script::~Script()
   lua_close(state);
 }
 
-void Script::Execute(const std::string &code)
+void Script::Execute(Entity* obj, const std::string &code)
 {
   int index = 0;
+  char id[16];
+  void* table = 0;
+//we need to create a new metatable for the object so we have a sanitary execution context.
+  if (!obj)
+    {
+      return;
+    }
+  NumberToString(id, obj->GetOnum());
+  if (!luaL_newmetatable(state, id))
+    {
+      return;
+    }
+  lua_pushstring(state, "__index");
+  lua_pushvalue(state, LUA_GLOBALSINDEX);
+  lua_settable(state, -3); //table is at -1 again
 
 //we load our code to be executed.
   int status = luaL_loadbuffer(state, code.c_str(), code.length(), "execution");
   if (!status)
     {
+//we set the table
+      lua_getmetatable(state, -2);
+//now we setfenv
+      lua_setfenv(state, -2); //the function is back at -1
 //we push our traceback function on to the stack.
+
       lua_getglobal(state, "debug");
       lua_getfield(state, -1, "traceback");
-      lua_remove(state, -2);
+      lua_remove(state, -2); //the traceback field is at the top of the stack.
       index = lua_gettop(state);
 //we call the code.
       status = lua_pcall(state, 0, 0, index);
@@ -60,7 +80,7 @@ BOOL InitializeScript(void)
 #ifdef MODULE_SCRIPTING
   world->WriteLog("Initializing scripting.");
   world->commands.AddCommand(new CMDExecute());
-Script* scr = new Script();
+  Script* scr = new Script();
   if (!InitWorldScript(scr))
     {
       world->WriteLog("Initialization of world script system failed.", ERR);
@@ -76,7 +96,7 @@ Script* scr = new Script();
       world->WriteLog("Initialization of entity script failed.", ERR);
       return false;
     }
-world->AddProperty("script", (void*)scr);
+  world->AddProperty("script", (void*)scr);
 #endif
   return true;
 }
@@ -97,8 +117,8 @@ BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std
   std::string input;
   int elapsed = 0;
   Script* scr = NULL;
-
-  scr = new Script();
+  World* world = World::GetPtr();
+  scr = (Script*)world->GetProperty("script");
   if (!scr)
     {
       mobile->Message(MSG_INFO, "could not create script interface.");
@@ -127,7 +147,7 @@ BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std
     }
 
 //execute the code.
-  scr->Execute(input);
+  scr->Execute(mobile, input);
 //  st << "Result: " << (ret == NULL?"no return":ret) << "\n";
   delete scr;
 

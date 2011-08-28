@@ -1034,7 +1034,7 @@ BOOL World::CreateObject(Entity* obj)
 }
 BOOL World::RecycleObject(Entity* obj)
 {
-      _onumPool->push_back(obj->GetOnum());
+  _onumPool->push_back(obj->GetOnum());
 
 //we recursively recycle everything in contents.
   std::list<Entity*>* contents = obj->GetContents();
