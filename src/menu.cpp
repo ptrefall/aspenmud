@@ -25,8 +25,10 @@ Menu::Menu(void)
 }
 Menu::~Menu(void)
 {
-  std::vector <MENU_DATA*>::iterator it;
-  for (it = _options.begin(); it != _options.end(); it++)
+  std::vector <MENU_DATA*>::iterator it, itEnd;
+
+itEnd = _options.end();
+  for (it = _options.begin(); it != itEnd; ++it)
     {
       delete (*it);
     }
@@ -153,11 +155,8 @@ BOOL Menu::Unattach(void)
   _sock->ClearInput();
   return true;
 }
-
-BOOL Menu::ShowMenu(void)
+BOOL Menu::CanShow()
 {
-  std::vector <MENU_DATA*>::iterator it;
-
   if (_sock==NULL)
     {
       return false;
@@ -170,6 +169,17 @@ BOOL Menu::ShowMenu(void)
     {
       return false;
     }
+
+return true;
+}
+BOOL Menu::ShowMenu()
+{
+  std::vector <MENU_DATA*>::iterator it;
+
+if (!CanShow())
+{
+return false;
+}
 
   int count=0;
   std::stringstream st;
