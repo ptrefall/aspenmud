@@ -28,6 +28,7 @@ struct MENU_DATA
 
 class Menu
 {
+protected:
   std::vector <MENU_DATA*> _options;
   Player* _mobile;
   Socket* _sock;
@@ -41,22 +42,23 @@ public:
   Menu(void);
   ~Menu(void);
 
-  void AddItem(const std::string &name, MENUCB callback, void* args, int subitem);
-  void RemoveItem(const std::string &item);
-  BOOL ItemExists(const std::string &item);
+ virtual void AddItem(const std::string &name, MENUCB callback, void* args, int subitem);
+  virtual void RemoveItem(const std::string &item);
+  virtual BOOL ItemExists(const std::string &item);
 
   Socket* GetConnectedSocket(void) const;
   void SetConnectedSocket(Socket* sock);
   Player* GetMobile(void) const;
   void SetMobile(Player* mobile);
-  int GetCode(void) const;
-  void SetCode(int code);
+  virtual int GetCode(void) const;
+  virtual void SetCode(int code);
   std::string GetExitMessage(void) const;
   void SetExitMessage(const std::string &message);
-  MENU_DATA* GetDataByIndex(unsigned int index);
-  BOOL Attach(void);
-  BOOL Unattach(void);
-  BOOL ShowMenu(void);
+  virtual MENU_DATA* GetDataByIndex(unsigned int index);
+  virtual BOOL Attach(void);
+  virtual BOOL Unattach(void);
+virtual BOOL CanShow();
+  virtual BOOL ShowMenu();
 };
 
 class MenuInput:public InputHandle

@@ -38,6 +38,10 @@ Entity::Entity(void)
          boost::bind(OlcEditor, _1, _2, _3,
                      boost::protect(boost::bind(&Entity::GetDescription, this)),
                      boost::protect(boost::bind(&Entity::SetDescription, this, _1))));
+  AddOlc("script", "Editing object script", EDITOR,
+         boost::bind(OlcEditor, _1, _2, _3,
+                     boost::protect(boost::bind(&Entity::GetScript, this)),
+                     boost::protect(boost::bind(&Entity::SetScript, this, _1))));
 #endif
 
   events.RegisterEvent("PostLook", new Event());
