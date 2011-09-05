@@ -23,13 +23,9 @@ extern "C"
 
 //Basic userdata class
 //used to pass in the type of class we're working with.
-enum UDATA_TYPE {
-  type_none, type_server, type_world, type_object, type_player, type_npc
-};
 struct UserData
 {
-  UDATA_TYPE type;
-  void* ptr;
+  Entity* ptr;
 };
 
 class Script

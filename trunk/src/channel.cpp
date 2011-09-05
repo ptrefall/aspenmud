@@ -285,7 +285,7 @@ void Channel::Broadcast(Player* caller,const std::string &message,BOOL access)
       caller->Message(MSG_ERROR,"You must provide a message.");
       return;
     }
-  if (BitIsSet(caller->GetFlag(), PF_SILENCE))
+  if (BitIsSet(caller->GetPflag(), PF_SILENCE))
     {
       caller->Message(MSG_ERROR, "You can not broadcast to channels while you are silenced.");
       return;

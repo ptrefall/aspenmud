@@ -23,6 +23,7 @@ static const struct luaL_reg player_table [] =
   {"SetTitle", SCR_SetTitle},
   {"GetLevel", SCR_GetLevel},
   {"SetLevel", SCR_SetLevel},
+  {"GetPflag", SCR_GetPflag},
   {"GetRank", SCR_GetRank},
   {"GetFirstLogin", SCR_GetFirstLogin},
   {"GetLastLogin", SCR_GetLastLogin},
@@ -43,7 +44,7 @@ static const struct luaL_reg player_table [] =
 BOOL InitPlayerScript(Script* s)
 {
   lua_State* lstate = s->GetState();
-  luaL_newmetatable(lstate, "aspen.player");
+  luaL_newmetatable(lstate, "player");
   lua_pushstring(lstate, "__index");
   lua_pushvalue(lstate, -2);
   lua_settable(lstate, -3);
@@ -204,6 +205,26 @@ int SCR_SetLevel(lua_State* l)
 
   ((Player*)udata->ptr)->SetLevel(level);
   return 0;
+}
+
+int SCR_GetPflag(lua_State* l)
+{
+  UserData* udata = NULL;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "Invalid number of arguments to \'GetFlag\'.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -1);
+  if (!IsPlayer(l, udata))
+    {
+      return 0;
+    }
+
+  lua_pushinteger(l, ((Player*)udata->ptr)->GetPflag());
+  return 1;
 }
 
 int SCR_GetRank(lua_State* l)
