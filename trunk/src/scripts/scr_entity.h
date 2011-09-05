@@ -14,5 +14,8 @@
 #ifdef MODULE_SCRIPTING
 BOOL InitEntityScript(Script* s);
 int SCR_GetName(lua_State* l);
+int SCR_SetName(lua_State* l);
+int SCR_GetDescription(lua_State* l);
+int SCR_SetDescription(lua_State* l);
 #endif
 #endif
