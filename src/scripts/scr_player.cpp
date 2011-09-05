@@ -24,6 +24,7 @@ static const struct luaL_reg player_table [] =
   {"GetLevel", SCR_GetLevel},
   {"SetLevel", SCR_SetLevel},
   {"GetPflag", SCR_GetPflag},
+  {"SetPflag", SCR_SetPflag},
   {"GetRank", SCR_GetRank},
   {"GetFirstLogin", SCR_GetFirstLogin},
   {"GetLastLogin", SCR_GetLastLogin},
@@ -225,6 +226,27 @@ int SCR_GetPflag(lua_State* l)
 
   lua_pushinteger(l, ((Player*)udata->ptr)->GetPflag());
   return 1;
+}
+int SCR_SetPflag(lua_State* l)
+{
+  FLAG flag = 0;
+  UserData* udata = NULL;
+
+  if (lua_gettop(l) != 2)
+    {
+      SCR_Error(l, "Invalid number of arguments to \'SetPflag\'.");
+      return 0;
+    }
+
+  flag = lua_tointeger(l, -1);
+  udata = (UserData*)lua_touserdata(l, -2);
+  if (!IsPlayer(l, udata))
+    {
+      return 0;
+    }
+
+  ((Player*)udata->ptr)->SetPflag(flag);
+  return 0;
 }
 
 int SCR_GetRank(lua_State* l)

@@ -121,7 +121,6 @@ public:
   *[in] The message
   */
   void Message(const MessageType type,const std::string &data) const;
-
   /*
   *Configuration management functions.
   *
@@ -163,7 +162,6 @@ public:
   *[in] the color.
   */
   void AddMessage(MessageType type, const std::string &color);
-
 //events
   EVENT(OnlineTime);
   EVENT(AutoSave);
