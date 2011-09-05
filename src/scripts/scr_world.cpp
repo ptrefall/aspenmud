@@ -34,7 +34,7 @@ static const struct luaL_reg world_table [] =
 BOOL InitWorldScript(Script* s)
 {
   lua_State* lstate = s->GetState();
-  luaL_newmetatable(lstate, "aspen.world");
+  luaL_newmetatable(lstate, "world");
   lua_pushstring(lstate, "__index");
   lua_pushvalue(lstate, -2);
   lua_settable(lstate, -3);

@@ -32,7 +32,7 @@ class Player:public Living
   std::string _prompt;
   int _level;
   FLAG _rank;
-  FLAG _flag;
+  FLAG _pflag;
   time_t _firstLogin;
   time_t _onlineTime;
   time_t _lastLogin;
@@ -78,8 +78,8 @@ public:
   void SetLevel(UINT s);
   FLAG GetRank() const;
   void SetRank(const FLAG s);
-  FLAG GetFlag() const;
-  void SetFlag(FLAG flag);
+  FLAG GetPflag() const;
+  void SetPflag(FLAG flag);
   UINT GetOnlineTime(void) const;
   void SetOnlineTime(UINT s);
   UINT GetFirstLogin(void) const;

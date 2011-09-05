@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <sys/time.h>
 #include "scripts.h"
 #include "scr_world.h"
@@ -18,6 +19,11 @@ Script::Script()
 {
   state = lua_open();
   luaL_openlibs(state);
+//we create the metatable
+  lua_newtable(state); //table is at -1
+  lua_pushvalue(state, LUA_GLOBALSINDEX);
+  lua_setfield(state, -2, "__index");
+  lua_setfield(state, LUA_REGISTRYINDEX, "meta");
 }
 Script::~Script()
 {
@@ -26,47 +32,25 @@ Script::~Script()
 
 void Script::Execute(Entity* obj, const std::string &code)
 {
-  int index = 0;
-  char id[16];
-  void* table = 0;
-//we need to create a new metatable for the object so we have a sanitary execution context.
-  if (!obj)
-    {
-      return;
-    }
-  NumberToString(id, obj->GetOnum());
-  if (!luaL_newmetatable(state, id))
-    {
-      return;
-    }
-  lua_pushstring(state, "__index");
-  lua_pushvalue(state, LUA_GLOBALSINDEX);
-  lua_settable(state, -3); //table is at -1 again
+  std::cout << code << std::endl;
+  int ret = 0;
+  World* world = World::GetPtr();
 
-//we load our code to be executed.
-  int status = luaL_loadbuffer(state, code.c_str(), code.length(), "execution");
-  if (!status)
+  if (!luaL_loadbuffer(state, code.c_str(), code.length(), "execution"))   // chunk is at -1
     {
-//we set the table
-      lua_getmetatable(state, -2);
-//now we setfenv
-      lua_setfenv(state, -2); //the function is back at -1
-//we push our traceback function on to the stack.
-
-      lua_getglobal(state, "debug");
-      lua_getfield(state, -1, "traceback");
-      lua_remove(state, -2); //the traceback field is at the top of the stack.
-      index = lua_gettop(state);
-//we call the code.
-      status = lua_pcall(state, 0, 0, index);
-      lua_remove(state, index);
-//if it failed, we garbage collect.
-      if (status)
+      lua_newtable(state); // create shadow environment table at -1
+      lua_getfield(state, LUA_REGISTRYINDEX, "meta"); //our metatable is at -1
+      lua_setmetatable(state, -2); //set table and pop
+      lua_setfenv(state, -2); //sets the environment
+      ret = lua_pcall(state, 0, 0, 0);
+      if (ret)
         {
-          lua_gc(state, LUA_GCCOLLECT, 0);
+          world->WriteLog(lua_tostring(state, -1), SCRIPT, "script");
+          lua_pop(state, 1);
         }
     }
 }
+
 lua_State* Script::GetState() const
 {
   return state;
@@ -132,8 +116,7 @@ BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std
   lua_setglobal(state, "__fd__");
 //now we assign a "me" keyword to the player.
   UserData* data = (UserData*)lua_newuserdata(state, sizeof(UserData));
-  data->ptr = (void*)mobile;
-  data->type = type_player;
+  data->ptr = (Entity*)mobile;
   lua_setglobal(state, "me");
 //we push our print replacement to the global table:
   lua_pushcfunction(state, SCR_Print);
@@ -148,9 +131,6 @@ BOOL CMDExecute::Execute(const std::string &verb, Player* mobile,std::vector<std
 
 //execute the code.
   scr->Execute(mobile, input);
-//  st << "Result: " << (ret == NULL?"no return":ret) << "\n";
-  delete scr;
-
   gettimeofday(&now, NULL);
   elapsed = (now.tv_sec - prev.tv_sec) * 1000;
   elapsed += (now.tv_usec - prev.tv_usec) / 1000;
@@ -221,7 +201,7 @@ BOOL IsPlayer(lua_State* l, UserData* udata)
       return false;
     }
 
-  if ((udata->type != type_player) || (udata->ptr == NULL))
+  if (!udata->ptr->IsPlayer())
     {
       SCR_Error(l, "Invalid type.");
       return false;
@@ -231,19 +211,13 @@ BOOL IsPlayer(lua_State* l, UserData* udata)
 }
 BOOL IsLiving(lua_State* l, UserData* udata)
 {
-  if ((udata->type != type_player) || (udata->type != type_npc) || (udata->ptr == NULL))
+  if (!udata)
     {
-      SCR_Error(l, "Invalid type.");
+      SCR_Error(l, "Udata passed to IsLiving was NULL.");
       return false;
     }
-
-  return true;
-}
-BOOL IsObject(lua_State* l, UserData* udata)
-{
-  if ((udata->type != type_player) || (udata->type != type_npc) || (udata->type != type_object) || (udata->ptr == NULL))
+  if (!udata->ptr->IsPlayer() || !udata->ptr->IsNpc())
     {
-      SCR_Error(l, "Invalid type.");
       return false;
     }
 

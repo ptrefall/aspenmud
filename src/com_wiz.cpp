@@ -197,13 +197,13 @@ BOOL CMDSilence::Execute(const std::string &verb, Player* mobile,std::vector<std
       return false;
     }
 
-  if (BitIsSet(mobile->GetFlag(), PF_SILENCE))
+  if (BitIsSet(mobile->GetPflag(), PF_SILENCE))
     {
       mobile->Message(MSG_ERROR, "That player has already been silenced.");
       return false;
     }
 
-  targ->SetFlag(BitSet(targ->GetFlag(), PF_SILENCE));
+  targ->SetPflag(BitSet(targ->GetPflag(), PF_SILENCE));
   mobile->Message(MSG_INFO, Capitalize(targ->GetName())+" was silenced.");
   world->WriteLog(Capitalize(targ->GetName())+" was silenced by "+Capitalize(mobile->GetName())+".");
   targ->Message(MSG_ERROR, "You were silenced by "+Capitalize(mobile->GetName())+".");
@@ -234,13 +234,13 @@ BOOL CMDUnsilence::Execute(const std::string &verb, Player* mobile,std::vector<s
       return false;
     }
 
-  if (!BitIsSet(targ->GetFlag(), PF_SILENCE))
+  if (!BitIsSet(targ->GetPflag(), PF_SILENCE))
     {
       mobile->Message(MSG_INFO, "That player is not silenced.");
       return false;
     }
 
-  targ->SetFlag(BitClear(mobile->GetFlag(), PF_SILENCE));
+  targ->SetPflag(BitClear(mobile->GetPflag(), PF_SILENCE));
   mobile->Message(MSG_INFO, Capitalize(targ->GetName())+" has been unsilenced.");
   world->WriteLog(Capitalize(targ->GetName())+" was unsilenced by "+Capitalize(mobile->GetName())+".");
   targ->Message(MSG_INFO, "You were unsilenced by "+Capitalize(mobile->GetName())+".");

@@ -42,7 +42,7 @@ public:
   Menu(void);
   ~Menu(void);
 
- virtual void AddItem(const std::string &name, MENUCB callback, void* args, int subitem);
+  virtual void AddItem(const std::string &name, MENUCB callback, void* args, int subitem);
   virtual void RemoveItem(const std::string &item);
   virtual BOOL ItemExists(const std::string &item);
 
@@ -57,7 +57,7 @@ public:
   virtual MENU_DATA* GetDataByIndex(unsigned int index);
   virtual BOOL Attach(void);
   virtual BOOL Unattach(void);
-virtual BOOL CanShow();
+  virtual BOOL CanShow();
   virtual BOOL ShowMenu();
 };
 

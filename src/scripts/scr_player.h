@@ -26,6 +26,7 @@ int SCR_GetTitle(lua_State* l);
 int SCR_SetTitle(lua_State*l);
 int SCR_GetLevel(lua_State* l);
 int SCR_SetLevel(lua_State* l);
+int SCR_GetPflag(lua_State* l);
 int SCR_GetRank(lua_State* l);
 int SCR_GetOnlineTime(lua_State* l);
 int SCR_GetFirstLogin(lua_State* l);

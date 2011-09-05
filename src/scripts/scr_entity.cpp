@@ -20,7 +20,7 @@ static const struct luaL_reg entity_table [] =
 BOOL InitEntityScript(Script* s)
 {
   lua_State* lstate = s->GetState();
-  luaL_newmetatable(lstate, "aspen.entity");
+  luaL_newmetatable(lstate, "entity");
   lua_pushstring(lstate, "__index");
   lua_pushvalue(lstate, -2);
   lua_settable(lstate, -3);
@@ -39,12 +39,6 @@ int SCR_GetName(lua_State* l)
       SCR_Error(l, "Invalid number of arguments to \'GetPassword\'.");
       return 0;
     }
-  if (!IsObject(l, udata))
-    {
-      SCR_Error(l, "First argument to 'GetName' must be an object.");
-      return 0;
-    }
-
   name = ((Entity*)udata->ptr)->GetName();
   lua_pushlstring(l, name.c_str(), name.length());
   return 1;

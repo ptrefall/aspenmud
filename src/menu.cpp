@@ -27,7 +27,7 @@ Menu::~Menu(void)
 {
   std::vector <MENU_DATA*>::iterator it, itEnd;
 
-itEnd = _options.end();
+  itEnd = _options.end();
   for (it = _options.begin(); it != itEnd; ++it)
     {
       delete (*it);
@@ -170,16 +170,16 @@ BOOL Menu::CanShow()
       return false;
     }
 
-return true;
+  return true;
 }
 BOOL Menu::ShowMenu()
 {
   std::vector <MENU_DATA*>::iterator it;
 
-if (!CanShow())
-{
-return false;
-}
+  if (!CanShow())
+    {
+      return false;
+    }
 
   int count=0;
   std::stringstream st;
