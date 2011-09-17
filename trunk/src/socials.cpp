@@ -117,7 +117,7 @@ void Socials::Load(void)
           data->rtarg = social->Attribute("rtarg");
           data->ytarg = social->Attribute("ytarg");
 
-          if (id > _socid)
+          if ((unsigned int)id > _socid)
             {
               _socid = id+1;
             }

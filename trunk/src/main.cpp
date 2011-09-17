@@ -4,6 +4,7 @@
 #include <cstring>
 #include <ctime>
 #include <cstdio>
+#include <sstream>
 #include "mud.h"
 #include "conf.h"
 #include "socket.h"
@@ -38,6 +39,14 @@ int main(int argc, char** argv)
   BOOL copyover=false; //are we rebooting for copyover?
   int listener=0; //the socket to listen on when recovering from copyover
   int port = 0;
+#ifdef ELAPSED_STARTUP
+  timeval start, end;
+  std::stringstream st;
+  float elapsed;
+
+//we start the counter for elapsed here:
+  gettimeofday(&start, NULL);
+#endif
 
 #ifdef SECURE_INITIALIZATION
   if (getuid() == 0)
@@ -152,6 +161,14 @@ int main(int argc, char** argv)
 
 //load state:
   world->LoadState();
+
+#ifdef ELAPSED_STARTUP
+//and we're finished
+  gettimeofday(&end, NULL);
+  elapsed = (float)(end.tv_usec-start.tv_usec)/1000;
+  st << "Startup elapsed time: " << elapsed << " ms." << std::endl;
+  world->WriteLog(st.str());
+#endif
 //start the game loop:
   world->WriteLog("Entering game loop.");
   GameLoop();
