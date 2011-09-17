@@ -27,7 +27,7 @@ Entity::Entity(void)
   _onum=0;
   _components=new std::vector<Component*>();
   _aliases = new std::vector<std::string>();
-
+  variables.SetObject(this);
 #ifdef OLC
   _olcs = new std::vector<struct OLC_DATA*>();
   AddOlc("name", "Please enter the name of the object", STRING,

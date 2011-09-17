@@ -17,5 +17,11 @@ int SCR_GetName(lua_State* l);
 int SCR_SetName(lua_State* l);
 int SCR_GetDescription(lua_State* l);
 int SCR_SetDescription(lua_State* l);
+int SCR_GetPlural(lua_State* l);
+int SCR_SetPlural(lua_State* l);
+int SCR_GetScript(lua_State* l);
+int SCR_SetScript(lua_State* l);
+int SCR_GetLocation(lua_State* l);
+int SCR_SetLocation(lua_State* l);
 #endif
 #endif

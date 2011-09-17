@@ -1,5 +1,5 @@
 /*
-*A Property tree, used for attaching and storing components on objects.
+*A Property tree, used for attaching and storing properties on objects.
 *Wrritten by CPPMan
 */
 #ifndef _PROPERTY_HPP
@@ -19,7 +19,7 @@ class Property
   std::vector<Property *> Children;
   std::string LastSearchName;
   Property *LastSearchRes;
-
+  Entity* owner;
 public:
   Property(const std::string name, const Variant& value, Property *parent = NULL)
   {
@@ -33,6 +33,7 @@ public:
     Name="root";
     Parent = NULL;
     Value = Variant();
+    owner = NULL;
     LastSearchRes = NULL;
   }
 
@@ -57,6 +58,15 @@ public:
   void SetValue(const Variant& value)
   {
     Value = value;
+  }
+
+  void SetObject(Entity* obj)
+  {
+    owner = obj;
+  }
+  Entity* GetOwner() const
+  {
+    return owner;
   }
 
   Property* GetParent() const

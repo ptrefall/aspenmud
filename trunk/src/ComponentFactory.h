@@ -2,18 +2,24 @@
 *Component Factory
 *Holds a list of component names and function pointers for their creation.
 */
-
 #ifndef COMPONENT_FACTORY_H
 #define COMPONENT_FACTORY_H
-#include <map>
 #include <string>
+#include <map>
 #include "mud.h"
 #include "conf.h"
 #include "component.h"
 
+struct componentEntry
+{
+  COMCREATECB cb;
+  unsigned int id;
+};
+
 class ComponentFactory
 {
-  std::map <std::string,COMCREATECB> *_components;
+  std::map <std::string, componentEntry*> *_components;
+  unsigned int _id;
 public:
   ComponentFactory(void);
   ~ComponentFactory(void);
@@ -36,5 +42,6 @@ public:
   *Returns: A pointer to the object created, or NULL if the component wasn't created.
   */
   Component* Create(const std::string &name);
+  unsigned int GetId(const std::string &name);
 };
 #endif

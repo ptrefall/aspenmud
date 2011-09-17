@@ -7,12 +7,12 @@ static const struct luaL_reg entity_table [] =
   {"SetName", SCR_SetName},
   {"GetDescription", SCR_GetDescription},
   {"SetDescription", SCR_SetDescription},
-//{"GetPlural", SCR_GetPlural},
-//{"SetPlural", SCR_SetPlural},
-//{"GetScript", SCR_GetScript},
-//{"SetScript", SCR_SetScript},
-//{"GetLocation", SCR_GetLocation},
-//{"SetLocation", SCR_SetLocation},
+  {"GetPlural", SCR_GetPlural},
+  {"SetPlural", SCR_SetPlural},
+  {"GetScript", SCR_GetScript},
+  {"SetScript", SCR_SetScript},
+  {"GetLocation", SCR_GetLocation},
+  {"SetLocation", SCR_SetLocation},
 //{"GetContents", SCR_GetContents},
   {NULL, NULL}
 };
@@ -36,12 +36,12 @@ int SCR_GetName(lua_State* l)
 
   if (lua_gettop(l) != 1)
     {
-      SCR_Error(l, "Invalid number of arguments to \'GetName\'.");
+      SCR_Error(l, "Invalid number of arguments to 'GetName'.");
       return 0;
     }
 
   udata = (UserData*)lua_touserdata(l, -1);
-  if (!udata)
+  if (!IsObject(l, udata))
     {
       SCR_Error(l, "Argument 1 to 'GetName' must be an object.");
       return 0;
@@ -58,19 +58,19 @@ int SCR_SetName(lua_State* l)
 
   if (lua_gettop(l) != 2)
     {
-      SCR_Error(l, "Invalid number of arguments to \'SetName\'.");
+      SCR_Error(l, "Invalid number of arguments to 'SetName'.");
       return 0;
     }
 
   name = lua_tostring(l, -1);
   if (!name)
     {
-      SCR_Error(l, "Argument 2 to \'SetName\' must be a string.");
+      SCR_Error(l, "Argument 2 to 'SetName' must be a string.");
       return 0;
     }
 
   udata = (UserData*)lua_touserdata(l, -2);
-  if (!udata)
+  if (!IsObject(l, udata))
     {
       SCR_Error(l, "Argument 1 to 'SetName' must be an object.");
       return 0;
@@ -87,12 +87,12 @@ int SCR_GetDescription(lua_State *l)
 
   if (lua_gettop(l) != 1)
     {
-      SCR_Error(l, "Invalid number of arguments to \'GetDescription\'.");
+      SCR_Error(l, "Invalid number of arguments to 'GetDescription'.");
       return 0;
     }
 
   udata = (UserData*)lua_touserdata(l, -1);
-  if (!udata)
+  if (!IsObject(l, udata))
     {
       SCR_Error(l, "Argument 1 to 'GetDescription' must be an object.");
       return 0;
@@ -109,25 +109,183 @@ int SCR_SetDescription(lua_State* l)
 
   if (lua_gettop(l) != 2)
     {
-      SCR_Error(l, "Invalid number of arguments to \'SetDescription\'.");
+      SCR_Error(l, "Invalid number of arguments to 'SetDescription'.");
       return 0;
     }
 
   description = lua_tostring(l, -1);
   if (!description)
     {
-      SCR_Error(l, "Argument 2 to \'SetDescription\' must be a string.");
+      SCR_Error(l, "Argument 2 to 'SetDescription' must be a string.");
       return 0;
     }
 
   udata = (UserData*)lua_touserdata(l, -2);
-  if (!udata)
+  if (!IsObject(l, udata))
     {
       SCR_Error(l, "Argument 1 to 'SetDescription' must be an object.");
       return 0;
     }
 
   ((Entity*)udata->ptr)->SetDescription(description);
+  return 0;
+}
+
+int SCR_GetPlural(lua_State* l)
+{
+  UserData* udata = NULL;
+  std::string plural;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'GetPlural'.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -1);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'GetPlural' must be an object.");
+      return 0;
+    }
+
+  plural = ((Entity*)udata->ptr)->GetPlural();
+  lua_pushlstring(l, plural.c_str(), plural.length());
+  return 1;
+}
+int SCR_SetPlural(lua_State* l)
+{
+  UserData* udata = NULL;
+  const char* plural = NULL;
+
+  if (lua_gettop(l) != 2)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'SetPlural'.");
+      return 0;
+    }
+
+  plural = lua_tostring(l, -1);
+  if (!plural)
+    {
+      SCR_Error(l, "Argument 2 to 'SetPlural' must be a string.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -2);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'SetPlural' must be an object.");
+      return 0;
+    }
+
+  ((Entity*)udata->ptr)->SetPlural(plural);
+  return 0;
+}
+
+int SCR_GetScript(lua_State* l)
+{
+  UserData* udata = NULL;
+  std::string script;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'GetScript'.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -1);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'GetScript' must be an object.");
+      return 0;
+    }
+
+  script = ((Entity*)udata->ptr)->GetScript();
+  lua_pushlstring(l, script.c_str(), script.length());
+  return 1;
+}
+int SCR_SetScript(lua_State* l)
+{
+  UserData* udata = NULL;
+  const char* script = NULL;
+
+  if (lua_gettop(l) != 2)
+    {
+      SCR_Error(l, "Invalid number of arguments to \'SetScript\'.");
+      return 0;
+    }
+
+  script = lua_tostring(l, -1);
+  if (!script)
+    {
+      SCR_Error(l, "Argument 2 to 'SetScript' must be a string.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -2);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'SetScript' must be an object.");
+      return 0;
+    }
+
+  ((Entity*)udata->ptr)->SetScript(script);
+  return 0;
+}
+
+int SCR_GetLocation(lua_State* l)
+{
+  UserData* udata = NULL;
+  Entity* location = NULL;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'GetLocation'.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -1);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'GetLocation' must be an object.");
+      return 0;
+    }
+
+  location = ((Entity*)udata->ptr)->GetLocation();
+  if (!location)
+    {
+      return 0;
+    }
+
+  ObjectToStack(l, location);
+  return 1;
+}
+int SCR_SetLocation(lua_State* l)
+{
+  UserData* udata = NULL;
+  UserData* location = NULL;
+
+  if (lua_gettop(l) != 2)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'SetLocation'.");
+      return 0;
+    }
+
+  location = (UserData*)lua_touserdata(l, -1);
+  if (!IsObject(l, location))
+    {
+      SCR_Error(l, "Argument 2 to 'SetLocation' must be an object.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -2);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'SetLocation' must be an object.");
+      return 0;
+    }
+
+  ((Entity*)udata->ptr)->SetLocation((Entity*)location->ptr);
   return 0;
 }
 #endif

@@ -79,8 +79,8 @@ int SCR_FindPlayer(lua_State* l)
     }
 
   UserData* data = (UserData*)lua_newuserdata(l, sizeof(UserData));
-  data->ptr = (void*)world->FindPlayer(search);
-  data->type = type_player;
+  data->ptr = (Entity*)world->FindPlayer(search);
+  data->type = OBJECT;
   return 1;
 }
 int SCR_GetPlayers(lua_State* l)
@@ -101,8 +101,8 @@ int SCR_GetPlayers(lua_State* l)
   for (i = 0, it = players->begin(); it != itEnd; ++i, ++it)
     {
       data = (UserData*)lua_newuserdata(l, sizeof(UserData));
-      data->ptr = (void*)(*it);
-      data->type = type_player;
+      data->ptr = (Entity*)(*it);
+      data->type = OBJECT;
       lua_rawseti(l, i, -2);
       data = NULL;
     }

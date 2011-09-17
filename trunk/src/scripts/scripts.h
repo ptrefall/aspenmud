@@ -23,9 +23,18 @@ extern "C"
 
 //Basic userdata class
 //used to pass in the type of class we're working with.
+enum UType {
+  OBJECT, COMPONENT
+};
 struct UserData
 {
   Entity* ptr;
+  UType type;
+};
+struct ComponentData
+{
+  Component* com;
+  UType type;
 };
 
 class Script
@@ -89,6 +98,20 @@ BOOL IsLiving(lua_State* l, UserData* udata);
 *Param: [in] The object to check.
 */
 BOOL IsObject(lua_State* l, UserData* udata);
+/*
+*Checks to see if the user data is a component.
+*Param: [in] the active lua state.
+*Param: [in] a pointer to the user data.
+*Return: True if the object is a component, false otherwise.
+*/
+BOOL IsComponent(lua_State* l, UserData* udata);
+/*
+*Creates a UserData structure to hold an object and pushes it on the stack.
+*Param: [in] the state that this userdata belongs to.
+*[in]: A pointer to the object that you want in the userdata.
+*Return: A pointer to the userdata object created.
+*/
+UserData* ObjectToStack(lua_State* l, Entity* obj);
 /*
 *Used as a drop-in replacement for print.
 */
