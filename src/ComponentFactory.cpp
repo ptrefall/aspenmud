@@ -4,10 +4,19 @@
 
 ComponentFactory::ComponentFactory(void)
 {
-  _components=new std::map<std::string,COMCREATECB>();
+  _components = new std::map <std::string, componentEntry*>();
+  _id = 1;
 }
 ComponentFactory::~ComponentFactory(void)
 {
+  std::map <std::string, componentEntry*>::iterator it, itEnd;
+
+  itEnd = _components->end();
+  for (it = _components->begin(); it != itEnd; ++it)
+    {
+      delete (*it).second;
+    }
+
   delete _components;
 }
 BOOL ComponentFactory::HasComponent(const std::string &name)
@@ -21,8 +30,11 @@ BOOL ComponentFactory::RegisterComponent(const std::string &name,COMCREATECB cb)
     {
       return false;
     }
-
-  (*_components)[name]=cb;
+  componentEntry* entry = new componentEntry();
+  entry->cb = cb;
+  entry->id = _id;
+  _id++;
+  (*_components)[name]=entry;
   return true;
 }
 
@@ -30,8 +42,18 @@ Component* ComponentFactory::Create(const std::string &name)
 {
   if (HasComponent(name))
     {
-      return ((*_components)[name])();
+      return ((*_components)[name])->cb();
     }
 
   return NULL;
+}
+
+unsigned int ComponentFactory::GetId(const std::string &name)
+{
+  if (!HasComponent(name))
+    {
+      return 0;
+    }
+
+  return ((*_components)[name])->id;
 }

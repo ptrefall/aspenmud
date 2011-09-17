@@ -195,9 +195,8 @@ BOOL VariantToStack(lua_State* l, Variant& var)
 
 BOOL IsPlayer(lua_State* l, UserData* udata)
 {
-  if (!udata)
+  if (!IsObject(l, udata))
     {
-      SCR_Error(l, "Udata passed to IsPlayer was NULL.");
       return false;
     }
 
@@ -211,11 +210,11 @@ BOOL IsPlayer(lua_State* l, UserData* udata)
 }
 BOOL IsLiving(lua_State* l, UserData* udata)
 {
-  if (!udata)
+  if (!IsObject(l, udata))
     {
-      SCR_Error(l, "Udata passed to IsLiving was NULL.");
       return false;
     }
+
   if (!udata->ptr->IsPlayer() || !udata->ptr->IsNpc())
     {
       return false;
@@ -223,6 +222,38 @@ BOOL IsLiving(lua_State* l, UserData* udata)
 
   return true;
 }
+BOOL IsObject(lua_State* l, UserData* udata)
+{
+  if (!udata)
+    {
+      return false;
+    }
+
+  if (udata->type != OBJECT)
+    {
+      return false;
+    }
+
+  return true;
+}
+BOOL IsComponent(lua_State* l, ComponentData* cdata)
+{
+  if (!cdata || cdata->type != COMPONENT)
+    {
+      return false;
+    }
+
+  return true;
+}
+
+UserData* ObjectToStack(lua_State* l, Entity* obj)
+{
+  UserData* udata = (UserData*)lua_newuserdata(l, sizeof(UserData));
+  udata->type = OBJECT;
+  udata->ptr = obj;
+  return udata;
+}
+
 int SCR_Print(lua_State* l)
 {
   std::string data;
