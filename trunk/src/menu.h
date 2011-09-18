@@ -55,7 +55,7 @@ public:
   std::string GetExitMessage(void) const;
   void SetExitMessage(const std::string &message);
   virtual MENU_DATA* GetDataByIndex(unsigned int index);
-  virtual BOOL Attach(void);
+  virtual BOOL Attach();
   virtual BOOL Unattach(void);
   virtual BOOL CanShow();
   virtual BOOL ShowMenu();

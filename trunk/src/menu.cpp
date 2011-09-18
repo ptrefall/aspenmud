@@ -198,11 +198,12 @@ BOOL Menu::ShowMenu()
 void MenuInput::Input(void* arg, const std::string &input)
 {
   Menu* m=(Menu*)arg;
-  std::string::iterator it;
+  std::string::iterator it, itEnd;
   std::string data = input;
   MENU_DATA* option = NULL;
 
-  for (it = data.begin(); it != data.end(); it++)
+  itEnd = data.end();
+  for (it = data.begin(); it != itEnd; ++it)
     {
       if (!isdigit((*it)))
         {

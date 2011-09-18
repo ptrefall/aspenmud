@@ -6,11 +6,14 @@
 #include <list>
 #include <cstring>
 #include <boost/bind.hpp>
+#include <boost/bind/protect.hpp>
 #include "player.h"
 #include "event.h"
 #include "utils.h"
 #include "world.h"
 #include "exception.h"
+#include "olc.h"
+
 
 Player::Player()
 {
@@ -42,6 +45,9 @@ Player::Player()
 
 #ifdef OLC
   RemoveOlc("name");
+  AddOlc("Rank", "Adjust the player's rank", NOINPUT, boost::bind(OlcPlayerFlag, _1, _2, _3,
+         boost::protect(boost::bind(&Player::GetRank, this)),
+         boost::protect(boost::bind(&Player::SetRank, this, _1))));
 #endif
 
 //events

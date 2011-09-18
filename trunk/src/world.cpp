@@ -1071,7 +1071,7 @@ BOOL World::RecycleObject(Entity* obj)
 void World::InitializeNums()
 {
   WriteLog("Initializing vnums for pool.");
-  unsigned int max=0;
+  VNUM max=0;
   unsigned int i = 0;
   std::map<VNUM,Entity*>::iterator ot, otEnd;
 

@@ -22,7 +22,7 @@ class Variant;
 
 //olc forward declarations
 struct OLC_DATA;
-enum OLC_INPUT_TYPE {NUM, STRING, BOOLEAN, EDITOR};
+enum OLC_INPUT_TYPE {NUM, STRING, BOOLEAN, NOINPUT, EDITOR};
 typedef void (*FP_INPUT)(Entity*, Player*, const Variant*);
 typedef boost::function<void (Entity*, Player*, const Variant*)> OLCFUNC;
 //input defines

@@ -10,6 +10,7 @@
 #include "player.h"
 #include "utils.h"
 #include "menu.h"
+#include "toggleMenu.h"
 #include "command.h"
 #include "editor.h"
 
@@ -89,7 +90,7 @@ MENU(olc_menu_cb)
   arg->mobile = mob;
   arg->menudata = option;
   arg->olc = olc;
-  if (arg->olc->type == EDITOR)
+  if (arg->olc->type == EDITOR || arg->olc->type == NOINPUT)
     {
 //we need to handle this hear, otherwise we have problems when the user enters the editor because they have to input a command.
       (arg->olc->callback)(arg->obj, arg->mobile, NULL);
@@ -153,6 +154,15 @@ void OlcString(Entity* ed, Player* mob, const Variant* input, boost::function<st
     }
 
   set(input->GetStr());
+}
+void OlcPlayerFlag(Entity* ed, Player* mob, const Variant* input, boost::function<FLAG ()> get, boost::function<void (FLAG)> set)
+{
+  ToggleMenu* menu = new ToggleMenu(mob, get, set);
+  menu->AddItem("playtester", RANK_PLAYTESTER);
+  menu->AddItem("Newbie helper", RANK_NEWBIEHELPER);
+  menu->AddItem("Newbie", RANK_NEWBIE);
+  menu->AddItem("Builder", RANK_BUILDER);
+  menu->Attach();
 }
 
 void SaveString(EventArgs* args, void* caller, boost::function<void (const std::string&)> set)
