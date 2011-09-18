@@ -10,6 +10,7 @@
 
 ToggleMenu::ToggleMenu(Player* mobile, ToggleGetter g, ToggleSetter s):Menu(mobile)
 {
+  _Initialize();
   _g = g;
   _s = s;
   _code = g();
