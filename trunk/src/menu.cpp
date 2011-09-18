@@ -165,10 +165,6 @@ BOOL Menu::CanShow()
     {
       return false;
     }
-  if (!_options.size())
-    {
-      return false;
-    }
 
   return true;
 }

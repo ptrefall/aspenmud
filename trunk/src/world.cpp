@@ -1072,7 +1072,7 @@ void World::InitializeNums()
 {
   WriteLog("Initializing vnums for pool.");
   VNUM max=0;
-  unsigned int i = 0;
+  VNUM i = 0;
   std::map<VNUM,Entity*>::iterator ot, otEnd;
 
   max=0;
