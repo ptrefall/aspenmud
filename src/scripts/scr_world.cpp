@@ -90,21 +90,16 @@ int SCR_GetPlayers(lua_State* l)
 //our list of players
   std::list <Player*> *players = world->GetPlayers();
 //iterators for the list.
-  std::list<Player*>::iterator it;
-  std::list<Player*>::iterator itEnd;
+  std::list<Player*>::iterator it, itEnd;
 //counter for index
   int i;
-  UserData* data = NULL;
 
   lua_newtable(l);
   itEnd = players->end();
   for (i = 0, it = players->begin(); it != itEnd; ++i, ++it)
     {
-      data = (UserData*)lua_newuserdata(l, sizeof(UserData));
-      data->ptr = (Entity*)(*it);
-      data->type = OBJECT;
+      ObjectToStack(l, (*it));
       lua_rawseti(l, i, -2);
-      data = NULL;
     }
   return 1;
 }

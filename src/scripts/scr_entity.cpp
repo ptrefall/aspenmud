@@ -13,7 +13,10 @@ static const struct luaL_reg entity_table [] =
   {"SetScript", SCR_SetScript},
   {"GetLocation", SCR_GetLocation},
   {"SetLocation", SCR_SetLocation},
-//{"GetContents", SCR_GetContents},
+  {"GetContents", SCR_GetContents},
+  {"GetOnum", SCR_GetOnum},
+  {"CanReceive", SCR_CanReceive},
+  {"MoveTo", SCR_MoveTo},
   {NULL, NULL}
 };
 
@@ -287,5 +290,121 @@ int SCR_SetLocation(lua_State* l)
 
   ((Entity*)udata->ptr)->SetLocation((Entity*)location->ptr);
   return 0;
+}
+
+int SCR_GetContents(lua_State* l)
+{
+  UserData* udata = NULL;
+  std::list<Entity*> *contents = NULL;
+  std::list<Entity*>::iterator it, itEnd;
+  int i;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'GetContents'.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -1);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'GetContents' must be an object.");
+      return 0;
+    }
+
+  contents = ((Entity*)udata->ptr)->GetContents();
+  lua_newtable(l);
+  itEnd = contents->end();
+  for (i = 0, it = contents->begin(); it != itEnd; ++it, ++i)
+    {
+      ObjectToStack(l, (*it));
+      lua_rawseti(l, i, -2);
+    }
+  return 1;
+}
+
+int SCR_GetOnum(lua_State* l)
+{
+  UserData* udata = NULL;
+  VNUM onum;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'GetOnum'.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -1);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'GetOnum' must be an object.");
+      return 0;
+    }
+
+  onum = ((Entity*)udata->ptr)->GetOnum();
+  lua_pushinteger(l, onum);
+  return 1;
+}
+
+int SCR_CanReceive(lua_State* l)
+{
+  UserData* udata = NULL;
+  UserData* obj = NULL;
+  BOOL ret;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'CanReceive'.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -2);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'CanReceive' must be an object.");
+      return 0;
+    }
+
+  obj = (UserData*)lua_touserdata(l, -1);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 2 to 'CanReceive' must be an object.");
+      return 0;
+    }
+
+  ret = ((Entity*)udata->ptr)->CanReceive((Entity*)obj->ptr);
+  lua_pushboolean(l, ret);
+  return 1;
+}
+
+int SCR_MoveTo(lua_State* l)
+{
+  UserData* udata = NULL;
+  UserData* obj = NULL;
+  BOOL ret;
+
+  if (lua_gettop(l) != 1)
+    {
+      SCR_Error(l, "Invalid number of arguments to 'MoveTo'.");
+      return 0;
+    }
+
+  udata = (UserData*)lua_touserdata(l, -2);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 1 to 'MoveTo' must be an object.");
+      return 0;
+    }
+
+  obj = (UserData*)lua_touserdata(l, -1);
+  if (!IsObject(l, udata))
+    {
+      SCR_Error(l, "Argument 2 to 'MoveTo' must be an object.");
+      return 0;
+    }
+
+  ret = ((Entity*)udata->ptr)->MoveTo((Entity*)obj->ptr);
+  lua_pushboolean(l, ret);
+  return 1;
 }
 #endif
