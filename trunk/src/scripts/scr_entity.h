@@ -23,5 +23,9 @@ int SCR_GetScript(lua_State* l);
 int SCR_SetScript(lua_State* l);
 int SCR_GetLocation(lua_State* l);
 int SCR_SetLocation(lua_State* l);
+int SCR_GetContents(lua_State* l);
+int SCR_GetOnum(lua_State* l);
+int SCR_CanReceive(lua_State* l);
+int SCR_MoveTo(lua_State* l);
 #endif
 #endif
