@@ -18,6 +18,7 @@ class HelpEntry
   FLAG _access;
   HELP_ENTRY_TYPE _type;
   UINT _id;
+  std::vector<HelpEntry*> *_seeAlso;
 public:
   HelpEntry(const std::string &name, const std::string &data, FLAG access, HELP_ENTRY_TYPE type);
   HelpEntry();
@@ -68,6 +69,35 @@ public:
   *Param: [in] the minimum access.
   */
   void SetAccess(FLAG access);
+  /*
+  *Takes a list of the SeeAlso entries and converts them to an english list.
+  *Return: The std::string with the SeeAlso list expanded to an actual English list.
+  */
+  std::string SeealsoToList();
+  /*
+  *Checks to see if the specified help entry is in the SeeAlso list.
+  *Param: [in] a pointer to the entry.
+  *Return: True if the entry was found, false otherwise.
+  */
+  BOOL SeeAlsoExists(HelpEntry* entry);
+  /*
+  *Checks to see if the specified help entry is in the SeeAlso list.
+  *Param: [in] The name of the entry.
+  *Return: True if the entry was found, false otherwise.
+  */
+  BOOL SeeAlsoExists(const std::string &name);
+  /*
+  *Adds a SeeAlso entry.
+  *Param: [in] a pointer to the entry.
+  *Return: True if the add was successful, false otherwise.
+  */
+  BOOL AddSeeAlso(HelpEntry* entry);
+  /*
+  *Removes the SeeAlso entry from the list.
+  *Param: [in] the name of the entry to remove.
+  *Return: True if the entry could be removed, false otherwise.
+  */
+  BOOL RemoveSeeAlso(const std::string &name);
   /*
   *Serializes the entry into the xml element.
   *Param: [in] the root xml element to append entries to.

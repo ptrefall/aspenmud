@@ -67,7 +67,7 @@ inline T Max(const T a,const T b)
 *Param: [in] a pointer to a list of std::string.
 *Return: the string converted.
 */
-std::string EnglishList(std::list <std::string> *in);
+std::string EnglishList(std::vector <std::string> *in);
 /*
 *Simulates dice rolls, using x number of dice with a set number of sides.
 *Param: [in] the number of dice.

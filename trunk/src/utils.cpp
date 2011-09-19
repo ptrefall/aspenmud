@@ -306,9 +306,9 @@ BOOL BitIsSet(FLAG flag,int pos)
   return (flag & pos) == pos;
 }
 
-std::string EnglishList(std::list<std::string> *in)
+std::string EnglishList(std::vector<std::string> *in)
 {
-  std::list <std::string>::iterator it;
+  std::vector <std::string>::iterator it;
   std::string str="";
 
   if (!in->size())
