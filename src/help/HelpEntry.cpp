@@ -1,20 +1,26 @@
 #include "../mud.h"
 #include "../conf.h"
+#include "../utils.h"
 #include "HelpEntry.h"
 #include <string>
+#include <vector>
 
 #ifdef MODULE_HELP
 HelpEntry::HelpEntry(const std::string &name, const std::string &data, FLAG access, HELP_ENTRY_TYPE type):_name(name), _data(data), _access(access), _type(type)
 {
   _lastModified = time(NULL);
   _id = 0;
+  _seeAlso = new std::vector<HelpEntry*>();
 }
 HelpEntry::HelpEntry()
 {
   _lastModified = time(NULL);
+  _id = 0;
+  _seeAlso = new std::vector<HelpEntry*>();
 }
 HelpEntry::~HelpEntry()
 {
+  delete _seeAlso;
 }
 
 std::string HelpEntry::GetName() const
@@ -53,7 +59,6 @@ void HelpEntry::SetId(UINT id)
   _id = id;
 }
 
-
 FLAG HelpEntry::GetAccess() const
 {
   return _access;
@@ -61,6 +66,79 @@ FLAG HelpEntry::GetAccess() const
 void HelpEntry::SetAccess(FLAG access)
 {
   _access = access;
+}
+
+std::string HelpEntry::SeealsoToList()
+{
+  if (_seeAlso->size() == 0)
+    {
+      return "none";
+    }
+
+  std::vector<std::string> names;
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  itEnd = _seeAlso->end();
+  for (it = _seeAlso->begin(); it != itEnd; ++it)
+    {
+      names.push_back((*it)->GetName());
+    }
+  return EnglishList(&names);
+}
+BOOL HelpEntry::SeeAlsoExists(HelpEntry* entry)
+{
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  itEnd = _seeAlso->end();
+  for (it = _seeAlso->begin(); it != itEnd; ++it)
+    {
+      if ((*it) == entry)
+        {
+          return true;
+        }
+    }
+
+  return false;
+}
+BOOL HelpEntry::SeeAlsoExists(const std::string &name)
+{
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  itEnd = _seeAlso->end();
+  for (it = _seeAlso->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == name)
+        {
+          return true;
+        }
+    }
+
+  return false;
+}
+BOOL HelpEntry::AddSeeAlso(HelpEntry* entry)
+{
+  if (SeeAlsoExists(entry))
+    {
+      return false;
+    }
+
+  _seeAlso->push_back(entry);
+  return true;
+}
+BOOL HelpEntry::RemoveSeeAlso(const std::string &name)
+{
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  itEnd = _seeAlso->end();
+  for (it = _seeAlso->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == name)
+        {
+          _seeAlso->erase(it);
+          return true;
+        }
+    }
+  return false;
 }
 
 void HelpEntry::Serialize(TiXmlElement* root)
