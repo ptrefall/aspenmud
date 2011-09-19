@@ -38,3 +38,33 @@ BOOL YesNoHandler::CreateHandler(Socket* sock,  YESNOCB cb)
   input->args = (void*)sock;
   return sock->SetInput(input);
 }
+
+LineHandler::LineHandler(LINECB cb):InputHandle()
+{
+  _cb = cb;
+}
+
+void LineHandler::Input(void* arg, const std::string &input)
+{
+  std::string data = input;
+  _cb((Socket*)arg, data);
+}
+
+BOOL LineHandler::CreateHandler(Socket* sock,  LINECB cb)
+{
+  if (sock == NULL)
+    {
+      return false;
+    }
+
+  in_data* input = new in_data();
+  LineHandler* handle = new LineHandler(cb);
+  if (!handle)
+    {
+      return false;
+    }
+
+  input->handle = handle;
+  input->args = (void*)sock;
+  return sock->SetInput(input);
+}

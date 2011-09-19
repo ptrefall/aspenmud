@@ -1,11 +1,14 @@
 #include <list>
 #include <map>
 #include <sstream>
+#include <unistd.h>
+#include <boost/bind.hpp>
 #include "com_gen.h"
 #include "utils.h"
 #include "player.h"
 #include "world.h"
 #include "option.h"
+#include "inputHandlers.h"
 
 void InitializeGenCommands()
 {
@@ -24,6 +27,7 @@ void InitializeGenCommands()
   world->commands.AddCommand(new CMDWhois());
   world->commands.AddCommand(new CMDLook());
   world->commands.AddCommand(new CMDCoord());
+  world->commands.AddCommand(new CMDSuicide());
 }
 
 //quit
@@ -481,4 +485,32 @@ BOOL CMDCoord::Execute(const std::string &verb, Player* mobile,std::vector<std::
   st << "You are at coords (" << p->x << ", " << p->y << ", " << p->z << ").";
   mobile->Message(MSG_INFO, st.str());
   return true;
+}
+
+CMDSuicide::CMDSuicide()
+{
+  SetName("suicide");
+}
+BOOL CMDSuicide::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  mobile->Message(MSG_NORMAL, "Are you sure you want to suicide? Please note that this will delete your current character, as well as any equipment you may own. Type yes if you want to continue, or no otherwise.");
+  YesNoHandler::CreateHandler(mobile->GetSocket(), boost::bind(&CMDSuicide::Confirm, this, _1, _2));
+  return true;
+}
+void CMDSuicide::Confirm(Socket* sock, BOOL choice)
+{
+  Player* mobile = sock->GetPlayer();
+  std::string path = std::string(PLAYER_DIR)+mobile->GetName();
+  World* world = World::GetPtr();
+
+  if (!choice)
+    {
+      mobile->Message(MSG_INFO, "You will not suicide.");
+      sock->ClearInput();
+      return;
+    }
+
+  world->WriteLog(mobile->GetName()+" has just suicided.");
+  sock->Kill();
+  unlink(path.c_str());
 }

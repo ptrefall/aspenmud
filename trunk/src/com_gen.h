@@ -93,4 +93,12 @@ public:
   CMDCoord();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
+
+class CMDSuicide:public Command
+{
+public:
+  CMDSuicide();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+  void Confirm(Socket* sock, BOOL choice);
+};
 #endif
