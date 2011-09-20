@@ -102,13 +102,24 @@ BOOL HelpTable::AddEntry(HelpEntry* entry)
 }
 BOOL HelpTable::RemoveEntry(const std::string &name)
 {
-  std::vector<HelpEntry*>::iterator it, itEnd;
+  std::vector<HelpEntry*>::iterator it, itEnd, it2, it2End;;
 
-  itEnd = _entries->end();
+  itEnd = it2End = _entries->end();
   for (it = _entries->begin(); it != itEnd; ++it)
     {
       if ((*it)->GetName() == name)
         {
+          for (it2 = _entries->begin(); it2 != it2End; ++it2)
+            {
+              if ((*it2) == (*it))
+                {
+                  continue;
+                }
+              if ((*it2)->SeeAlsoExists((*it)->GetName()))
+                {
+                  (*it2)->RemoveSeeAlso((*it)->GetName());
+                }
+            }
           _entries->erase(it);
           delete (*it);
           return true;
