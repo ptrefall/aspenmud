@@ -9,6 +9,7 @@ void Menu::_Initialize(void)
 {
   _exitMessage="abort";
   _data=NULL;
+  _attached = false;
 }
 
 Menu::Menu(Player* mobile)

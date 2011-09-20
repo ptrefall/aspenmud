@@ -5,6 +5,7 @@
 #define MENU_H
 #include <string>
 #include <vector>
+#include <boost/function.hpp>
 #include "mud.h"
 #include "conf.h"
 #include "socket.h"
@@ -12,8 +13,10 @@
 class Menu;
 #define MENU(name)\
 void name(Player* mob, Menu* menu, void*args, int subitem)
+#define CMENU(c, name)\
+void c::name(Player* mob, Menu* menu, void*args, int subitem)
 //our menu callback.
-typedef void (*MENUCB)(Player*, Menu*, void*, int);
+typedef boost::function<void (Player*, Menu*, void*, int)> MENUCB;
 
 //menu data structure
 //used for holding information about each individual item.
