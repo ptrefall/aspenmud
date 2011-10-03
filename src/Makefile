@@ -11,7 +11,8 @@ ECHO = echo
 #PROF = -pg
 CC	= g++
 #debugging code (should always be used except for special cases).
-CFLAGS	= -ggdb -pedantic -Wall -O0 -std=c++0x -Xlinker -Map=output.map
+CFLAGS	= -ggdb -pedantic -Wall -O0 -std=c++0x
+#CFLAGS += -Xlinker -Map=output.map
 #makes the compile use our libraries.
 CFLAGS += -L../libs
 #makes the compiler use our includes.

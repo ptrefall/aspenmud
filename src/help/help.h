@@ -46,6 +46,8 @@ public:
   EVENT(EditorSave);
   void AddSeealso(Socket* sock, std::string input, void* data);
 };
+
+EVENT(CleanupHelp);
 #endif
 
 BOOL InitializeHelp();

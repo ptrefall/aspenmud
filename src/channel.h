@@ -18,8 +18,6 @@
 *Channel based defines
 */
 
-EVENT(SubscribeChannels);
-EVENT(UnsubscribeChannels);
 void InitializeChannels(void);
 
 /*
@@ -80,9 +78,14 @@ public:
   *Param: [in] The player to add to the list.
   *[in]: Determines whether or not the players add/remove is announced to the player. useful for logging in or adding mobs to channels.
   */
-  void AddListener(Player* subscriber,BOOL quiet=0);
-  void RemoveListener(Player* subscriber,BOOL quiet=0);
-
+  void AddListener(Player* subscriber,BOOL quiet = false);
+  void RemoveListener(Player* subscriber,BOOL quiet = false);
+  /*
+  *Checks to see if a listener exists.
+  *Param: [in] a pointer to the player
+  *Return: True if the specified listener exists, false otherwise.
+  */
+  BOOL HasListener(Player* mobile);
   /*
   *Sends a message to all those subscribed to the channel.
   *Param: [in] the player doing the broadcast.
@@ -91,6 +94,9 @@ public:
   *Those who don't have the access right of the channel can not broadcast by default.
   */
   void Broadcast(Player* caller,const std::string &message,BOOL access=true);
+  static EVENT(SubscribeChannels);
+  static EVENT(UnsubscribeChannels);
+  static EVENT(OptionChanged);
 };
 
 #endif /*CHANNEL_H*/

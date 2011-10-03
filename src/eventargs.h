@@ -3,6 +3,8 @@
 #include "mud.h"
 #include "conf.h"
 #include "entity.h"
+#include "option.h"
+
 /*
 *LookArgs
 *Called when a player looks at an object.
@@ -46,5 +48,13 @@ public:
   EditorExitedArgs(Editor* ed):editor(ed) {}
   EditorExitedArgs() {}
   Editor* editor;
+};
+
+class OptionChangedArgs:public EventArgs
+{
+public:
+  OptionChangedArgs(OptionNode* v):option(v) {}
+  OptionChangedArgs() {}
+  OptionNode* option;
 };
 #endif

@@ -266,7 +266,7 @@ BOOL Server::PollSockets()
               break;
             }
 //transfer control to retrieval of new password
-          sock->Write("Please choose a password. Please make your password between 5 and 20 characters long.\nStrong passwords contain both lower and uppercase letters, numbers, letters and a dash ('-').\nEnter your new password?");
+          sock->Write("Please choose a password. Please make your password between 5 and 20 characters long.\nStrong passwords contain both lower and uppercase letters, numbers, letters and a dash ('-').\nEnter your new password?\n");
           sock->Write(TELNET_ECHO_OFF);
 //name was valid, set it in the player class.
           mob->SetName(input);

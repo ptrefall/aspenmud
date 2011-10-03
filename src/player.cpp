@@ -9,11 +9,11 @@
 #include <boost/bind/protect.hpp>
 #include "player.h"
 #include "event.h"
+#include "eventargs.h"
 #include "utils.h"
 #include "world.h"
 #include "exception.h"
 #include "olc.h"
-
 
 Player::Player()
 {
@@ -53,7 +53,7 @@ Player::Player()
 //events
   events.RegisterEvent("EnterGame", new Event());
   events.RegisterEvent("LeaveGame", new Event());
-
+  events.RegisterEvent("OptionChanged", new Event());
   events.AddCallback("HeartBeat", boost::bind(&Player::OnlineTime, this, _1, _2));
   events.AddCallback("HeartBeat", boost::bind(&Player::AutoSave, this, _1, _2));
 }
@@ -498,6 +498,8 @@ BOOL Player::ToggleOption(const std::string &option)
               node->_data.SetInt(1);
             }
           (*_config)[option] = node;
+          OptionChangedArgs arg(node);
+          events.CallEvent("OptionChanged", &arg, this);
         }
       return true;
     }
@@ -513,6 +515,8 @@ BOOL Player::ToggleOption(const std::string &option)
             {
               (*_config)[option]->_data.SetInt(1);
             }
+          OptionChangedArgs arg((*_config)[option]);
+          events.CallEvent("OptionChanged", &arg, this);
         }
       return true;
     }

@@ -149,8 +149,6 @@ BOOL CMDToggle::Execute(const std::string &verb, Player* mobile,std::vector<std:
       headers = new std::vector<std::string>();
       headers->push_back("option");
       headers->push_back("value");
-      headers->push_back("description");
-
       poptions=mobile->GetOptions();
       pitEnd = poptions->end();
       for (pit = poptions->begin(); pit != pitEnd; ++pit)
@@ -160,7 +158,6 @@ BOOL CMDToggle::Execute(const std::string &verb, Player* mobile,std::vector<std:
             {
               cols->push_back(popt->_option->GetName());
               cols->push_back(popt->_data.GetInt()==0?"off: ":"on ");
-              cols->push_back(popt->_option->GetHelp());
             }
         }
 
@@ -177,14 +174,27 @@ BOOL CMDToggle::Execute(const std::string &verb, Player* mobile,std::vector<std:
             {
               cols->push_back(gopt->GetName());
               cols->push_back(gopt->GetData().GetInt()==0?"off: ":"on ");
-              cols->push_back(gopt->GetHelp());
             }
         }
 
-      mobile->Message(MSG_LIST, Columnize(cols, 3, headers));
-
+      mobile->Message(MSG_LIST, Columnize(cols, 2, headers));
+      mobile->Message(MSG_INFO, "Note: You can use toggle help <option> to get more help on a specific option.");
       delete cols;
       delete headers;
+      return true;
+    }
+
+//see if they want help on a specific option.
+  if (args[0] == "help" && args.size() == 2)
+    {
+      gopt = world->GetGlobalOption(args[1]);
+      if (!gopt)
+        {
+          mobile->Message(MSG_ERROR, "That option does not exist.");
+          return false;
+        }
+
+      mobile->Message(MSG_INFO, gopt->GetHelp());
       return true;
     }
 

@@ -388,6 +388,14 @@ void CMDHedit::AddSeealso(Socket* sock, std::string input, void* data)
 
   sock->ClearInput();
 }
+
+EVENT(CleanupHelp)
+{
+  World* world = World::GetPtr();
+  HelpTable* table = (HelpTable*)world->GetProperty("help");
+  delete table;
+  world->RemoveProperty("help");
+}
 #endif
 
 BOOL InitializeHelp()
@@ -403,9 +411,11 @@ BOOL InitializeHelp()
       return false;
     }
   world->AddProperty("help", (void*)table);
+  world->events.AddCallback("Shutdown", CleanupHelp);
   world->commands.AddCommand(new CMDHelp());
   world->commands.AddCommand(new CMDHedit());
 #endif
 
   return true;
 }
+
