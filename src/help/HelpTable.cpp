@@ -143,6 +143,25 @@ BOOL HelpTable::EntryExists(const std::string &name)
 
   return false;
 }
+HelpEntry* HelpTable::GetEntry(const std::string &name)
+{
+  std::vector<HelpEntry*>::iterator it, itEnd;
+
+  if (!EntryExists(name))
+    {
+      return NULL;
+    }
+
+  itEnd = _entries->end();
+  for (it = _entries->begin(); it != itEnd; ++it)
+    {
+      if ((*it)->GetName() == name)
+        {
+          return (*it);
+        }
+    }
+  return NULL;
+}
 
 BOOL HelpTable::ShowEntry(const std::string &name, Player* mobile)
 {

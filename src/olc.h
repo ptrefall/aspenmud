@@ -75,6 +75,14 @@ public:
 *[in] A function object holding the setter.
 */
 void OlcString(Entity* ed, Player* mob, const Variant* input, boost::function<std::string ()> get, boost::function<void (const std::string&)> set);
+/*
+*Shows a ToggleMenu with player ranks.
+*Param: [in] The object you're editing, if any.
+*Param: [in] the player doing the editing.
+*Param: [in] NULL.
+*Param: [in] the getter to retrieve the flag.
+*Param: [in] the setter for setting the flag.
+*/
 void OlcPlayerFlag(Entity* ed, Player* mob, const Variant* input, boost::function<FLAG ()> get, boost::function<void (FLAG)> set);
 /*
 *This is the event that is used to save a specified string to an object.

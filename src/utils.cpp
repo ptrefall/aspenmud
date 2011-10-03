@@ -80,6 +80,39 @@ void Tokenize(const std::string &str, std::vector<std::string> &tokens, const st
     }
 }
 
+void SplitToVector(const std::string &line, std::vector<std::string>* output, int cols)
+{
+  if (line.length() <= cols)
+    {
+      output->push_back(line);
+      return;
+    }
+
+  size_t start, length, cur;
+  length = line.length();
+  cur = start = 0;
+
+  while (1)
+    {
+      cur = start+cols; //move the pointer to the maximum length from start.
+      if (length - start <= cols) //the rest of the line is less than cols, so we don't need to split.
+        {
+          output->push_back(line.substr(start, length));
+          return;
+        }
+
+      for (;; --cur) //we decrement cur until we find a space:
+        {
+          if (line[cur] == ' ') //we found a space in our search backwards.
+            {
+              output->push_back(line.substr(start, cur-start)); //pushes the substr between start and cur.
+              start = cur+1; //moves start to cur+1, which is after the space.
+              break;
+            }
+        }
+    }
+}
+
 BOOL IsValidUserName(const std::string &input)
 {
   const char* ptr=input.c_str();

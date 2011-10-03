@@ -33,6 +33,15 @@ UINT GetFileSize(const std::string &path);
 *note: The slices will be put into tokens. If no tokens are found, the vector will contain the string passed in.
 */
 void Tokenize(const std::string &str, std::vector<std::string> &tokens, const std::string &del=" ");
+/*
+*Splits a string up into a vector based on columns.
+*We split to the last word, rather than cutting a word in half and wrapping it to the next column.
+*Param: [in] the string to split.
+*Param: [in] a pointer to the vector that will accept the lines.
+*Param: [in] the number of columns to split to.
+*/
+void SplitToVector(const std::string &line, std::vector<std::string>* output, int cols=80);
+
 //player validation functions
 BOOL IsValidUserName(const std::string &input);
 BOOL IsValidPassword(const std::string &input);
