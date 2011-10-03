@@ -82,7 +82,7 @@ void Tokenize(const std::string &str, std::vector<std::string> &tokens, const st
 
 void SplitToVector(const std::string &line, std::vector<std::string>* output, int cols)
 {
-  if (line.length() <= cols)
+  if (line.length() <= (unsigned int)cols)
     {
       output->push_back(line);
       return;
@@ -95,7 +95,7 @@ void SplitToVector(const std::string &line, std::vector<std::string>* output, in
   while (1)
     {
       cur = start+cols; //move the pointer to the maximum length from start.
-      if (length - start <= cols) //the rest of the line is less than cols, so we don't need to split.
+      if ((int)(length - start) <= cols) //the rest of the line is less than cols, so we don't need to split.
         {
           output->push_back(line.substr(start, length));
           return;
@@ -133,15 +133,22 @@ BOOL IsValidUserName(const std::string &input)
 
 BOOL IsValidPassword(const std::string &input)
 {
-  std::string validChars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-";
+  std::string::const_iterator it, itEnd;
+
   if ((input.length()<5)||(input.length()>20))
     {
       return false;
     }
-  if (input.find_first_not_of(validChars)!=std::string::npos)
+
+  itEnd = input.end();
+  for (it = input.begin(); it != itEnd; ++it)
     {
-      return false;
+      if (!isgraph((*it)))
+        {
+          return false;
+        }
     }
+
   return true;
 }
 

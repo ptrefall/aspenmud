@@ -1,6 +1,7 @@
 #include <sstream>
 #include <string>
 #include <list>
+#include <boost/bind.hpp>
 #include "mud.h"
 #include "channel.h"
 #include "player.h"
@@ -13,13 +14,13 @@ void InitializeChannels()
   World* world = World::GetPtr();
 
   world->WriteLog("Initializing channels");
-  world->events.AddCallback("PlayerConnect", SubscribeChannels);
-  world->events.AddCallback("PlayerDisconnect", UnsubscribeChannels);
+  world->events.AddCallback("PlayerConnect", boost::bind(&Channel::SubscribeChannels, _1, _2));
+  world->events.AddCallback("PlayerDisconnect", boost::bind(&Channel::UnsubscribeChannels, _1, _2));
 //Register channels here.
   world->AddChannel(new Channel("chat","ch",RANK_PLAYER));
 }
 
-EVENT(SubscribeChannels)
+CEVENT(Channel, SubscribeChannels)
 {
   World* world = World::GetPtr();
 
@@ -27,6 +28,7 @@ EVENT(SubscribeChannels)
   std::list <std::string>::iterator it, itEnd;
   Channel* chan=NULL;
   Player* mobile=(Player*)caller;
+  mobile->events.AddCallback("OptionChanged", boost::bind(&Channel::OptionChanged, _1, _2));
   world->GetChannelNames(names);
 
   itEnd = names->end();
@@ -43,7 +45,7 @@ EVENT(SubscribeChannels)
     }
   delete names;
 }
-EVENT(UnsubscribeChannels)
+CEVENT(Channel, UnsubscribeChannels)
 {
   World* world = World::GetPtr();
 
@@ -63,6 +65,26 @@ EVENT(UnsubscribeChannels)
         }
     }
   delete names;
+}
+CEVENT(Channel, OptionChanged)
+{
+  World* world = World::GetPtr();
+  Player* mobile = (Player*)caller;
+  OptionChangedArgs* arg = (OptionChangedArgs*)args;
+  OptionNode* node = arg->option;
+  Channel* chan = world->FindChannel(node->_option->GetName());
+
+  if (chan)
+    {
+      if (node->_data.GetInt())
+        {
+          chan->AddListener(mobile);
+        }
+      else
+        {
+          chan->RemoveListener(mobile);
+        }
+    }
 }
 
 Channel::Channel(const std::string &name,const std::string &alias,const FLAG access)
@@ -212,8 +234,6 @@ std::list <HistoryNode*>* Channel::GetHistory(void) const
 
 void Channel::AddListener(Player* subscriber,BOOL quiet)
 {
-  std::list<Player*>::iterator it, itEnd;
-
   if (!subscriber->HasAccess(_access))
     {
       if (!quiet)
@@ -223,17 +243,13 @@ void Channel::AddListener(Player* subscriber,BOOL quiet)
       return;
     }
 
-  itEnd = _listeners->end();
-  for (it = _listeners->begin(); it != itEnd; ++it)
+  if (HasListener(subscriber))
     {
-      if ((*it)==subscriber)
+      if (!quiet)
         {
-          if (!quiet)
-            {
-              subscriber->Message(MSG_ERROR,"You are already subscribed to that channel.");
-            }
-          return;
+          subscriber->Message(MSG_ERROR,"You are already subscribed to that channel.");
         }
+      return;
     }
 
   _listeners->push_back(subscriber);
@@ -244,26 +260,35 @@ void Channel::AddListener(Player* subscriber,BOOL quiet)
 }
 void Channel::RemoveListener(Player* subscriber,BOOL quiet)
 {
-  std::list<Player*>::iterator it, itEnd;
-
-  itEnd = _listeners->end();
-  for (it = _listeners->begin(); it != itEnd; ++it)
+  if (HasListener(subscriber))
     {
-      if ((*it)==subscriber)
+      _listeners->remove(subscriber);
+      if (!quiet)
         {
-          _listeners->remove(subscriber);
-          if (!quiet)
-            {
-              subscriber->Message(MSG_INFO,"Tuned out.");
-            }
-          return;
+          subscriber->Message(MSG_INFO,"Tuned out.");
         }
+      return;
     }
 
   if (!quiet)
     {
       subscriber->Message(MSG_INFO,"You are not tuned into that channel.");
     }
+}
+BOOL Channel::HasListener(Player* mobile)
+{
+  std::list<Player*>::iterator it, itEnd;
+
+  itEnd = _listeners->end();
+  for (it = _listeners->begin(); it != itEnd; ++it)
+    {
+      if ((*it) == mobile)
+        {
+          return true;
+        }
+    }
+
+  return false;
 }
 
 void Channel::Broadcast(Player* caller,const std::string &message,BOOL access)
@@ -288,6 +313,11 @@ void Channel::Broadcast(Player* caller,const std::string &message,BOOL access)
   if (BitIsSet(caller->GetPflag(), PF_SILENCE))
     {
       caller->Message(MSG_ERROR, "You can not broadcast to channels while you are silenced.");
+      return;
+    }
+  if (!HasListener(caller))
+    {
+      caller->Message(MSG_ERROR, "You must be tuned into that channel before you can broadcast on it.");
       return;
     }
 
