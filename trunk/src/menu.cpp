@@ -10,18 +10,20 @@ void Menu::_Initialize(void)
   _exitMessage="abort";
   _data=NULL;
   _attached = false;
+  _arg = NULL;
+  _sock = NULL;
+  _mobile = NULL;
 }
 
-Menu::Menu(Player* mobile)
+Menu::Menu(Player* mobile, void* arg)
 {
+  _Initialize();
   _mobile = mobile;
   _sock = _mobile->GetSocket();
-  _Initialize();
+  _arg = arg;
 }
 Menu::Menu(void)
 {
-  _sock=NULL;
-  _mobile = NULL;
   _Initialize();
 }
 Menu::~Menu(void)
@@ -104,6 +106,20 @@ void Menu::SetCode(int code)
   _code=code;
 }
 
+void* Menu::GetArg() const
+{
+  return _arg;
+}
+void Menu::SetArg(void* arg)
+{
+  _arg = arg;
+}
+
+void Menu::AtUnattach(UNATTACHCB cb)
+{
+  _unattachcb = cb;
+}
+
 std::string Menu::GetExitMessage(void) const
 {
   return _exitMessage;
@@ -138,7 +154,7 @@ BOOL Menu::Attach()
   ShowMenu();
   return true;
 }
-BOOL Menu::Unattach(void)
+BOOL Menu::Unattach()
 {
   if (_sock==NULL)
     {
@@ -154,6 +170,10 @@ BOOL Menu::Unattach(void)
     }
 
   _sock->ClearInput();
+  if (!_unattachcb.empty())
+    {
+      _unattachcb(this);
+    }
   return true;
 }
 BOOL Menu::CanShow()
@@ -216,6 +236,7 @@ void MenuInput::Input(void* arg, const std::string &input)
     {
       m->GetMobile()->Message(MSG_INFO, "Exiting.");
       m->Unattach();
+      delete m;
       return;
     }
   option = m->GetDataByIndex(result);

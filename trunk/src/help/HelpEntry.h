@@ -99,6 +99,23 @@ public:
   */
   BOOL RemoveSeeAlso(const std::string &name);
   /*
+  *Populates a vector with all the names of the SeeAlso entries.
+  *Param: [in] a pointer to a vector of strings, which will contain the names of the see also entries.
+  *Return: True on success, false on failure.
+  */
+  BOOL SeeAlsoToList(std::vector<std::string>* entries);
+  /*
+  *Returns a seeAlso entry based on the given index, NULL if none was found.
+  *Param: [in] the index.
+  *Return: A pointer to the help entry this index references, NULL if none was found.
+  */
+  HelpEntry* GetSeeAlsoByIndex(unsigned int index);
+  /*
+  *Updates the time since the help entry was last modified, and sets the required rank.
+  *Param: [in] the rank to set.
+  */
+  void UpdateAccess(FLAG access);
+  /*
   *Serializes the entry into the xml element.
   *Param: [in] the root xml element to append entries to.
   */

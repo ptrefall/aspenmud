@@ -140,6 +140,36 @@ BOOL HelpEntry::RemoveSeeAlso(const std::string &name)
     }
   return false;
 }
+BOOL HelpEntry::SeeAlsoToList(std::vector<std::string>* entries)
+{
+  if (!entries)
+    {
+      return false;
+    }
+
+  std::vector<HelpEntry*>::iterator it, itEnd;
+  itEnd = _seeAlso->end();
+  for (it = _seeAlso->begin(); it != itEnd; ++it)
+    {
+      entries->push_back((*it)->GetName());
+    }
+  return true;
+}
+HelpEntry* HelpEntry::GetSeeAlsoByIndex(unsigned int index)
+{
+  if (index < 0 || index > _seeAlso->size()-1)
+    {
+      return NULL;
+    }
+
+  return _seeAlso->at(index);
+}
+
+void HelpEntry::UpdateAccess(FLAG access)
+{
+  _lastModified = time(NULL);
+  SetAccess(access);
+}
 
 void HelpEntry::Serialize(TiXmlElement* root)
 {

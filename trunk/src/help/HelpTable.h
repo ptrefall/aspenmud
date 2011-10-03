@@ -41,6 +41,12 @@ public:
   */
   BOOL EntryExists(const std::string &name);
   /*
+  *Tries to retrieve a pointer to the specified help entry.
+  *Param: [in] the name of the entry to find.
+  *Return: A pointer to the help entry if one was found, NULL otherwise.
+  */
+  HelpEntry* GetEntry(const std::string &name);
+  /*
   *Tries to show the specified entry.
   *Param: [in] the name of the entry to show.
   *Param: [in] a pointer to the player to show the entry to.
