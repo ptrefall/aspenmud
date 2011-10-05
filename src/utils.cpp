@@ -252,12 +252,18 @@ std::string Center(const std::string &str,const int width)
 
 std::string Explode(std::vector <std::string> &parts, const std::string &del)
 {
-  std::vector<std::string>::iterator it;
-  std::vector<std::string>::iterator itEnd;
+  std::vector<std::string>::iterator it, itEnd;
   std::stringstream st;
 
   itEnd = parts.end();
-  for (it=parts.begin(); it != itEnd; ++it)
+  it = parts.begin();
+//we need to handle the first element before the loop so we don't have a space in the beginning.
+  if (it != itEnd)
+    {
+      st << (*it);
+      ++it;
+    }
+  for (; it != itEnd; ++it)
     {
       st << del << (*it);
     }

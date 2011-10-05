@@ -80,13 +80,6 @@ public:
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 
-class CMDSay:public Command
-{
-public:
-  CMDSay();
-  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
-};
-
 class CMDCoord:public Command
 {
 public:
@@ -100,5 +93,26 @@ public:
   CMDSuicide();
   BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
   void Confirm(Socket* sock, BOOL choice);
+};
+
+class CMDSay:public Command
+{
+public:
+  CMDSay();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
+
+class CMDEmote:public Command
+{
+public:
+  CMDEmote();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
+};
+
+class CMDPrompt:public Command
+{
+public:
+  CMDPrompt();
+  BOOL Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd);
 };
 #endif
