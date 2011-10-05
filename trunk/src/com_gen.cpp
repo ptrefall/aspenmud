@@ -28,6 +28,9 @@ void InitializeGenCommands()
   world->commands.AddCommand(new CMDLook());
   world->commands.AddCommand(new CMDCoord());
   world->commands.AddCommand(new CMDSuicide());
+  world->commands.AddCommand(new CMDSay());
+  world->commands.AddCommand(new CMDEmote());
+  world->commands.AddCommand(new CMDPrompt());
 }
 
 //quit
@@ -454,26 +457,6 @@ BOOL CMDLook::Execute(const std::string &verb, Player* mobile,std::vector<std::s
   return true;
 }
 
-CMDSay::CMDSay()
-{
-  SetName("say");
-}
-BOOL CMDSay::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
-{
-  std::string message;
-  if (!args.size())
-    {
-      mobile->Message(MSG_ERROR, "Say what?");
-      return false;
-    }
-
-  message = Explode(args);
-  ((Room*)mobile->GetLocation())->TellAllBut(Capitalize(mobile->GetName())+" says, '"+message+"'", mobile);
-  mobile->Message(MSG_INFO, "You say, '"+message+"'");
-
-  return true;
-}
-
 CMDCoord::CMDCoord()
 {
   SetName("coord");
@@ -523,4 +506,57 @@ void CMDSuicide::Confirm(Socket* sock, BOOL choice)
   world->WriteLog(mobile->GetName()+" has just suicided.");
   sock->Kill();
   unlink(path.c_str());
+}
+
+CMDSay::CMDSay()
+{
+  SetName("say");
+}
+BOOL CMDSay::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  if (!args.size())
+    {
+      mobile->Message(MSG_ERROR, "Say what?");
+      return false;
+    }
+
+  std::string message = Explode(args);
+  ((Room*)mobile->GetLocation())->TellAllBut(Capitalize(mobile->GetName())+" says, '"+message+"'", mobile);
+  mobile->Message(MSG_INFO, "You say, '"+message+"'");
+  return true;
+}
+
+CMDEmote::CMDEmote()
+{
+  SetName("emote");
+}
+BOOL CMDEmote::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  if (!args.size())
+    {
+      mobile->Message(MSG_ERROR, "Emote what?");
+      return false;
+    }
+
+  std::string message = Explode(args);
+  ((Room*)mobile->GetLocation())->TellAll(Capitalize(mobile->GetName())+" "+message);
+  return true;
+}
+
+CMDPrompt::CMDPrompt()
+{
+  SetName("prompt");
+}
+BOOL CMDPrompt::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
+{
+  if (!args.size())
+    {
+      mobile->Message(MSG_INFO, "Your current prompt is:\n"+mobile->GetPrompt());
+      return false;
+    }
+
+  std::string prompt = Explode(args);
+  mobile->SetPrompt(prompt);
+  mobile->Message(MSG_INFO, "Prompt set to:\n"+prompt);
+  return false;
 }

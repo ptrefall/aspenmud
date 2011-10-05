@@ -558,14 +558,27 @@ BOOL World::DoCommand(Player* mobile,std::string args)
   //std::list<Command*>* externals; //external commands
   std::vector <Command*>::iterator it; //an iterator for iterating through the command list
   std::vector <Command*>::iterator itEnd; //an iterator to point to the end of the commands list.
-  // parse command name
-  for (i = 0; i < len; i++)
-    {
-      if (line[i] == ' ') break;
-    }
 
-  // copy the command
-  cmd = args.substr(0, i);
+  if (args[0] == '\"' || args[0] == '\'')
+    {
+      cmd="say";
+      i = 1; //the arguments are just after the quote.
+    }
+  else if(args[0] == ':')
+    {
+      cmd="emote";
+      i=1;
+    }
+  else
+    {
+      // parse command name
+      for (i = 0; i < len; i++)
+        {
+          if (line[i] == ' ') break;
+        }
+      // copy the command
+      cmd = args.substr(0, i);
+    }
 //make the command lowercase
   /*
       for (int n = 0; n < (int)cmd.length(); n++) {
