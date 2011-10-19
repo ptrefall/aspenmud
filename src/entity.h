@@ -90,6 +90,8 @@ public:
   *Return: true on success, false on failure.
   */
   virtual BOOL MoveTo(Entity* targ);
+  virtual void ObjectEnter(Entity* obj);
+  virtual void ObjectLeave(Entity* obj);
   /*
   *Adds the specified component to the list.
   *Param: [in] a pointer to the component object.
