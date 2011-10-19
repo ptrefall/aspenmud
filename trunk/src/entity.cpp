@@ -299,10 +299,32 @@ BOOL Entity::MoveTo(Entity* targ)
 {
   if (targ->CanReceive(this))
     {
+      if (_location)
+        {
+          _location->ObjectLeave(this);
+        }
       _location=targ;
+      targ->ObjectEnter(this);
       return true;
     }
   return false;
+}
+void Entity::ObjectEnter(Entity* obj)
+{
+  _contents.push_back(obj);
+}
+void Entity::ObjectLeave(Entity* obj)
+{
+  std::list<Entity*>::iterator it, itEnd;
+
+  itEnd = _contents.end();
+  for (it = _contents.begin(); it != itEnd; ++it)
+    {
+      if ((*it) == obj)
+        {
+          it = _contents.erase(it);
+        }
+    }
 }
 
 BOOL Entity::AddComponent(Component* component)

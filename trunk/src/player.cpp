@@ -335,6 +335,8 @@ void Player::EnterGame(BOOL quiet)
   world->events.CallEvent("PlayerConnect", NULL,this);
   events.CallEvent("EnterGame", NULL, this);
   Save();
+
+  Message(MSG_INFO, GetLocation()->DoLook(this));
 }
 void Player::LeaveGame()
 {

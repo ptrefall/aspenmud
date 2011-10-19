@@ -183,7 +183,8 @@ BOOL InitializeZones()
         }
       room->SetName("A blank room");
       room->SetCoord(p);
-      if (!world->CreateObject(room))
+      room->SetOnum(ROOM_START);
+      if (!world->AddObject(ROOM_START, room))
         {
           return false;
         }
