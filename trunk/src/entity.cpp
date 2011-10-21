@@ -22,6 +22,7 @@ Entity::Entity(void)
 {
   _name="A blank object";
   _desc="You see nothing special.";
+  _short = "A generic object lies here.";
   _script="";
   _location=NULL;
   _onum=0;
@@ -43,6 +44,7 @@ Entity::Entity(void)
                      boost::protect(boost::bind(&Entity::GetScript, this)),
                      boost::protect(boost::bind(&Entity::SetScript, this, _1))));
 #endif
+  _persistent = true;
 
   events.RegisterEvent("PostLook", new Event());
   events.RegisterEvent("PreLook",new Event());
@@ -79,6 +81,15 @@ void Entity::SetName(const std::string &s)
   _name=s;
 }
 
+std::string Entity::GetShort() const
+{
+  return _short;
+}
+void Entity::SetShort(const std::string &s)
+{
+  _short = s;
+}
+
 std::string Entity::GetDescription(void) const
 {
   return _desc;
@@ -104,6 +115,15 @@ std::string Entity::GetScript(void) const
 void Entity::SetScript(const std::string &script)
 {
   _script=script;
+}
+
+BOOL Entity::GetPersistent() const
+{
+  return _persistent;
+}
+void Entity::SetPersistent(BOOL s)
+{
+  _persistent = s;
 }
 
 Entity* Entity::GetLocation(void) const
@@ -146,9 +166,15 @@ void Entity::Serialize(TiXmlElement* root)
 
   if (_contents.size())
     {
-      for (cit = _contents.begin(); cit != citEnd; ++cit)
+      if (_persistent)
         {
-          (*cit)->Serialize(ent);
+          for (cit = _contents.begin(); cit != citEnd; ++cit)
+            {
+              if (!(*cit)->IsLiving())
+                {
+                  (*cit)->Serialize(ent);
+                }
+            }
         }
     }
   ent->LinkEndChild(contents);
@@ -452,6 +478,15 @@ BOOL Entity::IsNpc()
 }
 BOOL Entity::IsPlayer()
 {
+  return false;
+}
+BOOL Entity::IsLiving()
+{
+  if (IsPlayer() || IsNpc())
+    {
+      return true;
+    }
+
   return false;
 }
 

@@ -28,9 +28,11 @@ class Entity:public ISerializable
   VNUM _onum;
   Entity* _location;
   std::string _name;
+  std::string _short; //the description you see in a room.
   std::string _desc;
   std::string _script; //the scripting associated with this object.
   std::string _plural;
+  BOOL _persistent;
 public:
 //these are objects we need to store on each entity.
   EventManager events;
@@ -41,12 +43,16 @@ public:
   virtual ~Entity(void);
   virtual std::string GetName(void) const;
   virtual void SetName(const std::string &s);
+  virtual std::string GetShort() const;
+  virtual void SetShort(const std::string &s);
   virtual std::string GetDescription(void) const;
   virtual void SetDescription(const std::string &s);
   virtual std::string GetPlural();
   virtual void SetPlural(const std::string &s);
   virtual std::string GetScript(void) const;
   virtual void SetScript(const std::string &script);
+  virtual BOOL GetPersistent() const;
+  virtual void SetPersistent(BOOL s);
   /*
   *Returns the location of this object.
   *Return: A pointer to the entity in which this object is located, or NULL if the object does not have  a parent location.
@@ -90,7 +96,16 @@ public:
   *Return: true on success, false on failure.
   */
   virtual BOOL MoveTo(Entity* targ);
+  /*
+  *Called when an object is moved into another object.
+  *For example, if you put a sword in a container, the ObjectEnter would be called on the container with the sword being passed as an argument.
+  *Param: [in] the object entering the current object.
+  */
   virtual void ObjectEnter(Entity* obj);
+  /*
+  *Called when an object leaves another object.
+  *Param: [in] The object that is being removed.
+  */
   virtual void ObjectLeave(Entity* obj);
   /*
   *Adds the specified component to the list.
@@ -141,6 +156,7 @@ public:
   std::vector<std::string>* GetAliases();
   virtual BOOL IsNpc();
   virtual BOOL IsPlayer(void);
+  virtual BOOL IsLiving();
 #ifdef OLC
 //olc-based functions.
   /*

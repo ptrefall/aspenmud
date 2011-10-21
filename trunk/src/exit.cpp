@@ -70,7 +70,7 @@ void Exit::Serialize(TiXmlElement* root)
   int tmp = (int)_direction;
   node->SetAttribute("direction", tmp);
   node->SetAttribute("to", _to);
-  root->LinkEndChild(root);
+  root->LinkEndChild(node);
 }
 void Exit::Deserialize(TiXmlElement* node)
 {

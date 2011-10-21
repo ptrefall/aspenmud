@@ -20,6 +20,7 @@ Room::Room(void)
   _zone=NULL;
   _rflag = 0;
   SetOnum(ROOM_NOWHERE);
+  SetPersistent(false);
   events.AddCallback("PostLook", ROOM_POST_LOOK);
 }
 Room::~Room(void)
@@ -207,6 +208,7 @@ void Room::Serialize(TiXmlElement* root)
 
   if (_exits->size())
     {
+      itEnd = _exits->end();
       for (it=_exits->begin(); it != itEnd; ++it)
         {
           (*it)->Serialize(exits);
