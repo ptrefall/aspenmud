@@ -48,7 +48,7 @@ World::World()
   _objects=new std::map<VNUM,Entity*>();
   _onumPool=new std::vector <VNUM>();
   _state = new std::map<std::string, ISerializable*>();
-  _maxOnum=0;
+  _maxOnum = 0;
   _chanid=1;
   _server = NULL;
 //events
@@ -1084,11 +1084,10 @@ BOOL World::RecycleObject(Entity* obj)
 void World::InitializeNums()
 {
   WriteLog("Initializing vnums for pool.");
-  VNUM max=0;
-  VNUM i = 0;
+  VNUM max = 1;
+  VNUM i = 1;
   std::map<VNUM,Entity*>::iterator ot, otEnd;
 
-  max=0;
   otEnd = _objects->end();
   for (ot=_objects->begin(); ot != otEnd; ++ot)
     {
@@ -1098,7 +1097,7 @@ void World::InitializeNums()
         }
     }
   _maxOnum=max;
-  for (i=0; i!=max; i++)
+  for (i = 1; i!=max; i++)
     {
       if (!GetObject(i))
         {

@@ -110,6 +110,7 @@ CMDDig::CMDDig()
 BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
   World* world = World::GetPtr();
+  std::stringstream st;
   int toid = 0;
   Room* room = NULL;
   Room* location = (Room*)mobile->GetLocation();
@@ -185,6 +186,7 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
         {
           room->SetZone(zone);
           zone->AddRoom(room->GetOnum());
+          st << "Created room " << room->GetOnum() << "\n";
         }
     }
   else
@@ -195,6 +197,7 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
           mobile->Message(MSG_ERROR, "That rnum does not exist.");
           return false;
         }
+      st << "Found room " << room->GetOnum() << "\n";
     }
 
   p = *location->GetCoord();
@@ -247,12 +250,16 @@ BOOL CMDDig::Execute(const std::string &verb, Player* mobile,std::vector<std::st
   orig=new Exit(room->GetOnum());
   orig->SetDirection(GetDirectionByName(args[0]));
   location->AddExit(orig);
+  st << "Added exit from " << location->GetName() << "(" << location->GetOnum() << ") to newly created room.\n";
   if (dir!="")
     {
       other=new Exit(location->GetOnum());
       other->SetDirection(GetDirectionByName(dir));
       room->AddExit(other);
+      st << "Added exit from newly created room to " << location->GetName() << "(" << location->GetOnum() << ").\nDone.\n";
     }
+
+  mobile->Message(MSG_INFO, st.str());
   Zone::SaveZones();
   return true;
 }

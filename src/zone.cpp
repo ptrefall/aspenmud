@@ -186,6 +186,7 @@ BOOL InitializeZones()
       room->SetOnum(ROOM_START);
       if (!world->AddObject(ROOM_START, room))
         {
+          world->WriteLog("The start room could not be created. This is probably because ROOM_START would have overwritten the ID of a previously existing object.", ERR);
           return false;
         }
       if (!zone->AddRoom(room->GetOnum()))
