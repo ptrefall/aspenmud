@@ -102,5 +102,6 @@ public:
 //serialization
   virtual void Serialize(TiXmlElement* root);
   virtual void Deserialize(TiXmlElement* node);
+  EVENT(PostLook);
 };
 #endif
