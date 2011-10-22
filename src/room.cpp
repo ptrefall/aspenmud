@@ -1,6 +1,7 @@
 #include <sstream>
 #include <string>
 #include <list>
+#include <boost/bind.hpp>
 #include <tinyxml.h>
 #include "room.h"
 #include "living.h"
@@ -21,7 +22,7 @@ Room::Room(void)
   _rflag = 0;
   SetOnum(ROOM_NOWHERE);
   SetPersistent(false);
-  events.AddCallback("PostLook", ROOM_POST_LOOK);
+  events.AddCallback("PostLook", boost::bind(&Room::PostLook, this, _1, _2));
 }
 Room::~Room(void)
 {
@@ -247,26 +248,28 @@ void Room::Deserialize(TiXmlElement* room)
   Entity::Deserialize(room->FirstChild("entity")->ToElement());
 }
 
-
 //events
-EVENT(ROOM_POST_LOOK)
+CEVENT(Room, PostLook)
 {
-  std::vector<Exit*>::iterator it;
   std::stringstream st;
   LookArgs* largs=(LookArgs*)args;
-  Room* targ=(Room*)largs->_targ;
+  size_t i, count;
+  i = count = 0;
+  std::vector<Exit*> *exits = GetExits();
 
-  if (!targ->GetExits()->size())
+  if (!GetExits()->size())
     {
       largs->_desc+="You see no obvious exits.";
     }
   else
     {
       st << "Obvious exits: [";
-      for (it=targ->GetExits()->begin(); it!=targ->GetExits()->end(); it++)
+      count = GetExits()->size();
+      for (i = 0; i < count-1; i++)
         {
-          st << (*it)->GetName();
+          st << exits->at(i)->GetName() << ", ";
         }
+      st << exits->at(exits->size()-1)->GetName();
       st << "].";
       largs->_desc+=st.str();
     }
