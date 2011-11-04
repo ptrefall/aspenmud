@@ -32,6 +32,8 @@ Player::Player()
   _lastLogin=0;
   _lastSave = 0;
   _lastBackup = 0;
+_watching = NULL;
+_watchers = new std::list<Player*>();
 //config defaults:
   _config=new std::map<std::string, OptionNode*>();
 
@@ -87,6 +89,8 @@ Player::~Player()
       delete _config;
       _config=NULL;
     }
+
+delete _watchers;
 }
 
 BOOL Player::IsPlayer(void)
