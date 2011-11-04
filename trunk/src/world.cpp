@@ -367,60 +367,84 @@ Channel* World::FindChannel(const std::string &name)
 
 BOOL World::InitializeFiles()
 {
-  struct stat *fs; //holds file stats
+  struct stat fs; //holds file stats
 //load our banner:
 //retrieve size of file so we can create the buffer:
-  fs=new struct stat();
-  if(stat(LOGIN_FILE,fs))
+  if(stat(LOGIN_FILE, &fs))
     {
       WriteLog("Could not stat login file.", CRIT);
       return false;
     }
-  _banner=new char[fs->st_size+1];
-  memset(_banner,0,fs->st_size+1);
+
+  _banner=new char[fs.st_size+1];
+if (!_banner)
+{
+return false;
+}
+
+  memset(_banner,0,fs.st_size+1);
 //open and load the banner:
   FILE* banner_fd=fopen(LOGIN_FILE,"r");
   if (!banner_fd)
     {
       WriteLog("Could not fopen banner file.", CRIT);
       delete []_banner;
+_banner = NULL;
       return false;
     }
-  if ((int)fread(_banner,1,fs->st_size,banner_fd)!=(int)fs->st_size)
+  if ((int)fread(_banner,1,fs.st_size,banner_fd)!=(int)fs.st_size)
     {
       WriteLog("Error loading banner.", CRIT);
+delete []_banner;
+_banner = NULL;
+fclose(banner_fd);
       return false;
     }
   fclose(banner_fd);
-  delete fs;
+
 //load our motd:
 //retrieve size of file so we can create the buffer:
-  fs=new struct stat();
-  if (stat(MOTD_FILE,fs))
+  if (stat(MOTD_FILE, &fs))
     {
       WriteLog("Could not stat MOTD file.", CRIT);
+delete []_banner;
+_banner = NULL;
       return false;
     }
 
-  _motd=new char[fs->st_size+1];
-  memset(_motd,0,fs->st_size+1);
+  _motd=new char[fs.st_size+1];
+if (!_motd)
+{
+delete []_banner;
+_banner = NULL;
+return false;
+}
+
+  memset(_motd,0,fs.st_size+1);
   FILE* motd_fd=fopen(MOTD_FILE,"r");
   if (!motd_fd)
     {
       WriteLog("Could not fopen MOTD.", CRIT);
+delete [] _banner;
+delete [] _motd;
+_motd = _banner = NULL;
       return false;
     }
 
-  if ((int)fread(_motd,1,fs->st_size,motd_fd)!=(int)fs->st_size)
+  if ((int)fread(_motd,1,fs.st_size,motd_fd)!=(int)fs.st_size)
     {
       WriteLog("Error loading MOTD.", CRIT);
+delete [] _banner;
+delete [] _motd;
+_motd = _banner = NULL;
+fclose(motd_fd);
       return false;
     }
   fclose(motd_fd);
-  delete fs;
   WriteLog("Files loaded successfully");
   return true;
 }
+
 
 const char* World::GetBanner() const
 {
