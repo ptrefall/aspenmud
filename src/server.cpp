@@ -40,8 +40,13 @@ Server::~Server()
 {
 //free variables and close sockets.
   if (control != -1)
-    close(control);
-  delete blist;
+    {
+      close(control);
+    }
+  if (blist)
+    {
+      delete blist;
+    }
 }
 
 BOOL Server::Listen(const int port)
@@ -50,7 +55,8 @@ BOOL Server::Listen(const int port)
 
   int reuse = 1;
   // try to create a communications endpoint
-  if ((control = socket(PF_INET, SOCK_STREAM, 0)) == -1)
+  control = socket(PF_INET, SOCK_STREAM, 0);
+  if (control == -1)
     {
       world->WriteLog("could not create socket.", ERR);
       return false;
@@ -82,6 +88,7 @@ BOOL Server::Listen(const int port)
       close(control);
       return false;
     }
+
   return true;
 }
 
@@ -92,10 +99,11 @@ int Server::GetListener(void) const
 
 BOOL Server::PollSockets()
 {
-  time_t res;
+  time_t res = 0;
   static struct timeval tv;
-  std::list<Socket*>::iterator iSocket;
-  std::list<Socket*>::iterator iSocketEnd = socketList.end();
+  std::list<Socket*>::iterator iSocket, iSocketEnd;
+
+  iSocketEnd = socketList.end();
   Socket *sock = NULL;
   Player* mob = NULL;
   std::string input;
@@ -112,8 +120,10 @@ BOOL Server::PollSockets()
           if (res>=GAME_IDLE_TIME)
             {
               if (sock->GetPlayer() && (!BitIsSet(sock->GetPlayer()->GetRank(), RANK_ADMIN)))
-                sock->Write("You idled out, thanks for playing!\n");
-              sock->Kill();
+                {
+                  sock->Write("You idled out, thanks for playing!\n");
+                  sock->Kill();
+                }
             }
           break;
 //assume any others are logins.
@@ -133,6 +143,7 @@ BOOL Server::PollSockets()
     {
       return false;
     }
+
   // attempt to establish new connections
   Accept();
 
@@ -160,9 +171,10 @@ BOOL Server::PollSockets()
           sock->UpdateLastCommand();
         }
     }
+
 //now we poll every socket for pending commands and handle them.
   iSocketEnd = socketList.end();
-  for (iSocket = socketList.begin(); iSocket != iSocketEnd; iSocket++)
+  for (iSocket = socketList.begin(); iSocket != iSocketEnd; ++iSocket)
     {
       sock = *iSocket;
       mob=sock->GetPlayer();
@@ -171,6 +183,7 @@ BOOL Server::PollSockets()
         {
           continue;
         }
+
 //handle incoming data based on a connection type
       switch (sock->GetConnectionType())
         {
@@ -195,6 +208,7 @@ BOOL Server::PollSockets()
             }
           break;
         }
+
 //login username prompt
         case con_name:
         {
@@ -230,6 +244,7 @@ BOOL Server::PollSockets()
           sock->SetConnectionType(con_password);
           break;
         }
+
 //login password prompt
         case con_password:
         {
@@ -243,6 +258,7 @@ BOOL Server::PollSockets()
               iSocket = CloseSocket(iSocket);
               break;
             }
+
 //the player successfully logged in, set them to the game connection and run the player's EnterGame function to handle game entrance.
           sock->Write(TELNET_ECHO_ON);
           sock->SetConnectionType(con_game);
@@ -251,6 +267,7 @@ BOOL Server::PollSockets()
           mob->EnterGame();
           break;
         }
+
 //login new username
         case con_newname:
         {
@@ -273,6 +290,7 @@ BOOL Server::PollSockets()
           sock->SetConnectionType(con_newpass);
           break;
         }
+
         //login new password
         case con_newpass:
         {
@@ -288,6 +306,7 @@ BOOL Server::PollSockets()
           sock->SetConnectionType(con_verpass);
           break;
         }
+
 //login verify password
         case con_verpass:
         {
@@ -329,9 +348,9 @@ BOOL Server::PollSockets()
 
 void Server::FlushSockets()
 {
-  std::list<Socket*>::iterator iSocket;
-  std::list<Socket*>::iterator iSocketEnd = socketList.end();
-  Socket *pSocket;
+  std::list<Socket*>::iterator iSocket, iSocketEnd;
+  iSocketEnd = socketList.end();
+  Socket *pSocket = NULL;
 
   // iterate through all sockets and flush outgoing data
   for (iSocket = socketList.begin(); iSocket != iSocketEnd; ++iSocket)
@@ -416,11 +435,14 @@ void Server::Accept()
     {
       return;
     }
+
   // try to accept new connection
-  if ((desc = accept(control, (struct sockaddr *) &addr, &len)) == -1)
+  desc = accept(control, (struct sockaddr *) &addr, &len);
+  if (desc == -1)
     {
       return;
     }
+
   // allocate a new socket
   pSocket = new Socket(desc);
   if (blist->AddressExists(addr.sin_addr.s_addr))
@@ -476,6 +498,7 @@ void Server::AddSock(Socket* sock)
   // attach to file descriptor set
   FD_SET(sock->GetControl(), &fSet);
 }
+
 BanList* Server::GetBanList() const
 {
   return blist;

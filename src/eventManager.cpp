@@ -3,6 +3,10 @@
 #include "event.h"
 #include "eventManager.h"
 #include "exception.h"
+#ifdef MODULE_SCRIPTING
+#include "scripts/scripts.h"
+#include "scripts/scr_events.h"
+#endif
 
 EventManager::EventManager(void)
 {
@@ -79,3 +83,16 @@ BOOL EventManager::AddCallback(const std::string &name, EVENTFUNC cb)
   (_events[name])->Add(cb);
   return true;
 }
+#ifdef MODULE_SCRIPTING
+BOOL EventManager::AddScriptCallback(lua_State* l, const char* event, const char* func)
+{
+  if (!IsEventRegistered(event))
+    {
+      throw(EventNotFoundException("Tried to call "+std::string(event)+"."));
+      return false;
+    }
+
+  (_events[event])->AddScriptCallback(l, func);
+  return true;
+}
+#endif

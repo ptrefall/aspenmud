@@ -6,6 +6,7 @@
 #include "scr_world.h"
 #include "scr_player.h"
 #include "scr_entity.h"
+#include "scr_events.h"
 #include "../mud.h"
 #include "../conf.h"
 #include "../world.h"
@@ -32,15 +33,17 @@ Script::~Script()
 
 void Script::Execute(Entity* obj, const std::string &code)
 {
-  std::cout << code << std::endl;
   int ret = 0;
   World* world = World::GetPtr();
 
   if (!luaL_loadbuffer(state, code.c_str(), code.length(), "execution"))   // chunk is at -1
     {
       lua_newtable(state); // create shadow environment table at -1
+      ObjectToStack(state, obj);
+      lua_setfield(state, -2, "this");
       lua_getfield(state, LUA_REGISTRYINDEX, "meta"); //our metatable is at -1
       lua_setmetatable(state, -2); //set table and pop
+
       lua_setfenv(state, -2); //sets the environment
       ret = lua_pcall(state, 0, 0, 0);
       if (ret)
@@ -78,6 +81,11 @@ BOOL InitializeScript(void)
   if (!InitEntityScript(scr))
     {
       world->WriteLog("Initialization of entity script failed.", ERR);
+      return false;
+    }
+  if (!InitEventScript(scr))
+    {
+      world->WriteLog("Initialization of event script failed.", ERR);
       return false;
     }
   world->AddProperty("script", (void*)scr);

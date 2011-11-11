@@ -41,8 +41,8 @@ class Player:public Living
   std::map <std::string,OptionNode*> *_config;
   std::map <MessageType,std::string> *_messages;
   Socket *_sock;
-Player* _watching;
-std::list<Player*> *_watchers;
+  Player* _watching;
+  std::list<Player*> *_watchers;
 public:
   Player(void);
   ~Player(void);

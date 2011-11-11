@@ -49,5 +49,15 @@ public:
   *[in] the callback.
   */
   BOOL AddCallback(const std::string &name, EVENTFUNC callback);
+#ifdef MODULE_SCRIPTING
+  /*
+  *Adds a script event callback.
+  *Param: [in] a pointer to the lua state.
+  *[in] the name of the event.
+  *[in] the name of the callback.
+  *Return: True on success, false on failure.
+  */
+  BOOL AddScriptCallback(lua_State* l, const char* event, const char* func);
+#endif
 };
 #endif
