@@ -24,6 +24,12 @@ public:
 */
 typedef void (*EVENTCB)(EventArgs*,void*);
 typedef boost::function<void (EventArgs*, void*)> EVENTFUNC;
+/*
+*We need to forward declare this so that we don't have circular includes.
+*/
+#ifdef MODULE_SCRIPTING
+struct lua_State;
+#endif
 
 /*
 *This holds our event function object, as well as an ID associated with each event.
@@ -32,6 +38,11 @@ struct EventContainer
 {
   EVENTFUNC cb;
   UINT id;
+#ifdef MODULE_SCRIPTING
+  BOOL script;
+  std::string func;
+  lua_State* state;
+#endif
 };
 
 /*
@@ -41,7 +52,6 @@ struct EventContainer
 void name(EventArgs* args, void* caller)
 #define CEVENT(c, name)\
 void c::name(EventArgs* args,void* caller)
-
 
 /*
 *Main event class.
@@ -62,6 +72,9 @@ public:
   virtual BOOL operator -=(UINT id);
   virtual UINT Add(const EVENTFUNC cb);
   virtual BOOL Remove(UINT id);
+#ifdef MODULE_SCRIPTING
+  virtual UINT AddScriptCallback(lua_State* l, const char* func);
+#endif
   /*
   *Trigger all events in the callback list, passing args.
   *Params: [in] EventArgs specific to this event.

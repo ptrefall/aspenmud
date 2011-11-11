@@ -4,6 +4,10 @@
 #include <vector>
 #include "event.h"
 #include "exception.h"
+#ifdef MODULE_SCRIPTING
+#include "scripts/scripts.h"
+#include "scripts/scr_events.h"
+#endif
 
 Event::Event()
 {
@@ -34,6 +38,10 @@ UINT Event::Add(const EVENTFUNC cb)
   _id++;
   c->id = _id;
   c->cb = cb;
+#ifdef MODULE_SCRIPTING
+  c->script = false;
+  c->state = NULL;
+#endif
   _callbacks->push_back(c);
   return c->id;
 }
@@ -53,6 +61,24 @@ BOOL Event::Remove(UINT id)
 
   return false;
 }
+#ifdef MODULE_SCRIPTING
+UINT Event::AddScriptCallback(lua_State* l, const char* func)
+{
+  EventContainer* c = new EventContainer();
+  if (!c)
+    {
+      return 0;
+    }
+
+  _id++;
+  c->id = _id;
+  c->script = true;
+  c->state = l;
+  c->func = func;
+  _callbacks->push_back(c);
+  return c->id;
+}
+#endif
 
 BOOL Event::operator +=(const EVENTFUNC cb)
 {
@@ -65,13 +91,24 @@ BOOL Event::operator -=(UINT id)
   return true;
 }
 
-void Event::Invoke(EventArgs *args,void*caller)
+void Event::Invoke(EventArgs* args, void* caller)
 {
   std::vector <EventContainer*>::iterator it, itEnd;
 
   itEnd = _callbacks->end();
   for (it = _callbacks->begin(); it != itEnd; ++it)
     {
-      (*it)->cb(args,caller);
+#ifdef MODULE_SCRIPTING
+      if ((*it)->script)
+        {
+          SCR_CallEvent((*it)->state, (*it)->func.c_str(), args, caller);
+        }
+      else
+        {
+#endif
+          (*it)->cb(args,caller);
+#ifdef MODULE_SCRIPTING
+        }
+#endif
     }
 }

@@ -377,10 +377,10 @@ BOOL World::InitializeFiles()
     }
 
   _banner=new char[fs.st_size+1];
-if (!_banner)
-{
-return false;
-}
+  if (!_banner)
+    {
+      return false;
+    }
 
   memset(_banner,0,fs.st_size+1);
 //open and load the banner:
@@ -389,15 +389,15 @@ return false;
     {
       WriteLog("Could not fopen banner file.", CRIT);
       delete []_banner;
-_banner = NULL;
+      _banner = NULL;
       return false;
     }
   if ((int)fread(_banner,1,fs.st_size,banner_fd)!=(int)fs.st_size)
     {
       WriteLog("Error loading banner.", CRIT);
-delete []_banner;
-_banner = NULL;
-fclose(banner_fd);
+      delete []_banner;
+      _banner = NULL;
+      fclose(banner_fd);
       return false;
     }
   fclose(banner_fd);
@@ -407,37 +407,37 @@ fclose(banner_fd);
   if (stat(MOTD_FILE, &fs))
     {
       WriteLog("Could not stat MOTD file.", CRIT);
-delete []_banner;
-_banner = NULL;
+      delete []_banner;
+      _banner = NULL;
       return false;
     }
 
   _motd=new char[fs.st_size+1];
-if (!_motd)
-{
-delete []_banner;
-_banner = NULL;
-return false;
-}
+  if (!_motd)
+    {
+      delete []_banner;
+      _banner = NULL;
+      return false;
+    }
 
   memset(_motd,0,fs.st_size+1);
   FILE* motd_fd=fopen(MOTD_FILE,"r");
   if (!motd_fd)
     {
       WriteLog("Could not fopen MOTD.", CRIT);
-delete [] _banner;
-delete [] _motd;
-_motd = _banner = NULL;
+      delete [] _banner;
+      delete [] _motd;
+      _motd = _banner = NULL;
       return false;
     }
 
   if ((int)fread(_motd,1,fs.st_size,motd_fd)!=(int)fs.st_size)
     {
       WriteLog("Error loading MOTD.", CRIT);
-delete [] _banner;
-delete [] _motd;
-_motd = _banner = NULL;
-fclose(motd_fd);
+      delete [] _banner;
+      delete [] _motd;
+      _motd = _banner = NULL;
+      fclose(motd_fd);
       return false;
     }
   fclose(motd_fd);

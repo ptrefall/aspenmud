@@ -29,15 +29,15 @@ BOOL YesNoHandler::CreateHandler(Socket* sock,  YESNOCB cb, void* arg)
     }
 
   in_data* input = new in_data();
-if (!input)
-{
-return false;
-}
+  if (!input)
+    {
+      return false;
+    }
 
   YesNoHandler* handle = new YesNoHandler(cb, arg);
   if (!handle)
     {
-delete input;
+      delete input;
       return false;
     }
 
@@ -66,15 +66,15 @@ BOOL LineHandler::CreateHandler(Socket* sock,  LINECB cb)
     }
 
   in_data* input = new in_data();
-if (!input)
-{
-return false;
-}
+  if (!input)
+    {
+      return false;
+    }
 
   LineHandler* handle = new LineHandler(cb);
   if (!handle)
     {
-delete input;
+      delete input;
       return false;
     }
 
