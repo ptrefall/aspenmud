@@ -61,6 +61,7 @@ World::World()
   events.RegisterEvent("Shutdown", new Event());
   events.RegisterEvent("Copyover", new Event());
   events.RegisterEvent("ObjectLoaded", new Event());
+  events.RegisterEvent("ObjectDestroyed", new Event());
 }
 World::~World()
 {
@@ -1101,6 +1102,7 @@ BOOL World::RecycleObject(Entity* obj)
         }
     }
 
+  events.CallEvent("ObjectDestroyed", NULL, (void*)obj);
   delete obj;
   return true;
 }

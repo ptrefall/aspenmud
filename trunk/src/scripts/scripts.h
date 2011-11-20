@@ -39,12 +39,13 @@ struct ComponentData
 
 class Script
 {
-  lua_State *state;
+  static lua_State *state;
 public:
   Script();
   ~Script();
+  EVENT(ObjectDestroyed);
   void Execute(Entity* obj, const std::string &code);
-  lua_State* GetState() const;
+  static lua_State* GetState();
 };
 
 class CMDExecute:public Command
@@ -116,6 +117,7 @@ UserData* ObjectToStack(lua_State* l, Entity* obj);
 *Used as a drop-in replacement for print.
 */
 int SCR_Print(lua_State* l);
+std::string SCR_TypeToStr(lua_State* l, int index);
 #endif
 
 BOOL InitializeScript();

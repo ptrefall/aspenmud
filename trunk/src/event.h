@@ -40,8 +40,8 @@ struct EventContainer
   UINT id;
 #ifdef MODULE_SCRIPTING
   BOOL script;
-  std::string func;
-  lua_State* state;
+  int func;
+  Entity* obj;
 #endif
 };
 
@@ -73,7 +73,7 @@ public:
   virtual UINT Add(const EVENTFUNC cb);
   virtual BOOL Remove(UINT id);
 #ifdef MODULE_SCRIPTING
-  virtual UINT AddScriptCallback(lua_State* l, const char* func);
+  virtual UINT AddScriptCallback(Entity* obj, int func);
 #endif
   /*
   *Trigger all events in the callback list, passing args.

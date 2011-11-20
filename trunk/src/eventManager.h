@@ -57,7 +57,7 @@ public:
   *[in] the name of the callback.
   *Return: True on success, false on failure.
   */
-  BOOL AddScriptCallback(lua_State* l, const char* event, const char* func);
+  BOOL AddScriptCallback(Entity* obj, const char* event, int func);
 #endif
 };
 #endif
