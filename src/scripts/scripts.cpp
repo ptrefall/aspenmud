@@ -1,7 +1,7 @@
 #include <string>
 #include <sstream>
-#include <iostream>
 #include <sys/time.h>
+#include <boost/bind.hpp>
 #include "scripts.h"
 #include "scr_world.h"
 #include "scr_player.h"
@@ -16,29 +16,50 @@
 #include "../variant.h"
 
 #ifdef MODULE_SCRIPTING
+lua_State* Script::state;
 Script::Script()
 {
-  state = lua_open();
+  Script::state = lua_open();
+  lua_State* state = Script::GetState();
+  World* world = World::GetPtr();
   luaL_openlibs(state);
 //we create the metatable
   lua_newtable(state); //table is at -1
   lua_pushvalue(state, LUA_GLOBALSINDEX);
   lua_setfield(state, -2, "__index");
   lua_setfield(state, LUA_REGISTRYINDEX, "meta");
+  world->events.AddCallback("ObjectDestroyed", boost::bind(&Script::ObjectDestroyed, this, _1, _2));
 }
 Script::~Script()
 {
+  lua_State* state = Script::GetState();
   lua_close(state);
+}
+
+CEVENT(Script, ObjectDestroyed)
+{
+  lua_State* state = Script::GetState();
+  Entity* obj = (Entity*)caller;
+  lua_pushinteger(state, obj->GetOnum());
+  lua_pushnil(state);
+  lua_settable(state, LUA_REGISTRYINDEX);
 }
 
 void Script::Execute(Entity* obj, const std::string &code)
 {
+  lua_State* state = Script::GetState();
   int ret = 0;
   World* world = World::GetPtr();
 
   if (!luaL_loadbuffer(state, code.c_str(), code.length(), "execution"))   // chunk is at -1
     {
+//we need to create the metatable and store it in the registry:
+      lua_pushinteger(state, obj->GetOnum());
       lua_newtable(state); // create shadow environment table at -1
+      lua_settable(state, LUA_REGISTRYINDEX);
+//now we get the table back again:
+      lua_pushinteger(state, obj->GetOnum());
+      lua_gettable(state, LUA_REGISTRYINDEX);
       ObjectToStack(state, obj);
       lua_setfield(state, -2, "this");
       lua_getfield(state, LUA_REGISTRYINDEX, "meta"); //our metatable is at -1
@@ -54,9 +75,9 @@ void Script::Execute(Entity* obj, const std::string &code)
     }
 }
 
-lua_State* Script::GetState() const
+lua_State* Script::GetState()
 {
-  return state;
+  return Script::state;
 }
 #endif
 
@@ -294,4 +315,32 @@ int SCR_Print(lua_State* l)
   write(fd, data.c_str(), data.length());
   return 0;
 }
+
+std::string SCR_TypeToStr(lua_State* l, int index)
+{
+  switch(lua_type(l, index))
+    {
+    default:
+      return "unknown";
+    case LUA_TNIL:
+      return "nil";
+    case LUA_TNUMBER:
+      return "number";
+    case LUA_TBOOLEAN:
+      return "boolean";
+    case LUA_TSTRING:
+      return "string";
+    case LUA_TTABLE:
+      return "table";
+    case LUA_TFUNCTION:
+      return "function";
+    case LUA_TUSERDATA:
+      return "userdata";
+    case LUA_TTHREAD:
+      return "thread";
+    case LUA_TLIGHTUSERDATA:
+      return "lightuserdata";
+    }
+}
+
 #endif

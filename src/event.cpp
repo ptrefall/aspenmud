@@ -40,7 +40,7 @@ UINT Event::Add(const EVENTFUNC cb)
   c->cb = cb;
 #ifdef MODULE_SCRIPTING
   c->script = false;
-  c->state = NULL;
+  c->obj = NULL;
 #endif
   _callbacks->push_back(c);
   return c->id;
@@ -62,7 +62,7 @@ BOOL Event::Remove(UINT id)
   return false;
 }
 #ifdef MODULE_SCRIPTING
-UINT Event::AddScriptCallback(lua_State* l, const char* func)
+UINT Event::AddScriptCallback(Entity* obj, int func)
 {
   EventContainer* c = new EventContainer();
   if (!c)
@@ -73,7 +73,7 @@ UINT Event::AddScriptCallback(lua_State* l, const char* func)
   _id++;
   c->id = _id;
   c->script = true;
-  c->state = l;
+  c->obj = obj;
   c->func = func;
   _callbacks->push_back(c);
   return c->id;
@@ -101,7 +101,7 @@ void Event::Invoke(EventArgs* args, void* caller)
 #ifdef MODULE_SCRIPTING
       if ((*it)->script)
         {
-          SCR_CallEvent((*it)->state, (*it)->func.c_str(), args, caller);
+          SCR_CallEvent((*it)->obj, (*it)->func, args, caller);
         }
       else
         {

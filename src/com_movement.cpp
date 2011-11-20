@@ -55,7 +55,7 @@ BOOL DoMove(const std::string &verb, Player* mobile,std::vector<std::string> &ar
   room->events.CallEvent("OnExit", NULL, (void*)mobile);
   dest = (Room*)world->GetObject(exit->GetTo());
   mobile->MoveTo(dest);
-  dest->events.CallEvent("OnEnter", NULL, (void*)mobile);
+  dest->events.CallEvent("OnEnter", NULL, (void*)dest);
 
   mobile->Message(MSG_INFO, ((Room*)world->GetObject(exit->GetTo()))->DoLook(mobile));
   return true;

@@ -84,7 +84,7 @@ BOOL EventManager::AddCallback(const std::string &name, EVENTFUNC cb)
   return true;
 }
 #ifdef MODULE_SCRIPTING
-BOOL EventManager::AddScriptCallback(lua_State* l, const char* event, const char* func)
+BOOL EventManager::AddScriptCallback(Entity* obj, const char* event, int func)
 {
   if (!IsEventRegistered(event))
     {
@@ -92,7 +92,7 @@ BOOL EventManager::AddScriptCallback(lua_State* l, const char* event, const char
       return false;
     }
 
-  (_events[event])->AddScriptCallback(l, func);
+  (_events[event])->AddScriptCallback(obj, func);
   return true;
 }
 #endif

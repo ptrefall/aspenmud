@@ -14,6 +14,6 @@ struct EventArgsUserData
 
 BOOL InitEventScript(Script* s);
 int SCR_AddCallback(lua_State* l);
-BOOL SCR_CallEvent(lua_State* l, const char* func, EventArgs* args, void* caller);
+BOOL SCR_CallEvent(Entity* obj, int func, EventArgs* args, void* caller);
 #endif
 #endif
