@@ -7,6 +7,6 @@
 class Npc:public Living
 {
 public:
-  BOOL IsNpc(void);
+  BOOL IsNpc() const;
 };
 #endif

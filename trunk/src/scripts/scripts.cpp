@@ -251,6 +251,20 @@ BOOL IsLiving(lua_State* l, UserData* udata)
 
   return true;
 }
+BOOL IsRoom(lua_State* l, UserData* udata)
+{
+  if (!IsObject(l, udata))
+    {
+      return false;
+    }
+
+  if (!udata->ptr->IsRoom())
+    {
+      return false;
+    }
+
+  return true;
+}
 BOOL IsObject(lua_State* l, UserData* udata)
 {
   if (!udata)

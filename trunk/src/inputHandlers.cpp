@@ -82,3 +82,48 @@ BOOL LineHandler::CreateHandler(Socket* sock,  LINECB cb)
   input->args = (void*)sock;
   return sock->SetInput(input);
 }
+
+TextBlockHandler::TextBlockHandler(TEXTBLOCKCB cb,  std::vector<std::string>* lines, void* arg)
+{
+  _arg = arg;
+  _cb = cb;
+  _lines = lines;
+}
+void TextBlockHandler::Input(void* arg, const std::string &input)
+{
+  if (input == ".")
+    {
+      std::string data = input;
+      _cb((Socket*)arg, _lines, _arg);
+      return;
+    }
+  if (_lines)
+    {
+      _lines->push_back(input);
+    }
+}
+
+BOOL TextBlockHandler::CreateHandler(Socket* sock, TEXTBLOCKCB cb, std::vector<std::string>* lines, void* arg)
+{
+  if (sock == NULL || lines == NULL)
+    {
+      return false;
+    }
+
+  in_data* input = new in_data();
+  if (!input)
+    {
+      return false;
+    }
+
+  TextBlockHandler* handle = new TextBlockHandler(cb, lines, arg);
+  if (!handle)
+    {
+      delete input;
+      return false;
+    }
+
+  input->handle = handle;
+  input->args = (void*)sock;
+  return sock->SetInput(input);
+}

@@ -1,6 +1,7 @@
 /*
 *The main scripts header.
-*Initializes other script components.
+*Initializes other script components, as well as contains utilities
+*that all of the script components can use.
 */
 #ifndef SCRIPTS_H
 #define SCRIPTS_H
@@ -74,35 +75,42 @@ Variant IndexToVariant(lua_State*l, int index);
 /*
 *Converts a given Variant to a value on the stack.
 *Param: [in] the state of which the stack belongs that we will put the variant on.
-*Param: [in] the variant we will push to the stack.
+*the variant we will push to the stack.
 *Return: True on success, false on failure.
 */
 BOOL VariantToStack(lua_State* l, Variant &var);
 /*
 *checks to see if the type of the udata is a player.
 *Param: [in] the lua state for the operation.
-*Param: [in] the UserData object to check.
+*[in] the UserData object to check.
 *Return: True if the object is a player, false otherwise.
 */
 BOOL IsPlayer(lua_State* l, UserData* udata);
 /*
 *Checks to see if the provided object is living.
 *Param: [in] the active lua state.
-*Param: [in] the UserData struct.
+*[in] the UserData struct.
+*Return: True if the object is living, false otherwise.
 */
 BOOL IsLiving(lua_State* l, UserData* udata);
 /*
+*Checks to see if the specified object is a room.
+*Param: [in] the active lua state.
+*[in] the UserData struct.
+*Return: True if the object is a room, false otherwise.
+*/
+BOOL IsRoom(lua_State* l, UserData* udata);
+/*
 *Checks to see if the specified object is of type Entity
-*This is slightly dificult because everything in game that is actually in game is an entity, but we need multiple checks since
-*lua requires us to have a separation.
 *Param: [in] the currently active lua state.
-*Param: [in] The object to check.
+*[in] The object to check.
+*Return: True if the object is a valid entity, false otherwise.
 */
 BOOL IsObject(lua_State* l, UserData* udata);
 /*
 *Checks to see if the user data is a component.
 *Param: [in] the active lua state.
-*Param: [in] a pointer to the user data.
+*[in] a pointer to the user data.
 *Return: True if the object is a component, false otherwise.
 */
 BOOL IsComponent(lua_State* l, UserData* udata);

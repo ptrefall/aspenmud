@@ -472,21 +472,25 @@ std::vector<std::string>* Entity::GetAliases()
   return _aliases;
 }
 
-BOOL Entity::IsNpc()
+BOOL Entity::IsNpc() const
 {
   return false;
 }
-BOOL Entity::IsPlayer()
+BOOL Entity::IsPlayer() const
 {
   return false;
 }
-BOOL Entity::IsLiving()
+BOOL Entity::IsLiving() const
 {
   if (IsPlayer() || IsNpc())
     {
       return true;
     }
 
+  return false;
+}
+BOOL Entity::IsRoom() const
+{
   return false;
 }
 

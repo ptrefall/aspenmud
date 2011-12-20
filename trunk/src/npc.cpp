@@ -1,6 +1,6 @@
 #include "npc.h"
 
-BOOL Npc::IsNpc(void)
+BOOL Npc::IsNpc() const
 {
   return true;
 }

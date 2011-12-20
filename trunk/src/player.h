@@ -50,7 +50,7 @@ public:
   *Checks to see if the object is a player.
   *Return: True
   */
-  BOOL IsPlayer(void);
+  BOOL IsPlayer() const;
 
   /*
   *Functions to load and retrieve player data from their file

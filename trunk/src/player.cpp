@@ -93,7 +93,7 @@ Player::~Player()
   delete _watchers;
 }
 
-BOOL Player::IsPlayer(void)
+BOOL Player::IsPlayer() const
 {
   return true;
 }
