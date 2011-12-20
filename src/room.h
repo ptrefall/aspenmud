@@ -99,6 +99,7 @@ public:
   *Param: [in] the coord structure to copy.
   */
   void SetCoord(point& coord);
+  BOOL IsRoom() const;
 //serialization
   virtual void Serialize(TiXmlElement* root);
   virtual void Deserialize(TiXmlElement* node);

@@ -201,6 +201,11 @@ void Room::SetCoord(point& coord)
   _coord = coord;
 }
 
+BOOL Room::IsRoom() const
+{
+  return true;
+}
+
 void Room::Serialize(TiXmlElement* root)
 {
   TiXmlElement* room = new TiXmlElement("room");

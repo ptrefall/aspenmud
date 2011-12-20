@@ -31,9 +31,7 @@ public:
   *Return: False
   *Note: Should overwrite this for player and NPC objects to return true for each object.
   */
-  virtual BOOL IsNpc(void);
-  virtual BOOL IsPlayer(void);
-
+  BOOL IsLiving() const;
   virtual void Serialize(TiXmlElement* root);
   virtual void Deserialize(TiXmlElement* root);
 };

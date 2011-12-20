@@ -10,6 +10,7 @@
 
 typedef boost::function<void (Socket*, BOOL, void*)> YESNOCB;
 typedef boost::function<void (Socket*, std::string&, void*)> LINECB;
+typedef boost::function<void (Socket*, std::vector<std::string>*, void*)> TEXTBLOCKCB;
 
 class YesNoHandler:public InputHandle
 {
@@ -29,5 +30,20 @@ public:
   LineHandler(LINECB cb, void* arg = NULL);
   void Input(void* arg, const std::string &input);
   static BOOL CreateHandler(Socket* sock, LINECB cb);
+};
+
+/*
+*Our textblock handler, used for receiving large amounts of text, such as a message,
+*multiple lines in an editor, etc.
+*/
+class TextBlockHandler:public InputHandle
+{
+  TEXTBLOCKCB _cb;
+  std::vector<std::string>* _lines;
+  void* _arg;
+public:
+  TextBlockHandler(TEXTBLOCKCB cb,  std::vector<std::string>* lines, void* arg = NULL);
+  void Input(void* arg, const std::string &input);
+  static BOOL CreateHandler(Socket* sock, TEXTBLOCKCB cb, std::vector<std::string>* lines, void* arg = NULL);
 };
 #endif

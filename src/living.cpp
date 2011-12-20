@@ -22,14 +22,9 @@ void Living::Update()
 {
   events.CallEvent("HeartBeat", NULL, (void*)this);
 }
-
-BOOL Living::IsNpc(void)
+BOOL Living::IsLiving() const
 {
-  return false;
-}
-BOOL Living::IsPlayer(void)
-{
-  return false;
+  return true;
 }
 
 void Living::Serialize(TiXmlElement* root)
