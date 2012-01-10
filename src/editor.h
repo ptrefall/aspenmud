@@ -10,6 +10,7 @@
 #include "player.h"
 #include "socket.h"
 #include "event.h"
+#include "inputHandlers.h"
 
 class Editor
 {
@@ -19,7 +20,6 @@ protected:
   int _cursor;
   BOOL _dirty;
   void* _arg;
-  struct in_data *_handler;
 public:
   EventManager events;
   Editor();
@@ -39,11 +39,7 @@ public:
   void SetArg(void* arg);
   void* GetArg() const;
   std::vector<std::string>* GetLines();
-};
-
-class EditorInput:public InputHandle
-{
-public:
   void Input(void* arg, const std::string &input);
+  void TextInput(Socket* sock, std::vector<std::string>* lines, void* args);
 };
 #endif
