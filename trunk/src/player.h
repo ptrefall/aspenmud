@@ -25,8 +25,8 @@ public:
 
 class Player:public Living
 {
-  unsigned char *_password;
-  unsigned char *_tempPassword;
+  std::string _password;
+  std::string _tempPassword;
   int _invalidPassword;
   std::string _title;
   std::string _prompt;

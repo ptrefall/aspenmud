@@ -5,6 +5,8 @@
 #include <sstream>
 #include <list>
 #include <cstring>
+#include <iostream>
+#include <sstream>
 #include <boost/bind.hpp>
 #include <boost/bind/protect.hpp>
 #include "player.h"
@@ -17,10 +19,6 @@
 
 Player::Player()
 {
-  _password =new unsigned char[SHA256_DIGEST_LENGTH+1];
-  _tempPassword = new unsigned char[SHA256_DIGEST_LENGTH+1];
-  memset(_password, 0, SHA256_DIGEST_LENGTH+1);
-  memset(_tempPassword, 0, SHA256_DIGEST_LENGTH+1);
   _invalidPassword=0;
   _prompt=">";
   _title="the brave";
@@ -63,16 +61,6 @@ Player::~Player()
 {
   std::map<std::string, OptionNode*>::iterator oit, oitEnd;
 
-  if (_password)
-    {
-      delete []_password;
-      _password=NULL;
-    }
-  if (_tempPassword)
-    {
-      delete []_tempPassword;
-      _tempPassword = NULL;
-    }
   if (_messages)
     {
       delete _messages;
@@ -101,14 +89,13 @@ BOOL Player::IsPlayer() const
 void Player::Serialize(TiXmlDocument* doc)
 {
   World* world = World::GetPtr();
-
   TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
   doc->LinkEndChild(decl);
   TiXmlElement* root = new TiXmlElement("player");
 
 //password info
   TiXmlElement* password = new TiXmlElement("password");
-  password->SetAttribute("value", (char*)_password);
+  password->SetAttribute("value", _password.c_str());
   password->SetAttribute("invalid", _invalidPassword);
   root->LinkEndChild(password);
 
@@ -175,7 +162,7 @@ void Player::Deserialize(TiXmlElement* root)
       throw(FileLoadException("Error loading file: password element was not found."));
     }
   password = node->ToElement();
-  memcpy(_password, password->Attribute("value"), SHA256_DIGEST_LENGTH);
+  _password = password->Attribute("value");
   password->Attribute("invalid", &_invalidPassword);
 
   node = root->FirstChild("timeinfo");
@@ -229,40 +216,46 @@ void Player::SetSocket(Socket* sock)
 
 std::string Player::GetPassword() const
 {
-  return std::string((char*)_password);
+  return _password;
 }
 void Player::SetPassword(const std::string &s)
 {
-  memset(_password, 0, SHA256_DIGEST_LENGTH+1);
-  SHA256((unsigned char*)s.c_str(), s.length(), _password);
+  std::stringstream st;
+  int i = 0;
+  unsigned char password[SHA256_DIGEST_LENGTH+1];
+  memset(password, 0, SHA256_DIGEST_LENGTH+1);
+  SHA256((unsigned char*)s.c_str(), s.length(), password);
+  for (i = 0; i < SHA256_DIGEST_LENGTH; ++i)
+    {
+      st << std::hex << (int)password[i];
+    }
+  _password = st.str();
 }
 
 std::string Player::GetTempPassword(void) const
 {
-  return std::string((char*)_tempPassword);
+  return _tempPassword;
 }
 void Player::SetTempPassword(const std::string &s)
 {
-  memset(_tempPassword, 0, SHA256_DIGEST_LENGTH+1);
-  SHA256((unsigned char*)s.c_str(), s.length(), _tempPassword);
+  std::stringstream st;
+  int i = 0;
+  unsigned char password[SHA256_DIGEST_LENGTH+1];
+  memset(password, 0, SHA256_DIGEST_LENGTH+1);
+  SHA256((unsigned char*)s.c_str(), s.length(), password);
+  for (i = 0; i < SHA256_DIGEST_LENGTH; ++i)
+    {
+      st << std::hex << (int)password[i];
+    }
+  _tempPassword = st.str();
 }
 void Player::ClearTempPassword(void)
 {
-  memset(_tempPassword, 0, SHA256_DIGEST_LENGTH+1);
+  _tempPassword.clear();
 }
 BOOL Player::ComparePassword(void)
 {
-  int i=0;
-  unsigned char* p;
-  unsigned char* t;
-  BOOL failed = false;
-  for (i = 0, p = _password, t = _tempPassword; i < SHA256_DIGEST_LENGTH; i++, p++, t++)
-    {
-      if (*p==*t)
-        continue;
-      failed = true;
-    }
-  return failed? 0:1;
+  return _password == _tempPassword;
 }
 
 void Player::IncInvalidPassword(void)
