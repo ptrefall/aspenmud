@@ -13,5 +13,6 @@ public:
   static EVENT(Added);
   static COMCREATE(Create);
   static COMINIT(Initialize);
+  static Stats* GetStats(Player* mobile);
 };
 #endif

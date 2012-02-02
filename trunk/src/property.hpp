@@ -1,5 +1,4 @@
-/*
-*A Property tree, used for attaching and storing properties on objects.
+/*A Property tree, used for attaching and storing properties on objects.
 *Wrritten by CPPMan
 */
 #ifndef _PROPERTY_HPP
@@ -10,6 +9,7 @@
 #include "variant.h"
 #include <vector>
 #include <string>
+#include <iostream>
 
 class Property
 {
@@ -50,7 +50,7 @@ public:
   {
     Property *prop = FindProperty(name);
     if (! prop)
-      throw std::runtime_error("Property not found.");
+      throw std::runtime_error("Property not found: Searched for "+name+".");
 
     else
       return prop->Value;
@@ -207,15 +207,15 @@ public:
     Value.Serialize(prop);
     if (Children.size())
       {
-        it= Children.begin();
+        std::cout << "in children if size" << std::endl;
         itEnd = Children.end();
-        for (; it != itEnd; ++it)
+        for (it = Children.begin(); it != itEnd; ++it)
           {
             (*it)->Serialize(prop);
           }
-        root->LinkEndChild(prop);
-
       }
+
+    root->LinkEndChild(prop);
   }
   void Deserialize(TiXmlElement* root, Property* parent = NULL)
   {
