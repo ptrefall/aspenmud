@@ -40,3 +40,13 @@ CEVENT(Stats, Added) //called for new player and player logins.
   Player* mob=(Player*)caller;
   mob->AddComponent(world->CreateComponent("stats"));
 }
+
+Stats* Stats::GetStats(Player* mobile)
+{
+  if (!mobile)
+    {
+      return NULL;
+    }
+
+  return (Stats*)mobile->GetComponent("stats");
+}

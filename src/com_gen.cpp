@@ -9,6 +9,8 @@
 #include "world.h"
 #include "option.h"
 #include "inputHandlers.h"
+#include "property.hpp"
+#include "components/stats.h"
 
 void InitializeGenCommands()
 {
@@ -213,15 +215,16 @@ CMDScore::CMDScore()
 }
 BOOL CMDScore::Execute(const std::string &verb, Player* mobile,std::vector<std::string> &args,int subcmd)
 {
+  Stats* stat = Stats::GetStats(mobile);
   mobile->Write(Capitalize(mobile->GetName())+"\n");
   mobile->Write(Repete("-",80));
   TimeInfo tm(mobile->GetOnlineTime());
   mobile->Write("Online time:\t"+tm.ToString()+"\n");
   std::stringstream st;
   mobile->Write(Repete("-",80));
-  st << "int: " << mobile->variables.GetPropertyRef("stats.int").GetInt() << "wis: " << mobile->variables.GetPropertyRef("stats.wis").GetInt() <<
-     "\nstr: " << mobile->variables.GetPropertyRef("stats.str").GetInt() << " dex: " << mobile->variables.GetPropertyRef("stats.dex").GetInt()
-     << "\nagi: " << mobile->variables.GetPropertyRef("stats.agi").GetInt() << " con: " << mobile->variables.GetPropertyRef("stats.con").GetInt() << "\n";
+  st << "int: " << stat->variables.GetPropertyRef("int").GetInt() << "wis: " << stat->variables.GetPropertyRef("wis").GetInt() <<
+     "\nstr: " << stat->variables.GetPropertyRef("str").GetInt() << " dex: " << stat->variables.GetPropertyRef("dex").GetInt()
+     << "\ndex: " << stat->variables.GetPropertyRef("dex").GetInt() << " con: " << stat->variables.GetPropertyRef("con").GetInt() << "\n";
   mobile->Write(st.str());
   return true;
 }
