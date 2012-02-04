@@ -103,6 +103,8 @@ public:
 //serialization
   virtual void Serialize(TiXmlElement* root);
   virtual void Deserialize(TiXmlElement* node);
+  virtual void ObjectEnter(Entity* obj);
+  virtual void ObjectLeave(Entity* obj);
   EVENT(PostLook);
 };
 #endif

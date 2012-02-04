@@ -9,7 +9,6 @@
 #include "variant.h"
 #include <vector>
 #include <string>
-#include <iostream>
 
 class Property
 {
@@ -207,7 +206,6 @@ public:
     Value.Serialize(prop);
     if (Children.size())
       {
-        std::cout << "in children if size" << std::endl;
         itEnd = Children.end();
         for (it = Children.begin(); it != itEnd; ++it)
           {

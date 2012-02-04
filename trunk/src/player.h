@@ -33,6 +33,7 @@ class Player:public Living
   int _level;
   FLAG _rank;
   FLAG _pflag;
+  FLAG _position;
   time_t _firstLogin;
   time_t _onlineTime;
   time_t _lastLogin;
@@ -65,6 +66,7 @@ public:
   *Getters return the value.
   */
   void SetSocket(Socket* sock);
+  virtual std::string GetShort() const;
   std::string GetPassword(void) const;
   void SetPassword(const std::string &s);
   std::string GetTempPassword(void) const;
