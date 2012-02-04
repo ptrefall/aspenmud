@@ -25,6 +25,7 @@ Player::Player()
   _level=1;
   _rank = RANK_PLAYER;
   _pflag = 0;
+  _position = standing;
   _firstLogin=0;
   _onlineTime=0;
   _lastLogin=0;
@@ -134,6 +135,7 @@ void Player::Serialize(TiXmlDocument* doc)
   root->SetAttribute("level", _level);
   root->SetAttribute("rank", _rank);
   root->SetAttribute("pflag", _pflag);
+  root->SetAttribute("position", _position);
   Living::Serialize(root);
   doc->LinkEndChild(root);
 }
@@ -205,6 +207,7 @@ void Player::Deserialize(TiXmlElement* root)
   _prompt = root->Attribute("prompt");
   root->Attribute("level", &_level);
   root->Attribute("rank", &_rank);
+  root->Attribute("position", &_position);
   root->Attribute("pflag", &_pflag);
   Living::Deserialize(root->FirstChild("living")->ToElement());
 }
@@ -212,6 +215,39 @@ void Player::Deserialize(TiXmlElement* root)
 void Player::SetSocket(Socket* sock)
 {
   _sock = sock;
+}
+std::string Player::GetShort() const
+{
+  std::string ret = GetName() + " " + GetTitle();
+  ret += " ";
+
+  switch(_position)
+    {
+    case unconcious:
+      ret += "lays here, unconcious";
+      break;
+    case sleeping:
+      ret += "is sleeping here.";
+      break;
+    case laying:
+      ret += "lies here.";
+      break;
+    case resting:
+      ret += "rests here.";
+      break;
+    case sitting:
+      ret += "is sitting here.";
+      break;
+    case flying:
+      ret += "hovers in mid air.";
+      break;
+    case standing:
+      ret += "is here.";
+      break;
+    default:
+      break;
+    }
+  return ret;
 }
 
 std::string Player::GetPassword() const
@@ -314,7 +350,11 @@ void Player::EnterGame(BOOL quiet)
 //move the player if it doesn't already have a location
   if (GetLocation()==NULL)
     {
-      SetLocation(world->GetObject(ROOM_START));
+      world->GetObject(ROOM_START)->ObjectEnter(this);;
+    }
+  else
+    {
+      GetLocation()->ObjectEnter(this);
     }
 //if there were password attempts, tell the player.
   if (_invalidPassword)

@@ -19,6 +19,7 @@
 
 class Entity:public ISerializable
 {
+protected:
   std::list <Entity*> _contents;
   std::vector <Component*> *_components;
   std::vector<std::string>* _aliases;

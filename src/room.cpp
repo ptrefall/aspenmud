@@ -253,23 +253,119 @@ void Room::Deserialize(TiXmlElement* room)
   Entity::Deserialize(room->FirstChild("entity")->ToElement());
 }
 
+void Room::ObjectEnter(Entity* obj)
+{
+  if (obj->IsLiving())
+    {
+      _mobiles.push_back((Living*)obj);
+    }
+  else
+    {
+      _contents.push_back(obj);
+    }
+}
+void Room::ObjectLeave(Entity* obj)
+{
+
+  if (obj->IsLiving())
+    {
+      std::list<Living*>::iterator it, itEnd;
+      itEnd = _mobiles.end();
+      for (it = _mobiles.begin(); it != itEnd; ++it)
+        {
+          if ((*it) == obj)
+            {
+              _mobiles.erase(it);
+              break;
+            }
+        }
+      return;
+    }
+  else
+    {
+      std::list<Entity*>::iterator it, itEnd;
+      itEnd = _contents.end();
+      for (it = _contents.begin(); it != itEnd; ++it)
+        {
+          if ((*it) == obj)
+            {
+              _contents.erase(it);
+              break;
+            }
+        }
+    }
+}
+
 //events
 CEVENT(Room, PostLook)
 {
   std::stringstream st;
   LookArgs* largs=(LookArgs*)args;
-  size_t i, count;
-  i = count = 0;
+  size_t i = 0;
+  size_t count = 0;
   std::vector<Exit*> *exits = GetExits();
+//we need to show everything in the room first:
+  if (_mobiles.size() != 1)
+    {
+      std::list<Living*>::iterator it, itEnd;
+      itEnd = _mobiles.end();
 
-  if (!GetExits()->size())
+      for (it = _mobiles.begin(); it != itEnd; ++it)
+        {
+          if ((*it) == largs->_caller)
+            {
+              continue;
+            }
+          largs->_desc += (*it)->GetShort()+"\r\n";
+        }
+    }
+  if (_contents.size())
+    {
+      std::list<Entity*>::iterator it, itEnd;
+      std::map<std::string, int> counts;
+      std::map<std::string, int>::iterator mit, mitEnd;
+      std::stringstream st;
+
+//we need to try to combine the objects. First, we go through the list of everything and see how many of x there are.
+//after that, we can add (x) foobars to the string.
+//this is a slightly slow process...
+      itEnd = _contents.end();
+      for (it = _contents.begin(); it != itEnd; ++it)
+        {
+          if (counts.count((*it)->GetShort()))
+            {
+              counts[(*it)->GetShort()]++;
+            }
+          else
+            {
+              counts[(*it)->GetShort()] = 1;
+            }
+        }
+
+//now we iterate:
+      mitEnd = counts.end();
+      for (mit = counts.begin(); mit != mitEnd; ++mit)
+        {
+          if ((*mit).second > 1)
+            {
+              st << "(" << (*mit).second << ") " << (*mit).first << "\r\n";
+            }
+          else
+            {
+              st << (*mit).first << "\r\n";
+            }
+        }
+      largs->_desc = st.str();
+    }
+
+  if (!exits->size())
     {
       largs->_desc+="You see no obvious exits.";
     }
   else
     {
       st << "Obvious exits: [";
-      count = GetExits()->size();
+      count = exits->size();
       for (i = 0; i < count-1; i++)
         {
           st << exits->at(i)->GetName() << ", ";
