@@ -9,7 +9,6 @@ BOOL InitializeSyslog()
   world->WriteLog("Initializing syslog.");
   world->events.GetEvent("PlayerConnect")->Add(SYSLOG_PlayerConnect);
   world->events.GetEvent("PlayerDisconnect")->Add(SYSLOG_PlayerDisconnect);
-  world->AddChannel(new Channel("syslog","",RANK_ADMIN),false);
 #endif
 
   return true;
