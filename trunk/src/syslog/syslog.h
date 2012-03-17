@@ -9,6 +9,12 @@
 
 BOOL InitializeSyslog(void);
 #ifdef MODULE_SYSLOG
+class SyslogChannel:public Channel
+{
+public:
+  SyslogChannel(const std::string &name,const std::string &alias,const FLAG access);
+  BOOL CanBroadcastWithoutListening(Player* mobile) const;
+};
 EVENT(SYSLOG_PlayerConnect);
 EVENT(SYSLOG_PlayerDisconnect);
 #endif

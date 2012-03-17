@@ -1,5 +1,6 @@
 #include <sstream>
 #include "syslog.h"
+#include "../player.h"
 
 BOOL InitializeSyslog()
 {
@@ -9,12 +10,24 @@ BOOL InitializeSyslog()
   world->WriteLog("Initializing syslog.");
   world->events.GetEvent("PlayerConnect")->Add(SYSLOG_PlayerConnect);
   world->events.GetEvent("PlayerDisconnect")->Add(SYSLOG_PlayerDisconnect);
+  world->AddChannel(new SyslogChannel("syslog","",RANK_ADMIN),false);
 #endif
 
   return true;
 }
 
 #ifdef MODULE_SYSLOG
+SyslogChannel::SyslogChannel(const std::string &name,const std::string &alias,const FLAG access):
+  Channel(name, alias, access)
+{
+}
+
+
+BOOL SyslogChannel::CanBroadcastWithoutListening(Player* mobile) const
+{
+  return true;
+}
+
 EVENT(SYSLOG_PlayerConnect)
 {
   World* world = World::GetPtr();

@@ -45,6 +45,7 @@ struct HistoryNode
 
 class Channel
 {
+protected:
   std::list <HistoryNode*> *_history;
   std::string _name;
   std::string _alias;
@@ -56,36 +57,42 @@ class Channel
   std::string _Patternize(const std::string &message,Player* caller);
 public:
   Channel(const std::string &name,const std::string &alias,const FLAG access);
-  ~Channel(void);
+  virtual ~Channel(void);
 
   /*
   *Getters and setters.
   *Exposes channel properties that are supposed to be visible to other objects.
   *Setters take the value to set, while getters return the value.
   */
-  void SetName(const std::string &name);
-  std::string GetName(void) const;
-  void SetAlias(const std::string &alias);
-  std::string GetAlias(void) const;
-  void SetPattern(const std::string &pattern);
-  std::string GetPattern(void) const;
-  void SetAccess(const FLAG access);
-  FLAG GetAccess(void) const;
-  std::list <HistoryNode*>* GetHistory(void) const;
+  virtual void SetName(const std::string &name);
+  virtual std::string GetName(void) const;
+  virtual void SetAlias(const std::string &alias);
+  virtual std::string GetAlias(void) const;
+  virtual void SetPattern(const std::string &pattern);
+  virtual std::string GetPattern(void) const;
+  virtual void SetAccess(const FLAG access);
+  virtual FLAG GetAccess(void) const;
+  virtual std::list <HistoryNode*>* GetHistory(void) const;
 
   /*
   *Adds and removes a listener from the list.
   *Param: [in] The player to add to the list.
   *[in]: Determines whether or not the players add/remove is announced to the player. useful for logging in or adding mobs to channels.
   */
-  void AddListener(Player* subscriber,BOOL quiet = false);
-  void RemoveListener(Player* subscriber,BOOL quiet = false);
+  virtual void AddListener(Player* subscriber,BOOL quiet = false);
+  virtual void RemoveListener(Player* subscriber,BOOL quiet = false);
+
   /*
   *Checks to see if a listener exists.
   *Param: [in] a pointer to the player
   *Return: True if the specified listener exists, false otherwise.
   */
-  BOOL HasListener(Player* mobile);
+  virtual BOOL HasListener(Player* mobile);
+  /*
+  *Checks to see if a player can broadcast without listening to the channel.
+  *Useful for channels where players events are being logged, etc.
+  */
+  virtual BOOL CanBroadcastWithoutListening(Player* mobile) const;
   /*
   *Sends a message to all those subscribed to the channel.
   *Param: [in] the player doing the broadcast.
@@ -93,7 +100,7 @@ public:
   *[in] Whether or not to check the access rights of the player before broadcasting.
   *Those who don't have the access right of the channel can not broadcast by default.
   */
-  void Broadcast(Player* caller,const std::string &message,BOOL access=true);
+  virtual void Broadcast(Player* caller,const std::string &message,BOOL access=true);
   static EVENT(SubscribeChannels);
   static EVENT(UnsubscribeChannels);
   static EVENT(OptionChanged);
