@@ -350,7 +350,7 @@ void Player::EnterGame(BOOL quiet)
 //move the player if it doesn't already have a location
   if (GetLocation()==NULL)
     {
-      world->GetObject(ROOM_START)->ObjectEnter(this);;
+      MoveTo(world->GetObject(ROOM_START));
     }
   else
     {

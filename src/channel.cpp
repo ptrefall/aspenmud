@@ -291,6 +291,11 @@ BOOL Channel::HasListener(Player* mobile)
   return false;
 }
 
+BOOL Channel::CanBroadcastWithoutListening(Player* mobile) const
+{
+  return false;
+}
+
 void Channel::Broadcast(Player* caller,const std::string &message,BOOL access)
 {
   std::list <Player*>::iterator it, itEnd;
@@ -317,8 +322,11 @@ void Channel::Broadcast(Player* caller,const std::string &message,BOOL access)
     }
   if (!HasListener(caller))
     {
-      caller->Message(MSG_ERROR, "You must be tuned into that channel before you can broadcast on it.");
-      return;
+      if (!CanBroadcastWithoutListening(caller))
+        {
+          caller->Message(MSG_ERROR, "You must be tuned into that channel before you can broadcast on it.");
+          return;
+        }
     }
 
   paternized=_Patternize(message,caller);
